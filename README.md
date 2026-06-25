@@ -121,6 +121,7 @@ python scripts/experiments/recompute_final_summary_from_public_ledger.py --check
 
 También está disponible como notebook en
 `notebooks/08_auditoria_final_ledger.ipynb`.
+La guía de notebooks está en `notebooks/README.md`.
 
 ## Estado y trabajo futuro
 

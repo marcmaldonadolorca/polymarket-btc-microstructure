@@ -1,0 +1,55 @@
+% called by main.tex
+%
+\chapter{Aspectos éticos y limitaciones}
+\label{ch::etica}
+
+Este capítulo recoge las consideraciones éticas que han guiado el trabajo y una revisión
+explícita de sus limitaciones, que delimitan el alcance de cualquier conclusión.
+
+\section{Consideraciones éticas}
+
+El sistema estudia decisiones económicas automatizadas y es especialmente sensible al
+sobreajuste cuando el horizonte de datos es reducido. La actuación responsable es no operar
+con capital real y no convertir un diagnóstico \emph{post-hoc} en una afirmación de
+rentabilidad. La política completa queda congelada para observación prospectiva, sin que los
+días usados para formularla cuenten de nuevo como validación.
+
+En cuanto a los datos, se adopta un marco de confidencialidad, integridad y disponibilidad.
+Una referencia externa retrasada o errónea puede inducir una señal espuria; por ello el
+sistema se entrena solo con sesiones aceptadas, separa datos crudos, características y
+etiquetas, mantiene trazabilidad de los artefactos e inhibe la operativa ante datos
+obsoletos. El trabajo emplea datos públicos de mercado y no datos personales. El corpus
+completo no se distribuye por tamaño; se publican el esquema, un ledger anonimizado de
+acciones y el código de evaluación.
+
+\section{Limitaciones}
+
+\textbf{Selección posterior al bloque.} El especialista base sí estaba congelado y su
+resultado limpio es $+0{,}349$ ticks por acción al coste de referencia. El filtro de
+volatilidad se incorporó después de observar el cambio de régimen; por tanto, su resultado de
+$+1{,}069$ ticks sobre el mismo bloque es exploratorio y necesita fechas posteriores.
+
+\textbf{Soporte temporal.} El conjunto fuera de muestra abarca cinco días. Tres de cinco son
+positivos para la política base y cinco de cinco dentro del subconjunto diagnóstico. Ninguna
+de las dos cifras constituye una validación definitiva.
+
+\textbf{Dependencia y solapamiento.} Las 318 unidades del diagnóstico pertenecen a 156
+mercados, con hasta ocho señales por mercado y horizontes H60 solapados. El
+\emph{bootstrap} por filas subestima esa dependencia. Un remuestreo agrupado por mercado
+amplía el IC90\,\% a $[+0{,}193,+2{,}004]$, pero sigue describiendo un subconjunto elegido
+\emph{post-hoc}. Además, no se ha fijado una regla de exposición simultánea; por ello la suma
+acumulada no es PnL de cartera.
+
+\textbf{Validación \emph{offline}.} La evaluación usa un modelo de ejecución conservador pero
+simplificado. No reconstruye la cola orden por orden ni incorpora rellenos parciales. El
+registro de sombra actual es retrospectivo; falta una ejecución prospectiva de mayor
+fidelidad.
+
+\textbf{Reproducibilidad parcial.} El repositorio permite recalcular las tablas públicas desde
+el ledger anonimizado y probar la lógica compartida. La reproducción integral del
+entrenamiento requiere el corpus privado de gran tamaño y se documenta como limitación, no
+como capacidad publicada.
+
+\textbf{Patrón en U.} Dentro de la baja volatilidad se observa una posible relación en forma de
+U entre volatilidad y resultado. Como se descubrió en los mismos cinco días, se conserva solo
+como hipótesis para trabajo futuro.

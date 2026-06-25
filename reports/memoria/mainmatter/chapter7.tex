@@ -1,0 +1,48 @@
+% called by main.tex
+%
+\chapter{Reproducibilidad}
+\label{ch::reproducibilidad}
+
+\section{Enlace a repositorio GitHub}
+
+El código, los registros de resultados y los artefactos públicos de auditoría se mantienen en
+un repositorio:
+
+\begin{center}
+\url{https://github.com/marcmaldonadolorca/polymarket-btc-microstructure}
+\end{center}
+
+\subsection{Estructura del repositorio}
+
+El repositorio se organiza en los siguientes directorios:
+
+\begin{description}[align=right,labelwidth=2.6cm]
+\item [\texttt{config/}] Umbrales congelados de la política y configuraciones del arco.
+\item [\texttt{docs/}] Documentos canónicos del proceso, renumerados de forma secuencial.
+\item [\texttt{notebooks/}] Cuadernos pedagógicos ejecutados (EDA, particiones, objetivo,
+línea base, latencia, secuencias, corrección del \emph{score} adverso y especialista).
+\item [\texttt{scripts/}] Puntos de entrada reproducibles de cada experimento.
+\item [\texttt{src/}] Paquete con la lógica compartida (datos, características, modelos,
+evaluación), con pruebas automatizadas.
+\item [\texttt{results/}] Tablas de resultados y ledger anonimizado de 754 unidades de acción.
+\item [\texttt{sql/}] Esquema de la consulta base de entrenamiento.
+\item [\texttt{reports/}] Esta memoria (fuente LaTeX).
+\end{description}
+
+\subsection{Cómo reproducir}
+
+El entorno se prepara con un entorno virtual de Python y la instalación de las dependencias
+declaradas. Las pruebas automatizadas verifican la lógica de política y sus guardas. El ledger
+\texttt{results/final\_candidate\_actions\_anonymized.csv} permite recalcular las tablas
+agregadas, los desgloses por régimen y la incertidumbre agrupada sin acceder al corpus
+completo. El script que lo genera queda versionado para mantener trazabilidad, aunque su
+ejecución integral requiere el workspace privado de investigación.
+
+\subsection{Datos no publicados}
+
+El conjunto completo (del orden de 2,6 millones de filas \emph{cross-venue}, más la base de
+captura) no se publica por tamaño. En su lugar se incluyen el esquema SQL, un ledger
+anonimizado suficiente para reproducir las cifras finales y el código del \emph{pipeline}.
+Esto permite una auditoría parcial, no la reproducción bit a bit del entrenamiento. Declarar
+esa frontera de forma explícita es parte de la trazabilidad y reduce la deuda técnica propia de
+estos sistemas~\cite{sculley2015debt}.

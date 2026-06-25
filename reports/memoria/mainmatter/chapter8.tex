@@ -1,0 +1,33 @@
+% called by main.tex
+%
+\chapter{Conclusiones}
+\label{ch::conclusiones}
+
+Este trabajo ha presentado una metodología de captura de datos, validación temporal y control
+de costes para la predicción de corto plazo en mercados de Bitcoin de Polymarket. La
+conclusión central es que una precisión direccional cercana al 90\,\% no garantiza una política
+económica: con una latencia de entrada realista, el coste y la ejecución dominan el resultado.
+
+El aprendizaje profundo aplicado a secuencias y al libro de órdenes aprende representaciones
+útiles, pero no produce una política estable con unas dos semanas de datos. El especialista
+tabular congelado conserva una señal modesta en cinco días intactos fuera de muestra:
+$+0{,}349$ ticks por unidad al coste de referencia, 754 unidades y tres de cinco días
+positivos; bajo el coste completo, el promedio es $-0{,}026$ ticks.
+
+El análisis posterior detecta un cambio de régimen y propone un filtro de baja volatilidad.
+Sobre el mismo bloque, ese subconjunto alcanza $+1{,}069$ ticks y cinco de cinco días
+positivos. Su valor es el de una hipótesis prometedora, no el de una validación confirmatoria:
+la regla se congela después del diagnóstico y queda pendiente de datos futuros.
+
+Las aportaciones del trabajo son cuatro: un sistema de captura y control de calidad
+multifuente; un protocolo temporal que incorpora coste y latencia medidos; evidencia
+cuantitativa de la ruptura entre predicción y ejecución; y una trazabilidad que conserva tanto
+los resultados negativos como la corrección de errores metodológicos. No se afirma
+rentabilidad real ni se presenta un bot listo para desplegar.
+
+\paragraph{Trabajo futuro.} La prioridad es ejecutar prospectivamente la política completa
+sin retocar umbrales, con una sola regla de exposición por mercado y registro de fills. Solo
+después podrá evaluarse el filtro de volatilidad. Con un horizonte de datos sustancialmente
+mayor podrán reevaluarse arquitecturas como el \emph{Temporal Fusion
+Transformer}~\cite{lim2021tft}. La regla que guía el proyecto permanece: la complejidad y
+cualquier afirmación económica deben ganarse su sitio con evidencia verdaderamente nueva.

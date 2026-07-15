@@ -188,6 +188,107 @@ con Bitcoin justifica el bloque de características externas. Es decir, el dise�
 de los apartados siguientes se deriva directamente de lo que muestran los datos, y no de
 elecciones arbitrarias.
 
+\section{Análisis exploratorio de series temporales}
+\label{sec::eda_series}
+
+Antes de modelar, el corpus se somete a un análisis exploratorio formal de series
+temporales. Cada análisis de esta sección responde una pregunta concreta de diseño y
+termina en una decisión; el material es una muestra de 285--300 series
+mercado--contrato del corpus completo (2,3 millones de filas, 1.018 series).
+
+\paragraph{Estacionariedad (ADF/KPSS).} Sobre los niveles del precio medio, el
+contraste ADF solo rechaza la raíz unitaria en el 6,3\% de las series, y el KPSS
+rechaza la estacionariedad en el 99,3\%; sobre las primeras diferencias, el ADF
+rechaza en el 100\% y el KPSS solo en el 12,6\%. Ambos contrastes coinciden: el
+precio medio es integrado de orden uno y los retornos son estacionarios. La decisión
+derivada es modelar siempre sobre diferencias o retornos, nunca sobre niveles
+(Figura~\ref{fig::eda_estacionariedad}).
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.85\textwidth]{figures/fig_eda_estacionariedad.png}
+\caption{Contrastes de estacionariedad ADF y KPSS sobre niveles y primeras
+diferencias del precio medio (muestra de 285 series). El patrón conjunto —raíz
+unitaria en niveles, estacionariedad en diferencias— es consistente en todo el corpus.}
+\label{fig::eda_estacionariedad}
+\end{figure}
+
+\paragraph{Autocorrelación (ACF/PACF).} Los retornos a 2 segundos presentan una
+autocorrelación de primer orden media de $0{,}07$, con cero retardos significativos
+de los diez primeros en la serie mediana: apenas hay estructura lineal explotable en
+el retorno puro. En cambio, los retornos absolutos muestran los diez primeros
+retardos significativos (agrupamiento de volatilidad) y el desequilibrio de
+profundidad del libro es extremadamente persistente (autocorrelación de primer orden
+$0{,}99$). La decisión derivada es doble: las características del modelo deben buscar
+la señal en el estado del libro y en la volatilidad —no en el retorno retardado— y la
+persistencia del desequilibrio valida su uso como característica lenta
+(Figura~\ref{fig::eda_acf}).
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.85\textwidth]{figures/fig_eda_acf.png}
+\caption{Funciones de autocorrelación medias: retornos, retornos absolutos y
+desequilibrio de profundidad. La señal lineal está en el estado del libro, no en el
+retorno retardado.}
+\label{fig::eda_acf}
+\end{figure}
+
+\paragraph{Descomposición STL de la actividad.} La serie agregada de actividad
+(eventos por cubo temporal) se descompone en tendencia, estacionalidad diaria y
+residuo; la componente estacional explica el 19,4\% de la varianza. Existe un ciclo
+diario real pero moderado: la actividad no es reducible a su patrón horario
+(Figura~\ref{fig::eda_stl}).
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.85\textwidth]{figures/fig_eda_stl.png}
+\caption{Descomposición STL de la actividad agregada del corpus. La estacionalidad
+diaria explica el 19,4\% de la varianza.}
+\label{fig::eda_stl}
+\end{figure}
+
+\paragraph{Espectro de Fourier y ciclo intrahora.} El espectro de la actividad
+muestra picos nítidos en los periodos de 24 horas y de 1 hora (230 y 225 veces la
+potencia mediana, respectivamente): el ciclo de vida horario de los mercados
+estudiados imprime su firma en la actividad global. Dentro de la hora, el perfil
+medio no es plano —la razón entre el minuto más y menos activo es $2{,}3$— y el
+minuto más activo es el \textbf{minuto 50}, coherente con la concentración de
+actividad en el tramo final de la vida del contrato que motiva el análisis del riesgo
+terminal del Capítulo~\ref{ch::despliegue} (Figura~\ref{fig::eda_fourier}).
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.85\textwidth]{figures/fig_eda_fourier.png}
+\caption{Espectro de la actividad agregada y perfil intrahora. Picos en 24\,h y 1\,h;
+el minuto 50 es el más activo del ciclo horario.}
+\label{fig::eda_fourier}
+\end{figure}
+
+\paragraph{Calidad por sesión e imputación.} La cobertura mediana de la malla de
+2 segundos es del 100\% y el 99,8\% de las series supera el 99\% de cobertura. Con
+esta densidad, la política de imputación puede ser conservadora: arrastre del último
+valor observado marcando el dato como \texttt{stale}, sin interpolar —interpolar
+inventaría microestructura precisamente donde el modelo la busca—, y exclusión de la
+sesión cuando la cobertura cae por debajo del umbral de calidad
+(Figura~\ref{fig::eda_calidad}).
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.85\textwidth]{figures/fig_eda_calidad.png}
+\caption{Distribución de la cobertura de la malla de 2\,s por serie. La densidad del
+corpus permite una política de imputación conservadora.}
+\label{fig::eda_calidad}
+\end{figure}
+
+\paragraph{Contraste con los hechos estilizados de la literatura.} Los resultados
+anteriores se alinean con los hechos estilizados que Dubach~\cite{dubach2026anatomy}
+documenta sobre el archivo \emph{tick-level} de toda la plataforma: ciclos de
+actividad intradía marcados, retornos sin estructura lineal apreciable pero con
+volatilidad agrupada, y estado del libro persistente. La diferencia es de resolución
+y de alcance: aquel archivo describe la plataforma completa a nivel de evento, y este
+corpus añade las referencias externas sincronizadas y el contrato de latencia que
+permiten pasar de la descripción a la evaluación económica.
+
 \section{Resultados en modelos baseline}
 
 Antes de introducir cualquier modelo complejo conviene establecer una línea base sencilla y
@@ -391,6 +492,68 @@ coste mayor produce un neto menor sobre la misma operación; por eso el resultad
 referencia ($c=0{,}5$) es siempre inferior al optimista ($c=0{,}25$) y superior al de estrés
 ($c=1$).
 
+\subsection{Fe de erratas: el régimen de comisiones de 2026}
+\label{sec::fe_erratas_fees}
+
+Durante la fase final del trabajo se detectó un error en el modelo de costes que
+merece documentarse como corrección metodológica explícita, porque su arreglo cambia
+las conclusiones económicas — en la dirección que las refuerza.
+
+Desde 2026 Polymarket aplica a los mercados de criptomonedas una comisión sobre el
+lado \emph{taker} de la operación, definida en su documentación
+oficial~\cite{polymarket_trading} como
+\begin{equation}
+\text{comisión}(C, p) = C \cdot r \cdot p\,(1-p),
+\label{eq::fee_oficial}
+\end{equation}
+donde $C$ es el número de contratos, $p$ el precio de ejecución y $r=0{,}07$ la tasa
+vigente para cripto. La forma $p\,(1-p)$ hace que la comisión sea máxima en torno a
+$p=0{,}5$ —justo la zona de precios donde opera la mayor parte de este trabajo— y
+decrezca hacia los extremos. La versión implementada originalmente en el código
+elevaba al cuadrado el término $p\,(1-p)$, lo que en torno al precio medio subestima
+el coste real en un factor de aproximadamente ocho: en $p=0{,}5$, la comisión oficial
+es de $1{,}75$ ticks por contrato frente a los $\sim$$0{,}22$ ticks del modelo erróneo.
+% TODO M2: figura de la curva de comisión oficial vs implementada (eq. fee) y
+% distribución del coste de entrada del corpus.
+
+Detectado el error, se corrigió la fórmula en todos los repositorios afectados y se
+re-evaluó la política congelada del especialista —sin reentrenar nada— sobre la misma
+ventana fuera de muestra, reproduciendo primero las cifras publicadas como control de
+integridad (n=754, $+0{,}349$ ticks netos; corte de baja volatilidad n=318,
+$+1{,}069$) y aplicando después la comisión oficial. El resultado se resume en la
+Tabla~\ref{tab::fees_antes_despues}: con el régimen de comisiones de 2026, ningún
+corte \emph{taker} es positivo — ni siquiera en la cota optimista que solo carga la
+comisión de entrada. Las comisiones medias medidas sobre el corpus (1,75 ticks la
+entrada, 1,71 la salida) superan por sí solas el edge bruto de la señal.
+
+\begin{table}[htbp]
+\centering
+\caption{Re-evaluación de la política congelada con la comisión oficial de 2026.
+Ticks netos medios por operación; «solo entrada» es la cota optimista que omite la
+comisión de salida.}
+\label{tab::fees_antes_despues}
+\begin{tabular}{lccc}
+\hline
+Corte & Publicado (fee errónea) & Fee oficial, solo entrada & Fee oficial, ida y vuelta \\
+\hline
+Todos (n=754) & $+0{,}349$ & $-1{,}059$ & $-3{,}304$ \\
+Baja volatilidad (n=318) & $+1{,}069$ & $-0{,}342$ & $-2{,}604$ \\
+\hline
+\end{tabular}
+\end{table}
+
+La lección es estructural, no incidental: el lado \emph{taker} de este mercado no es
+económico para una señal de la magnitud encontrada, y ninguna mejora razonable del
+modelo lo compensa. La misma estructura de comisiones señala la salida: el programa
+de reembolsos al creador de mercado (\emph{maker rebates}) reparte el 20\% del fondo
+de comisiones de cada mercado entre quienes aportan liquidez, con el mismo peso
+$p\,(1-p)$. La consecuencia para el diseño del trabajo es el giro al lado maker que
+articula el Capítulo~\ref{ch::despliegue}: la señal predictiva conserva su valor,
+pero el vehículo económico viable es cobrar el \emph{spread} y el reembolso, no
+pagarlos. Esta corrección quedó registrada públicamente como fe de erratas antes de
+la evaluación prospectiva, con su propio sello de tiempo
+(Capítulo~\ref{ch::reproducibilidad}).
+
 \subsection{Métricas de evaluación}
 
 La elección de métricas es deliberada y responde a las características del problema. Para la
@@ -494,6 +657,90 @@ Top 35\,\% test, coste $1{,}0$ & $+0{,}058$ & $-1{,}491$ \\
 \end{tabular}
 \end{table}
 
+\subsection{Peldaños de la asignatura: baselines clásicos, kNN-DTW y MOMENT}
+\label{sec::escalera}
+
+Para situar al especialista y responder de forma explícita a las técnicas de la
+asignatura de series temporales, se evalúa una escalera de modelos de referencia sobre
+un mismo problema controlado: predecir la dirección del precio medio a horizonte H60
+(60 pasos de 2\,s) en la foto de apertura$-45$\,s de cada mercado, con la misma capa
+económica (comisión taker oficial). El conjunto de evaluación son 906 casos congelados;
+cada modelo produce una señal de signo y se reporta su acierto direccional y su
+resultado bruto en ticks. Conviene subrayar que estos baselines usan un universo más
+amplio que el especialista final —no aplican su filtro estricto de tradabilidad—, de
+modo que la comparación con la cifra sellada del especialista es de contexto, no
+cabeza a cabeza.
+
+Los baselines clásicos se ajustan por serie sobre el tramo pre-señal, sin información
+futura. El \textbf{naive-drift} (signo de la deriva reciente) y el \textbf{ARIMA(1,1,1)}
+son los más informativos; el \textbf{suavizado exponencial de Holt} queda por detrás, y
+el \textbf{kNN con distancia DTW} —biblioteca de mayo, consultas de junio, con
+separación temporal estricta— no supera a la deriva simple. Como demostración de
+forecasting estacional donde tiene sentido, un modelo de Holt-Winters sobre la actividad
+agregada mejora un 2,7\,\% el error del persistente; a horizonte de segundos sobre el
+precio, en cambio, el componente estacional no aporta.
+
+El peldaño fundacional es \textbf{MOMENT-1-small}, evaluado en tres regímenes de
+adaptación crecientes: \emph{zero-shot} (reconstrucción con la cola enmascarada, sin
+entrenar), \emph{linear-probing} (solo la cabeza de predicción, backbone congelado) y
+\emph{fine-tuning completo} (todo el modelo, entrenado en GPU). El entrenamiento usa
+ventanas del propio corpus muestreadas fuera de los casos de evaluación —con un margen
+de exclusión que garantiza que entrenamiento y evaluación no comparten ni un frame— y
+restringidas al mismo régimen de actividad que el corte de evaluación (Sección
+\ref{sec::eda_series}). La Tabla~\ref{tab::escalera} recoge el resultado.
+
+\begin{table}[htbp]
+\centering
+\caption{Escalera de modelos de referencia sobre los 906 casos congelados (H60,
+comisión taker oficial). Acierto direccional y resultado bruto medio en ticks; el neto
+taker es negativo en todos los casos por el régimen de comisiones de 2026.}
+\label{tab::escalera}
+\begin{tabular}{lcc}
+\toprule
+Modelo & Acierto direccional & Bruto (ticks) \\
+\midrule
+ARIMA(1,1,1) & 56,5\,\% & $+0{,}621$ \\
+naive-drift & 53,1\,\% & $+1{,}186$ \\
+Holt (suavizado exponencial) & 48,4\,\% & $+0{,}516$ \\
+\textbf{MOMENT fine-tuning completo} & \textbf{47,3\,\%} & $+0{,}082$ \\
+MOMENT linear-probing & 46,6\,\% & $-0{,}175$ \\
+MOMENT zero-shot & 45,5\,\% & $-0{,}585$ \\
+kNN-DTW & 45,3\,\% & $-0{,}209$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+De esta escalera se extraen dos lecturas. La primera es que la adaptación del
+fundacional \emph{ayuda de forma monótona}: cada régimen mejora al anterior, tanto en
+acierto como en resultado bruto (zero-shot $\to$ linear-probing $\to$ fine-tuning
+completo), lo que confirma que el modelo capta algo de la estructura local al
+especializarse. La segunda, más importante, es que \emph{ni siquiera el fine-tuning
+completo supera a los baselines clásicos}: naive-drift y ARIMA, con una fracción del
+coste computacional, se sitúan claramente por encima. El fundacional de series
+temporales, la herramienta más sofisticada de la escalera, no es aquí la más precisa.
+
+Cabe preguntarse si el fundacional mejoraría con más datos. La
+Figura~\ref{fig::escalado} responde con una curva de escalado: se re-entrena el
+linear-probing sobre subconjuntos crecientes de ventanas (de 2.700 a 40.500) y se evalúa
+cada uno sobre los mismos casos congelados. La curva es esencialmente plana —el acierto
+oscila entre el 44 y el 47\,\% sin tendencia clara al alza— y se mantiene por debajo del
+baseline clásico en todo el rango. La conclusión es que el cuello de botella no es la
+cantidad de datos de entrenamiento ni la capacidad del modelo, sino el régimen de datos:
+a horizonte de 2 segundos, el precio medio de estos mercados apenas contiene estructura
+direccional explotable por encima de la deriva, con independencia de la sofisticación
+del modelo. Es la misma lección que atraviesa el trabajo —predecir es difícil, y donde
+se puede, no basta— reforzada ahora desde el lado del modelado.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.78\textwidth]{figures/fig_moment_scaling.png}
+\caption{Curva de escalado del fine-tuning de MOMENT (linear-probing) frente al número
+de ventanas de entrenamiento, evaluada sobre los 906 casos congelados. Más datos no
+cierran la brecha con la deriva simple: el techo lo marca el régimen de datos, no el
+tamaño de la muestra.}
+\label{fig::escalado}
+\end{figure}
+
 \subsection{Especialista \emph{prestart} H60}
 
 El candidato final es un especialista para la ventana \emph{prestart}: un modelo de
@@ -537,6 +784,53 @@ embargo, la decisión de incorporar este filtro a la política se tomó después
 nuevo bloque. Por esa razón, el resultado filtrado no se considera una segunda validación
 fuera de muestra, sino un análisis \emph{post-hoc} que genera una hipótesis para validación
 prospectiva.
+
+\subsection{Brazos de \emph{gate} pre-registrados: estático, GARCH y clustering de regímenes}
+\label{sec::brazos_gate}
+
+El filtro de volatilidad anterior es una hipótesis \emph{post-hoc}, y como tal no puede
+validarse sobre los mismos días que la inspiraron. Para convertirla en una prueba honesta,
+el pre-registro compromete por adelantado \emph{tres} brazos de \emph{gate} de régimen,
+cada uno con sus parámetros fijados antes de mirar la ventana de evaluación, que se
+evalúan en paralelo sobre la misma selección de señales. Los tres atacan la misma pregunta
+—operar solo cuando el régimen se parece a aquel en el que el modelo fue entrenado— por
+vías de sofisticación creciente.
+
+\paragraph{Brazo estático.} El filtro heredado: operar solo si la volatilidad realizada
+del perpetuo a 5 segundos no supera $0{,}6657$, el percentil 80 de la volatilidad de
+entrenamiento. Es un umbral fijo sobre una única variable; su versión de junio se reporta
+como diagnóstico, nunca como confirmación.
+
+\paragraph{Brazo GARCH.} Un modelo GARCH(1,1) con media constante sobre los retornos
+logarítmicos a un minuto del precio del perpetuo (en puntos básicos), ajustado
+\emph{exclusivamente} con datos hasta el 31 de mayo (13.036 observaciones). El \emph{gate}
+opera cuando la volatilidad condicional a un paso $\hat{\sigma}_t$ no supera $4{,}531$
+puntos básicos, el percentil 80 dentro de muestra. Los parámetros quedaron congelados
+($\mu=0{,}0358$, $\omega=0{,}391$, $\alpha_1=0{,}0908$, $\beta_1=0{,}892$) con su resumen
+SHA-256 en el pre-registro. Frente al brazo estático, el GARCH sustituye un umbral fijo por
+una estimación dinámica de la volatilidad que se actualiza sesión a sesión, pero sin
+reajustar nada tras el corte de mayo.
+
+\paragraph{Brazo de clustering de regímenes.} Un modelo no supervisado (KMeans con
+$k$ elegido por silueta, sobre características causales del tramo pre-apertura
+—volatilidad realizada, volumen, \emph{spread}, actividad y rango— normalizadas de forma
+robusta) entrenado solo con datos anteriores a julio. La solución retenida es $k=2$
+(silueta $0{,}31$): un régimen «tranquilo» (volatilidad $\approx 5{,}8$ bps) y otro
+«agitado» ($\approx 13{,}0$ bps, con más \emph{spread} y volumen). A diferencia de los dos
+anteriores, no impone un umbral sobre una variable elegida a mano, sino que deja que los
+datos definan los regímenes; su artefacto se sella como adenda del pre-registro antes del
+primer corte prospectivo. Un hallazgo del cruce con la vía maker matiza su interpretación:
+el régimen agitado, que perjudica al lado taker, resulta \emph{más} rentable para el maker
+—el mismo flujo que estorbaba a uno alimenta al otro—, lo que lo señala como candidato a
+\emph{gate} de la política maker, no solo de la taker.
+
+\paragraph{Capas de reporte.} Sobre la selección de cada brazo se reportan, declaradas por
+adelantado, las capas de la Sección~\ref{sec::fe_erratas_fees}: la comparabilidad histórica
+(net@0,5), la capa \emph{taker} con la comisión oficial de 2026 —cuya expectativa negativa
+se compromete antes de mirar los datos— y la capa \emph{maker} simulada, cuando el
+simulador de colas y fills la produzca. La combinación de tres brazos pre-comprometidos y
+tres capas publicadas en su totalidad es lo que impide que la elección \emph{a posteriori}
+del mejor resultado infle las conclusiones.
 
 \subsection{Protocolo de congelación}
 \label{sec:congelacion}

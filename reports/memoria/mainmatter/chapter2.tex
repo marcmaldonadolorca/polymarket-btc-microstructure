@@ -3,14 +3,16 @@
 \chapter{Estado de la cuestión}
 \label{ch::estado}
 
-Este capítulo sitúa el trabajo en la literatura. Se organiza en cinco áreas que confluyen
-en el problema —mercados de predicción, aprendizaje profundo sobre libros de órdenes,
-microestructura y ejecución, validación temporal en finanzas, y cambio de
-distribución— y termina señalando el hueco concreto que este trabajo pretende cubrir.
+Este capítulo sitúa el trabajo en la literatura. Se organiza en las áreas que confluyen
+en el problema —mercados de predicción y el estudio académico reciente de Polymarket,
+aprendizaje profundo sobre libros de órdenes, modelos fundacionales y auto-supervisados
+de series temporales, microestructura y ejecución, validación temporal en finanzas, y
+cambio de distribución— y termina señalando el hueco concreto que este trabajo pretende
+cubrir.
 
 \section{Trabajos previos y estudios relevantes}
 
-Esta sección recorre la literatura relevante para el problema, organizada en cinco bloques
+Esta sección recorre la literatura relevante para el problema, organizada en bloques
 temáticos. En cada bloque se resume qué proponen los trabajos de referencia y qué se toma
 de ellos para este trabajo. La predicción del movimiento de precios a partir de la
 microestructura es un campo activo, con propuestas asentadas tanto para mercados
@@ -32,6 +34,50 @@ basados en creadores de mercado automáticos (que fijan el precio mediante una f
 Polymarket emplea un libro de órdenes, lo que hace aplicable el instrumental clásico de la
 microestructura y justifica el enfoque de este trabajo.
 
+\subsection{Polymarket como objeto de estudio académico}
+
+Hasta 2025, Polymarket apenas contaba con literatura académica propia; en la primera
+mitad de 2026 han aparecido cinco estudios que lo convierten en objeto de análisis
+directo, y que delimitan con precisión el hueco que ocupa este trabajo.
+% TODO M2: figura de línea temporal de esta literatura (feb-jun 2026).
+
+Dubach~\cite{dubach2026anatomy} construye un archivo \emph{tick-level} del canal
+público del libro de órdenes (30~mil millones de eventos a lo largo de 52 días) y
+extrae de él ocho hechos estilizados de la microestructura de Polymarket:
+concentración de la actividad en pocos mercados, \emph{spreads} dependientes del
+nivel de precio, actividad de cancelación dominante y ciclos intradía marcados,
+entre otros. Es el trabajo más cercano al presente en objeto y escala temporal, y
+sirve aquí como referencia de contraste para el análisis exploratorio del
+Capítulo~\ref{ch::metodos}: los hechos estilizados que aquel archivo documenta
+sobre el conjunto de la plataforma se comparan con lo observado en el corpus propio
+de mercados horarios de Bitcoin. Tsang y Yang~\cite{tsang2026election} analizan el
+mercado de la elección presidencial estadounidense de 2024 con datos de la cadena
+Polygon y un marco contable a nivel de transacción, incluyendo la detección de
+\emph{wash trading}; su interés es forense y agregado, no operativo. Cheng, Yang y
+Zou~\cite{cheng2026arbitrage} buscan oportunidades de arbitraje en los mercados de
+baloncesto y encuentran que las anomalías de mercado único son rarísimas y de vida
+mediana de pocos segundos — una advertencia empírica directa contra las estrategias
+\emph{taker} de latencia que este trabajo confirma por otra vía.
+Nechepurenko~\cite{nechepurenko2026nonretail} estudia la composición del flujo
+ejecutado y muestra que la liquidez de Polymarket descansa en niveles de
+participantes no minoristas con firmas de microestructura diferenciadas; para este
+trabajo, ese resultado describe al adversario contra el que compite cualquier
+política \emph{maker}. Por último, Qin y Yang~\cite{qin2026polymarketv1} publican la
+base Polymarket-v1, el archivo on-chain completo de la primera generación del
+protocolo (1,2~mil millones de operaciones entre 2022 y 2026), orientada a la
+historia larga de operaciones liquidadas.
+
+La posición de este trabajo frente a esa literatura se resume en dos diferencias.
+La primera es el dato: los archivos citados capturan operaciones on-chain o el canal
+público de eventos, mientras que el corpus propio sincroniza el libro L2 completo a
+malla fija de 2 segundos con referencias externas simultáneas (\emph{spot},
+perpetuos y oráculo) y con un contrato de latencia medido sobre el ciclo real de
+órdenes — es decir, contiene exactamente la información que hace falta para simular
+ejecución, no solo para describir actividad. La segunda es la pregunta: ninguno de
+los cinco estudios evalúa económicamente una política de negociación congelada bajo
+coste, latencia y régimen de comisiones medidos, ni valida prospectivamente sus
+resultados; ese es el terreno de este trabajo.
+
 \subsection{Aprendizaje profundo sobre libros de órdenes}
 
 La predicción del movimiento de precios a partir del libro de órdenes es un problema con
@@ -46,7 +92,12 @@ recurrentes para detectar cambios de precio en el libro. Sirignano y
 Cont~\cite{sirignano2019universal} aportan evidencia de la existencia de características
 universales en la formación de precios que el aprendizaje profundo es capaz de capturar, y
 Jha et al.~\cite{jha2020digital} trasladan estas ideas al terreno de los criptoactivos,
-mostrando que el enfoque no es exclusivo de los mercados tradicionales.
+mostrando que el enfoque no es exclusivo de los mercados tradicionales. La línea sigue
+activa: TLOB~\cite{berti2025tlob} sustituye el par convolucional-recurrente por un
+transformador con doble atención (espacial sobre los niveles del libro y temporal sobre
+la secuencia) y documenta, además, que el rendimiento de todos estos modelos se degrada
+al acercarse a condiciones de mercado realistas — observación que anticipa el resultado
+central de este trabajo.
 
 De esta literatura este trabajo adopta una decisión de diseño —tratar el libro de órdenes
 como un objeto con estructura espacio-temporal, y no como una tabla plana— y, sobre ella,
@@ -56,6 +107,46 @@ habitual en estos trabajos. El segundo es de dominio: aplicar el enfoque a un me
 predicción sobre Bitcoin —y no a un mercado de acciones—, lo que obliga a combinar el libro
 con referencias externas. Esa doble diferencia es, precisamente, donde este trabajo pone el
 acento.
+
+\subsection{Modelos fundacionales de series temporales y aprendizaje auto-supervisado}
+
+Una segunda corriente reciente propone trasladar a las series temporales la receta de
+los grandes modelos de lenguaje: pre-entrenar un modelo genérico sobre colecciones
+masivas y heterogéneas de series y aplicarlo después a tareas nuevas sin entrenamiento
+(\emph{zero-shot}) o con una adaptación ligera (\emph{fine-tuning}).
+MOMENT~\cite{goswami2024moment} es el representante que este trabajo adopta como
+peldaño de su escalera de modelos: una familia abierta de transformadores
+pre-entrenados por reconstrucción enmascarada, con variantes que caben en hardware
+modesto. En la misma familia, Chronos~\cite{ansari2024chronos} discretiza los valores
+de la serie y los trata literalmente como \emph{tokens} de un modelo de lenguaje;
+TimesFM~\cite{das2024timesfm} es el fundacional de predicción de Google entrenado
+sobre cientos de miles de millones de puntos reales, y la línea
+Moirai~\cite{liu2025moirai2} —ya en su segunda versión, con predicción cuantílica—
+representa el estado del arte de los fundacionales universales de predicción. Fuera de
+las series, TabPFN~\cite{hollmann2025tabpfn} lleva la misma idea al dato tabular:
+una red pre-entrenada sobre el prior de millones de conjuntos sintéticos que
+clasifica conjuntos pequeños por inferencia en contexto, sin entrenar. Su inclusión
+en la escalera de este trabajo permite formular la pregunta simétrica —¿qué aporta
+un fundacional \emph{del tipo de dato que ganó} (tabular), y no solo del tipo de
+dato aparente (serie temporal)?— cuyos resultados se presentan en el
+Capítulo~\ref{ch::resultados}.
+
+El pre-entrenamiento auto-supervisado es el mecanismo que sostiene a estos modelos y
+una línea propia de literatura. Las estrategias dominantes son la reconstrucción de
+tramos enmascarados —SimMTM~\cite{dong2023simmtm} la formula como suma ponderada de
+series vecinas fuera de la variedad de la serie original—, el contraste jerárquico
+entre vistas aumentadas —TS2Vec~\cite{yue2022ts2vec}, generalizado por
+SoftCLT~\cite{lee2024softclt} con asignaciones blandas que respetan la cercanía
+temporal— y los objetivos híbridos: TimeSiam~\cite{dong2024timesiam} empareja
+subseries pasadas y presentes con codificadores siameses, y
+TimeDART~\cite{wang2025timedart} combina difusión y auto-regresión para capturar a la
+vez la dinámica global y los patrones locales. Para este trabajo, esta literatura
+cumple dos papeles: motiva el peldaño auto-supervisado de la escalera (un codificador
+convolucional-temporal pre-entrenado por reconstrucción sobre el propio corpus) y
+aporta la advertencia, repetida en sus propias evaluaciones, de que la ventaja del
+pre-entrenamiento depende críticamente del volumen y de la afinidad de dominio de los
+datos — condición que un mercado joven, con semanas de historia, no cumple de partida.
+% TODO M2: figura-mapa de la familia de modelos (fundacionales vs SSL vs especialista).
 
 \subsection{Microestructura, costes de ejecución y latencia}
 
@@ -99,6 +190,33 @@ con ventana móvil—, cuyos resultados se detallan en el Capítulo~\ref{ch::res
 último, en cuanto a arquitecturas profundas para series temporales multivariantes, trabajos
 como el \emph{Temporal Fusion Transformer}~\cite{lim2021tft} marcan una línea de evolución
 natural para cuando se disponga de muchos más datos.
+
+\subsection{Rigor de validación: pre-registro y control del sesgo de selección}
+
+Las referencias de validación temporal citadas más arriba comparten un diagnóstico: el
+riesgo dominante en la investigación financiera empírica no es el error del modelo,
+sino el del investigador que prueba muchas variantes y reporta la mejor. Harvey, Liu y
+Zhu~\cite{harvey2016cross} cuantifican el problema en la literatura de factores —la
+mayoría de los resultados publicados no sobreviviría umbrales de contraste múltiple— y
+Bailey y López de Prado~\cite{bailey2014deflated} ofrecen la corrección
+correspondiente para estrategias de negociación, la ratio de Sharpe deflactada, que
+penaliza explícitamente el número de ensayos. Ambas líneas atacan el sesgo
+\emph{a posteriori}, corrigiendo la métrica una vez cometido el pecado.
+
+La respuesta \emph{a priori} es el pre-registro: comprometer hipótesis, protocolo y
+criterios de éxito antes de observar los datos de evaluación, práctica hoy estándar en
+las ciencias experimentales~\cite{nosek2018preregistration}. Su punto débil clásico es
+la verificabilidad — nada impide redactar el «pre»-registro después. Este trabajo lo
+resuelve con un sello criptográfico de tiempo: el documento de pre-registro y la
+política congelada se atestan con OpenTimestamps~\cite{opentimestamps} sobre la cadena
+de Bitcoin, de modo que cualquier lector puede verificar que el compromiso es anterior
+a los datos de la ventana de evaluación, sin confiar en el autor ni en un tercero. La
+combinación —candidato congelado con hashes verificables, ventana de evaluación
+prospectiva intocada hasta un corte fijado de antemano, y reporte de todos los brazos
+comprometidos, favorables o no— es, hasta donde alcanza la revisión de este capítulo,
+inédita en la literatura de mercados de predicción, y constituye la aportación
+metodológica central del trabajo (el protocolo se detalla en el
+Capítulo~\ref{ch::metodos}).
 
 \section{Limitaciones en la literatura}
 

@@ -57,7 +57,9 @@ def outcome_sign(label):
 
 
 def fee_one_share(price, fee_rate_bps):
-    return price * (fee_rate_bps / 10_000.0) * (price * (1.0 - price)) ** 2
+    # Fórmula oficial Polymarket (docs.polymarket.com/trading/fees): fee = C·rate·p·(1−p).
+    # La fórmula anterior p·rate·(p(1−p))² subestimaba la fee real ~8x en p≈0.5.
+    return (fee_rate_bps / 10_000.0) * price * (1.0 - price)
 
 
 def safe_return_bps(now, prev):

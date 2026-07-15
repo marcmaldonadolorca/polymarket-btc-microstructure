@@ -155,6 +155,52 @@ se denominan \emph{unidades de acción}, no operaciones independientes, y la sum
 incorpora una regla de exposición máxima. Una futura sombra prospectiva deberá decidir si
 permite apilar posiciones o admite una sola posición por mercado.
 
+\subsection{Resultados con la comisión oficial de 2026 (capa taker-real)}
+\label{sec::taker_real}
+
+La corrección del modelo de costes (Sección~\ref{sec::fe_erratas_fees}) obliga a
+re-evaluar la política congelada con la comisión oficial de 2026. La operación se hizo sin
+reentrenar nada: los mismos artefactos sellados, la misma selección de acciones, y como
+control de integridad se reprodujeron primero las cifras publicadas (la política
+\texttt{ev>0{,}75, healthy\(\ge\)0{,}5} da $n=754$ y $+0{,}349$ ticks netos al coste de
+referencia; el corte de baja volatilidad, $n=318$ y $+1{,}069$). Después se aplicó la
+comisión real. La Tabla~\ref{tab::taker_real} resume el resultado.
+
+\begin{table}[htbp]
+\centering
+\caption{Política congelada re-evaluada con la comisión oficial de 2026. Ticks netos
+medios por acción; «solo entrada» es la cota optimista que omite la comisión de salida,
+«ida y vuelta» carga ambas. Las comisiones medias medidas son de 1,75 ticks a la entrada
+y 1,71 a la salida.}
+\label{tab::taker_real}
+\begin{tabular}{lccc}
+\toprule
+Corte & Publicado (fee errónea) & Fee oficial, solo entrada & Fee oficial, ida y vuelta \\
+\midrule
+Todas las acciones ($n=754$) & $+0{,}349$ & $-1{,}059$ & $-3{,}304$ \\
+Baja volatilidad ($n=318$) & $+1{,}069$ & $-0{,}342$ & $-2{,}604$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+El resultado es inequívoco: \emph{ningún corte taker es positivo} bajo el régimen de
+comisiones vigente, ni siquiera en la cota optimista que solo carga la comisión de
+entrada. La comisión media de entrada (1,75 ticks) supera por sí sola el resultado bruto
+de la señal. Este número negativo no es un fracaso del trabajo, sino su lección central
+confirmada estructuralmente: una precisión direccional cercana al 90\,\% —demostrada en
+los capítulos anteriores— no se traduce en beneficio cuando el coste de ejecución la
+domina. «Acertar no es ganar» deja de ser una advertencia metodológica y pasa a ser una
+consecuencia medida del régimen de comisiones. La política congelada se reporta, por
+tanto, tal cual: negativa en la capa taker, lo que motiva el giro al lado maker del
+Capítulo~\ref{ch::despliegue} y no una búsqueda de umbrales que la rescaten.
+
+\subsection{Validación prospectiva pre-registrada}
+
+\emph{[Esqueleto M0 — sección nueva (plan 2026-07-10, §2, cap.~4): resultados del corte
+prospectivo nº~1 (agosto) y nº~2 (pre-entrega) de la política congelada y sellada, con los
+tres brazos de gate y las dos capas de reporte, en tres niveles de evidencia declarados:
+confirmatorio, pre-registrado y exploratorio.]}
+
 \section{Comparativa con otros enfoques y baseline}
 
 Esta sección sitúa el resultado limpio del especialista frente a las alternativas evaluadas:
@@ -186,3 +232,86 @@ Ninguna alternativa produjo evidencia prospectiva robusta con tan pocos días. E
 negativo sigue siendo informativo, pero no permite declarar vencedor al filtro simple sobre
 el mismo bloque usado para proponerlo. La comparación definitiva queda aplazada hasta disponer
 de nuevos datos bajo una política ya congelada.
+
+\subsection{Diagnóstico del fallo fuera de muestra: \emph{deep ensembles} y drift}
+\label{sec::n3_diagnostico}
+
+La debilidad conocida de la pieza sellada es la cabeza de salud (\emph{healthy}): su
+capacidad de discriminación cae del entrenamiento a la validación de forma acusada
+(AUC $0{,}79 \to 0{,}56$). Conviene explicar \emph{por qué}, porque la causa determina si
+un reentrenamiento con más datos tiene techo. Se descompone la incertidumbre con un
+\emph{deep ensemble}: diez réplicas de la misma cabeza entrenadas con semillas distintas,
+midiendo tanto su rendimiento por partición como su desacuerdo mutuo
+(Figura~\ref{fig::n3}).
+
+El diagnóstico es inequívoco en tres puntos. Primero, la caída fuera de muestra es
+\emph{estable entre semillas} —la desviación del AUC entre réplicas es de apenas
+$\pm0{,}005$—, de modo que no es un artefacto de suerte en la inicialización: todas las
+réplicas coinciden en que la cabeza falla en junio. Segundo, el desacuerdo entre réplicas
+es \emph{prácticamente constante} entre entrenamiento y test ($\approx0{,}03$ en ambos):
+la incertidumbre epistémica no aumenta fuera de muestra, así que las réplicas no
+extrapolan de forma dispersa, sino que convergen con confianza a una función que
+simplemente no separa las clases en junio; promediarlas apenas mueve el AUC ($0{,}544 \to
+0{,}547$), lo que descarta que el problema sea de varianza. Tercero, un clasificador de
+dominio entrenado para distinguir mayo de junio a partir de las mismas características lo
+consigue con AUC $0{,}90$: las distribuciones de entrada se desplazan de forma marcada
+entre los dos periodos, encabezadas por la base del perpetuo (\emph{perp\_basis}) y la
+estructura de diferencias al contado--perpetuo.
+
+La conclusión es que el fallo de la cabeza de salud no es ruido irreducible ni un problema
+de capacidad del modelo, sino \emph{concept drift} inducido por un cambio de régimen en
+las variables externas de Bitcoin. Esto tiene una consecuencia práctica directa para la
+iteración v2: reentrenar con dos o tres veces más datos del mismo periodo tiene techo,
+porque el obstáculo no es el tamaño de la muestra sino la cobertura del régimen; solo
+datos que abarquen el régimen de junio mejorarían la generalización. Es la misma lección
+que ya apuntaba el fracaso de las técnicas de adaptación de dominio: contra un cambio de
+régimen con pocos días, restringir la operativa al régimen conocido es más honesto que
+pretender corregirlo.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{figures/fig_n3_ensemble_healthy.png}
+\caption{Diagnóstico del fallo fuera de muestra de la cabeza de salud. Izquierda: el AUC
+se desploma de entrenamiento a test con una dispersión mínima entre las diez réplicas
+(barras de error) y un desacuerdo entre réplicas plano (línea naranja) —el fallo es
+estable y no es epistémico. Derecha: un clasificador de dominio separa mayo de junio con
+AUC $0{,}90$, señal de un fuerte desplazamiento de covariables encabezado por la base del
+perpetuo.}
+\label{fig::n3}
+\end{figure}
+
+\subsection{Curva de escalado de datos: tabular frente a aprendizaje profundo}
+\label{sec::escalado_tab_deep}
+
+La conclusión anterior —el tabular sencillo bate a la red profunda con pocos datos— invita
+a una objeción natural: ¿no ganaría la vía profunda con más datos, dada su mayor capacidad?
+Se responde empíricamente con una curva de escalado que enfrenta a ambas vías sobre la
+\emph{misma} tarea y evaluación. Se predice la dirección del tramo H60 en los 906 casos
+congelados a partir de ventanas de contexto régimen-ajustadas y sin fuga; la vía profunda
+es el fine-tuning de MOMENT (Sección~\ref{sec::escalera}) y la tabular un \emph{gradient
+boosting} sobre características clásicas derivadas de la misma ventana (retornos a varios
+rezagos, momentum, volatilidad realizada y distancia a $0{,}5$). Ambas se entrenan sobre
+subconjuntos crecientes del mismo corpus —de 3.000 a algo más de 41.000 ventanas— y se
+evalúan sobre los mismos casos (Figura~\ref{fig::escalado_tab_deep}).
+
+El resultado es inequívoco: la vía tabular domina a la profunda \emph{en todo el rango de
+datos}. Con el corpus mínimo, la tabular acierta un 48,2\,\% frente al 46,0\,\% de
+MOMENT; con el corpus completo, la tabular sube hasta el 50,3\,\% mientras que la
+profunda se estanca en torno al 46,8\,\%. Es decir, la vía tabular no solo parte de un
+nivel más alto, sino que además escala al menos tan bien: la brecha no se cierra al añadir
+datos, se ensancha. La objeción queda respondida en negativo —al menos en este régimen de
+tamaño de corpus— y refuerza la elección del modelo tabular como vehículo de la señal. La
+lección para el proyecto es coherente con el resto del trabajo: la complejidad del modelo
+no es el cuello de botella, de modo que no compra rendimiento; con dos semanas de datos, la
+capacidad de una red profunda es una desventaja, no una ventaja.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.72\textwidth]{figures/fig_scaling_tab_vs_deep.png}
+\caption{Curva de escalado sobre la misma tarea (dirección H60, 906 casos congelados): la
+vía tabular (\emph{gradient boosting}) supera a la profunda (MOMENT) en todo el presupuesto
+de datos, y la distancia se mantiene o crece al aumentar el número de ventanas de
+entrenamiento. Con este horizonte de datos, más muestras no hacen que el aprendizaje
+profundo alcance al tabular.}
+\label{fig::escalado_tab_deep}
+\end{figure}

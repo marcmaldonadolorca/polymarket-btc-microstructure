@@ -1,51 +1,6 @@
 % Anexos (cargado por main.tex tras \appendix)
 
-\chapter{Glosario de términos}
-\label{anexo:glosario}
-
-Glosario pensado para el lector no familiarizado con las criptomonedas ni con la
-microestructura de mercado. Recoge los términos empleados a lo largo de la memoria.
-
-\begin{description}[align=left, leftmargin=3.2cm, labelwidth=3cm, font=\bfseries]
-\item[Mercado de predicción] Mercado en el que se negocian contratos cuyo valor depende del
-resultado de un acontecimiento futuro.
-\item[Contrato binario] Contrato que paga una unidad si el suceso ocurre y cero si no; su
-precio toma valores entre 0 y 1 y se interpreta como probabilidad.
-\item[Polymarket] Plataforma de mercados de predicción descentralizada, con emparejamiento
-fuera de cadena y liquidación en cadena.
-\item[Libro de órdenes (LOB)] Lista, ordenada por precio, de las órdenes de compra y venta
-pendientes de ejecución.
-\item[Bid / Ask] Mejor precio de compra (\emph{bid}) y mejor precio de venta (\emph{ask}).
-\item[Spread] Diferencia entre \emph{ask} y \emph{bid}; primer coste de cruzar el mercado.
-\item[Profundidad] Volumen disponible en cada nivel de precio del libro.
-\item[Precio medio (\emph{mid})] Punto medio entre \emph{bid} y \emph{ask}.
-\item[Tick] Variación mínima de precio del mercado; unidad de medida de los resultados.
-\item[Microestructura] Estudio de cómo se forman los precios a partir de órdenes, \emph{spread},
-profundidad y flujo, a escalas de tiempo muy finas.
-\item[Markout] Movimiento del precio desde el instante de ejecución a lo largo de un horizonte;
-sirve para medir si una operación fue buena.
-\item[Latencia] Retardo entre observar la oportunidad y ejecutar la orden.
-\item[Spot / Perpetuo] Mercado de Bitcoin al contado (\emph{spot}) y de futuros sin vencimiento
-(\emph{perpetual futures}); referencias externas del contrato.
-\item[Oráculo de precios] Fuente externa que aporta el precio de referencia de Bitcoin.
-\item[Volatilidad realizada] Medida de cuánto se ha movido el precio recientemente.
-\item[Ventana \emph{prestart}] Intervalo inmediatamente anterior a la apertura del mercado.
-\item[Validación temporal] Partición de los datos respetando el orden del tiempo (entrenar con
-el pasado, evaluar con el futuro).
-\item[Fuera de muestra (OOS)] Datos no usados ni para entrenar ni para seleccionar.
-\item[Fuera de pliegue (OOF)] Protocolo en el que las predicciones que consume una segunda etapa
-proceden siempre de un modelo que no las entrenó.
-\item[Fuga temporal] Filtración de información del futuro hacia el entrenamiento o las
-características; principal fuente de resultados ilusorios.
-\item[Congelación] Fijar el modelo y los umbrales antes de observar el conjunto fuera de muestra.
-\item[Drawdown] Mayor caída acumulada desde un máximo previo.
-\item[\emph{Bootstrap}] Remuestreo con reemplazo para estimar la incertidumbre de un resultado.
-\item[Registro de sombra] Contabilidad de lo que la política habría indicado sin arriesgar
-capital. Puede ser retrospectivo (replay \emph{offline}) o prospectivo; solo el segundo aporta
-nuevos días de validación.
-\item[Gradient boosting] Familia de modelos que suma muchos árboles de decisión, cada uno
-corrigiendo los errores del anterior.
-\end{description}
+% Glosario movido a frontmatter/8_glossary.tex (2026-07-10, punto 1 de la tutora).
 
 \chapter{Conjunto de características}
 \label{anexo:features}
@@ -110,3 +65,105 @@ El especialista base congelado opera con dos umbrales: valor esperado predicho s
 muestra se propone una política futura que exige, además, volatilidad realizada a 5 segundos
 no superior a 0,6657 (percentil 80 del entrenamiento). La incertidumbre exploratoria se
 estima con 5\,000 remuestreos y semilla fija, tanto por filas como agrupando por mercado.
+
+\chapter{Pre-registro v2 y verificación del sello}
+\label{anexo:preregistro}
+
+Este anexo reproduce el compromiso de pre-registro que sostiene la validación
+prospectiva del Capítulo~\ref{ch::resultados} y detalla cómo verificarlo de forma
+independiente. El documento íntegro vive en el repositorio
+(\texttt{docs/PREREGISTRO\_V2.md}); aquí se resume su contenido comprobable.
+
+\section*{Política congelada}
+
+La señal y la política se fijaron en el entrenamiento de mayo y no se han modificado
+desde entonces: universo \emph{prestart} estricto ($-60$ a $-45$\,s respecto a la
+apertura, \emph{spread} $\le 2$ ticks, libro saludable, coste visible acotado), dos
+cabezas de \emph{gradient boosting} sobre el conjunto de características \emph{no\_clock},
+y regla de operación «valor esperado $>0{,}75$ y salud $\ge 0{,}5$». La integridad de
+los artefactos se ancla con sus resúmenes SHA-256, incluidos literalmente en el
+pre-registro (modelos de valor esperado y de salud, manifiesto de características y
+\emph{gate} GARCH congelado).
+
+\section*{Brazos de \emph{gate} y capas de reporte}
+
+Se comprometieron por adelantado tres brazos de \emph{gate} —estático heredado,
+GARCH(1,1) ajustado solo con datos anteriores a junio, y clustering de regímenes
+(adenda A)— y tres capas de reporte que se publican todas: net@0,5 histórica, taker con
+comisión oficial (con expectativa \emph{declarada como negativa} antes de mirar los
+datos) y maker simulado. Declarar la expectativa negativa por adelantado es lo que
+convierte el resultado taker en una confirmación y no en una racionalización
+\emph{a posteriori}.
+
+\section*{Cortes prospectivos}
+
+Los datos elegibles son la captura de la Pi posterior a la reanudación del recolector,
+procesados con el mismo \emph{pipeline} congelado. Se fijaron dos cortes —el primero a
+finales de agosto, el segundo justo antes de la entrega— sin ningún vistazo intermedio a
+las métricas de resultado.
+
+\section*{Verificación independiente del sello temporal}
+
+El compromiso se ancla en la cadena de Bitcoin mediante
+OpenTimestamps~\cite{opentimestamps}. Para verificarlo sin confiar en el autor:
+
+\begin{enumerate}[noitemsep]
+\item Obtener el \emph{commit} del repositorio que introduce el pre-registro y su prueba
+\texttt{.ots} asociada (\texttt{docs/prereg\_v2\_commit.ots}).
+\item Ejecutar \texttt{ots verify docs/prereg\_v2\_commit.ots}: la herramienta consulta
+un nodo de Bitcoin y confirma el bloque —y por tanto la fecha— en que quedó atestado el
+resumen del documento.
+\item Comprobar que esa fecha es anterior al primer dato de la ventana de evaluación
+prospectiva. Como la atestación de Bitcoin no puede retro-fecharse, la anterioridad del
+compromiso queda demostrada sin necesidad de confiar en la palabra del autor ni en un
+sello privado.
+\end{enumerate}
+
+Una fe de erratas posterior (la corrección del modelo de comisiones,
+Sección~\ref{sec::fe_erratas_fees}) se selló con el mismo procedimiento, de modo que la
+cadena de compromisos es completa y auditable.
+
+\chapter{Auditoría del ledger público}
+\label{anexo:ledger}
+
+Las cifras económicas centrales del trabajo pueden recalcularse de forma independiente sin
+acceso al corpus privado ni a los modelos entrenados, a partir de un único fichero
+anonimizado que se publica con el código: el ledger de acciones candidatas
+(\texttt{results/final\_candidate\_actions\_anonymized.csv}). Este anexo describe su
+contenido y el procedimiento de auditoría.
+
+\section*{Contenido del ledger}
+
+El ledger contiene una fila por unidad de acción del bloque fuera de muestra (754 filas).
+Cada fila registra un identificador de acción, el día de sesión, los identificadores de
+mercado y de contrato \emph{anonimizados} mediante \emph{hash} (de modo que no se pueda
+reconstruir la identidad del mercado), el instante relativo a la apertura, el régimen de
+volatilidad (\texttt{high}/\texttt{low}) y el resultado neto en ticks a tres niveles de
+coste de ejecución (medio tick de referencia, y las variantes de un cuarto y de un tick
+completo). No incluye características del modelo ni datos crudos: es exactamente la
+información necesaria para auditar el resultado, y nada más.
+
+\section*{Procedimiento de reproducción}
+
+Con solo ese fichero y una utilidad de análisis de datos, la auditoría reproduce las tres
+cifras que sostienen las conclusiones económicas:
+
+\begin{enumerate}[noitemsep]
+\item \textbf{Resultado confirmatorio.} La media del resultado neto al coste de referencia
+sobre las 754 acciones (241 mercados, cinco días) es de $+0{,}349$ ticks por acción,
+idéntica a la cifra publicada. Bajo el coste conservador de un tick completo el promedio
+cae a $-0{,}026$: la señal no sobrevive al coste de estrés.
+\item \textbf{Diagnóstico \emph{post-hoc} de baja volatilidad.} Restringiendo a las 318
+acciones de régimen de baja volatilidad (156 mercados), la media asciende a $+1{,}069$
+ticks. Se recuerda que esta separación se decidió tras inspeccionar el bloque, por lo que
+es una hipótesis, no una segunda validación.
+\item \textbf{Incertidumbre agrupada por mercado.} Un \emph{bootstrap} que remuestrea
+mercados enteros —para no tratar como independientes las hasta ocho señales solapadas de un
+mismo mercado— sitúa el intervalo de confianza del 90\,\% del corte de baja volatilidad en
+$[+0{,}193,\,+2{,}004]$ ticks: positivo pero ancho, coherente con el escaso soporte
+temporal.
+\end{enumerate}
+
+El cuaderno \texttt{08\_auditoria\_final\_ledger} ejecuta estos tres cálculos paso a paso y
+constituye la vía pública más directa para verificar el resultado final del trabajo con
+independencia del autor.

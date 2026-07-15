@@ -29,5 +29,23 @@ rentabilidad real ni se presenta un bot listo para desplegar.
 sin retocar umbrales, con una sola regla de exposición por mercado y registro de fills. Solo
 después podrá evaluarse el filtro de volatilidad. Con un horizonte de datos sustancialmente
 mayor podrán reevaluarse arquitecturas como el \emph{Temporal Fusion
-Transformer}~\cite{lim2021tft}. La regla que guía el proyecto permanece: la complejidad y
-cualquier afirmación económica deben ganarse su sitio con evidencia verdaderamente nueva.
+Transformer}~\cite{lim2021tft}.
+
+Una segunda línea, más ambiciosa, ataca la limitación estructural del simulador maker
+—su incapacidad para medir la respuesta competitiva del mercado
+(Capítulo~\ref{ch::etica})—. La reproducción histórica trata el libro como un decorado
+inerte; capturar cómo reaccionarían los creadores de mercado incumbentes a las órdenes
+propias exige un simulador \emph{reactivo}. La línea de simuladores generativos de libros
+de órdenes de los últimos años ofrece el instrumental: modelos de «agente mundo» que
+aprenden de datos históricos una dinámica del libro capaz de reproducir cierto impacto de
+mercado~\cite{coletta2022worldagent}, modelos generativos autorregresivos del flujo de
+mensajes a nivel de \emph{token}~\cite{nagy2023generative} y, más recientemente, modelos
+de difusión para la simulación y predicción del libro~\cite{backhouse2025diffusion}; una
+revisión reciente sistematiza el campo~\cite{jain2024lobreview}. Integrar uno de estos
+simuladores reactivos con la política congelada de este trabajo permitiría estimar la
+selección adversa y el reparto de \emph{rebates} bajo competencia, no bajo el supuesto
+optimista del \emph{replay}. Es, por su alcance, un trabajo de la magnitud de otra tesis;
+aquí se deja señalado como la continuación natural de la vía maker.
+
+La regla que guía el proyecto permanece: la complejidad y cualquier afirmación económica
+deben ganarse su sitio con evidencia verdaderamente nueva.

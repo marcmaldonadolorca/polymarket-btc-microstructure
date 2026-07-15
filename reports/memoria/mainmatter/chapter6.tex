@@ -45,6 +45,15 @@ simplificado. No reconstruye la cola orden por orden ni incorpora rellenos parci
 registro de sombra actual es retrospectivo; falta una ejecución prospectiva de mayor
 fidelidad.
 
+\textbf{Respuesta competitiva del mercado.} Más allá de la fidelidad de la cola, el
+simulador maker hereda una limitación estructural de todo \emph{backtest} basado en
+reproducción histórica: asume que el resto del mercado —y en particular los creadores de
+mercado incumbentes— no reacciona a las órdenes propias. En un régimen de recompensas por
+liquidez, esa hipótesis es optimista, porque una orden \emph{maker} nueva compite por la
+cola y por el reparto de \emph{rebates} con participantes que ajustarían su comportamiento.
+Ningún \emph{replay} puede medir esa reacción; hacerlo exige un simulador reactivo, lo que
+se plantea como línea de trabajo futuro (Capítulo~\ref{ch::conclusiones}).
+
 \textbf{Reproducibilidad parcial.} El repositorio permite recalcular las tablas públicas desde
 el ledger anonimizado y probar la lógica compartida. La reproducción integral del
 entrenamiento requiere el corpus privado de gran tamaño y se documenta como limitación, no

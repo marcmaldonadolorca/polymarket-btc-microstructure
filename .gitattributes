@@ -1,0 +1,10 @@
+* text=auto eol=lf
+
+*.parquet -text
+*.joblib -text
+*.sqlite3 -text
+*.zip -text
+*.pdf -text
+*.png -text
+*.ipynb text eol=lf
+

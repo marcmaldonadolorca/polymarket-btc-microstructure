@@ -524,9 +524,21 @@ $p=0{,}5$ —justo la zona de precios donde opera la mayor parte de este trabajo
 decrezca hacia los extremos. La versión implementada originalmente en el código
 elevaba al cuadrado el término $p\,(1-p)$, lo que en torno al precio medio subestima
 el coste real en un factor de aproximadamente ocho: en $p=0{,}5$, la comisión oficial
-es de $1{,}75$ ticks por contrato frente a los $\sim$$0{,}22$ ticks del modelo erróneo.
-% TODO M2: figura de la curva de comisión oficial vs implementada (eq. fee) y
-% distribución del coste de entrada del corpus.
+es de $1{,}75$ ticks por contrato frente a los $\sim$$0{,}22$ ticks del modelo erróneo
+(Figura~\ref{fig:fees_errata}).
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.95\textwidth]{figures/fig_fees_errata.png}
+\caption{Fe de erratas del modelo de costes. Izquierda: comisión oficial de 2026
+($r\,p(1-p)$, $r=0{,}07$) frente a la fórmula implementada originalmente, en ticks por
+contrato; en $p=0{,}5$ la diferencia es de un factor ocho ($1{,}75$ frente a
+$\sim$$0{,}22$). Derecha: distribución del precio de entrada del corpus operable de la
+ventana fuera de muestra (n=6.010 operaciones candidatas) superpuesta a la curva
+oficial: las operaciones se concentran precisamente donde la comisión es máxima, con un
+coste de entrada medio de $1{,}75$ ticks por contrato.}
+\label{fig:fees_errata}
+\end{figure}
 
 Detectado el error, se corrigió la fórmula en todos los repositorios afectados y se
 re-evaluó la política congelada del especialista —sin reentrenar nada— sobre la misma

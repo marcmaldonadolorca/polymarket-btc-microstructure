@@ -142,6 +142,22 @@ respuesta competitiva de los creadores de mercado incumbentes
 suficiente para justificar la validación prospectiva pre-registrada, no para afirmar
 rentabilidad.
 
+\paragraph{Cotización óptima como línea de trabajo futuro.} La estrategia base de este
+simulador cotiza de forma pasiva y controla el inventario terminal con una regla
+heurística (la zona plana). El paso natural es sustituir esa heurística por la teoría
+canónica de \emph{market making} óptimo: el modelo de Avellaneda y
+Stoikov~\cite{avellaneda2008}, cuyo \emph{precio de reserva} sesga las cotizaciones en
+proporción al inventario y al tiempo restante hasta la resolución, y sus extensiones al
+control de riesgo de inventario~\cite{gueant2013}. Una exploración preliminar sobre el
+mismo corpus —fuera del pre-registro— indica que este sesgo, adaptado a la varianza de
+\emph{settlement} binario $p\,(1-p)$, neutraliza la pérdida terminal que penaliza a la
+estrategia pasiva, con una mejora neta modesta cuya magnitud, no obstante, depende del
+mismo modelo de \emph{fill} optimista y de la ausencia de respuesta competitiva ya
+señalados. Su validación real exige el simulador reactivo antes descrito. La reciente
+sistematización de la microestructura de los mercados de predicción
+descentralizados~\cite{rahman2026sok} enmarca esta línea dentro de un campo en rápida
+consolidación.
+
 \subsection{El tramo terminal: cuándo el precio se vuelve informativo}
 \label{sec::tramo_terminal}
 

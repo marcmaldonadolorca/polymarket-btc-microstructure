@@ -38,8 +38,19 @@ microestructura y justifica el enfoque de este trabajo.
 
 Hasta 2025, Polymarket apenas contaba con literatura académica propia; en la primera
 mitad de 2026 han aparecido cinco estudios que lo convierten en objeto de análisis
-directo, y que delimitan con precisión el hueco que ocupa este trabajo.
-% TODO M2: figura de línea temporal de esta literatura (feb-jun 2026).
+directo, y que delimitan con precisión el hueco que ocupa este trabajo
+(Figura~\ref{fig::lit_timeline}).
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{figures/fig_lit_timeline.png}
+\caption{La literatura académica sobre Polymarket surgida en la primera mitad de 2026 y la
+posición de este trabajo. Los cinco estudios describen la plataforma (elecciones, arbitraje,
+flujo, archivos on-chain o tick-level); este trabajo se distingue por añadir el libro L2
+sincronizado con referencias externas y un contrato de latencia, lo que habilita la
+evaluación económica de la ejecución que ninguno aborda.}
+\label{fig::lit_timeline}
+\end{figure}
 
 Dubach~\cite{dubach2026anatomy} construye un archivo \emph{tick-level} del canal
 público del libro de órdenes (30~mil millones de eventos a lo largo de 52 días) y
@@ -146,7 +157,18 @@ convolucional-temporal pre-entrenado por reconstrucción sobre el propio corpus)
 aporta la advertencia, repetida en sus propias evaluaciones, de que la ventaja del
 pre-entrenamiento depende críticamente del volumen y de la afinidad de dominio de los
 datos — condición que un mercado joven, con semanas de historia, no cumple de partida.
-% TODO M2: figura-mapa de la familia de modelos (fundacionales vs SSL vs especialista).
+La Figura~\ref{fig::model_map} resume las familias evaluadas y su relación con el
+especialista tabular que este trabajo acaba eligiendo.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{figures/fig_model_map.png}
+\caption{Familias de modelos consideradas —fundacionales de series, auto-supervisados y el
+fundacional tabular— y su papel como peldaños de la escalera comparativa frente al
+especialista tabular, que es el vehículo finalmente elegido de la señal. Las estrellas
+marcan los modelos efectivamente evaluados en este trabajo (MOMENT y TabPFN).}
+\label{fig::model_map}
+\end{figure}
 
 \subsection{Microestructura, costes de ejecución y latencia}
 

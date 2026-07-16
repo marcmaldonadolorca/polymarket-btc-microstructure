@@ -23,6 +23,11 @@ CSV públicos del repositorio.
 | `06_correccion_adverse.ipynb` | Corrección metodológica del score adverso | Ejecutable con CSV públicos |
 | `07_especialista_prestart.ipynb` | Candidato congelado y lectura final | Ejecutable con CSV públicos |
 | `08_auditoria_final_ledger.ipynb` | Reproducción de tablas finales desde ledger | Ejecutable con CSV públicos |
+| `09_eda_series_temporales.ipynb` | EDA formal de series (ADF/KPSS, ACF, STL, Fourier) | Ejecutable con CSV públicos |
+| `10_baselines_clasicos.ipynb` | Baselines de la asignatura (Holt/ARIMA/kNN-DTW) | Ejecutable con CSV públicos |
+| `11_regimenes_y_anomalias.ipynb` | Clustering de regímenes (mód. 5) y cruce maker | Ejecutable con CSV públicos |
+| `12_economia_maker.ipynb` | Tamaño del premio (B0) y simulador maker (B1) | Ejecutable con CSV públicos |
+| `13_fundacionales.ipynb` | Escalera MOMENT, escalado tabular-vs-deep, N1 y N3 | Ejecutable con CSV públicos |
 
 ## Auditoría final
 

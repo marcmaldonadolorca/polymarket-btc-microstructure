@@ -475,7 +475,19 @@ La latencia no se supone, se mide. En una prueba controlada del ciclo de orden d
 Polymarket, el tiempo entre observar la oportunidad y confirmar el emparejamiento fue de
 unos 0,43 segundos en el percentil 95 de la muestra válida. Aun así, por prudencia se
 trabaja con cifras peores: una latencia conceptual de un segundo y una latencia observable
-en los datos de dos segundos (la malla de captura). El coste de ejecución no se fija como un
+en los datos de dos segundos (la malla de captura). Conviene precisar \emph{dónde} reside esa
+latencia, porque determina qué mejoras son posibles. El cómputo local —desde observar el
+dato hasta emitir la decisión: cálculo de características e inferencia del modelo— se midió en
+torno a 25 milisegundos en el percentil 95, una fracción despreciable del ciclo. El grueso
+lo consumen etapas que no dependen del lenguaje de implementación: la construcción y la firma
+criptográfica de la orden, su envío por la red hasta el emparejador de Polymarket y la
+confirmación del emparejamiento. La latencia que anula la señal es, por tanto, un límite de
+red y de microestructura, no de software: reescribir el cálculo en un lenguaje más rápido
+reduciría esos 25 milisegundos a unos pocos, pero dejaría intacto el resto del ciclo —de
+cientos de milisegundos a segundos— sin rescatar la rentabilidad del lado \emph{taker}. Esta
+observación es, además, una de las razones estructurales del giro al lado \emph{maker}
+(Capítulo~\ref{ch::despliegue}): el creador de mercado pasivo no compite en esta carrera de
+latencia. El coste de ejecución no se fija como un
 número plano de ticks, sino como una fracción del coste visible de entrada de cada
 operación: la mitad de ese coste como referencia, un cuarto como contraste optimista y el
 coste completo como prueba de estrés. Modelar el coste relativo al libro de cada instante es

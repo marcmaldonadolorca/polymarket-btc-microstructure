@@ -1,0 +1,14 @@
+bloque,metrica,valor
+estacionariedad,ADF rechaza raíz unitaria en NIVELES (%),6.3
+estacionariedad,ADF rechaza en DIFERENCIAS (%),100.0
+estacionariedad,KPSS rechaza estacionariedad en NIVELES (%),99.3
+estacionariedad,KPSS rechaza en DIFERENCIAS (%),12.6
+acf,ACF(1) retornos,0.07
+acf,ACF(1) |retornos| (vol clustering),0.152
+acf,ACF(1) desequilibrio de libro,0.994
+stl,varianza explicada estacional (%),19.4
+fourier,pico 24h vs mediana,230.0
+fourier,pico 1h vs mediana,225.0
+fourier,minuto más activo,50.0
+calidad,cobertura mediana de la malla 2s (%),100.0
+calidad,series con cobertura >=99% (%),99.8

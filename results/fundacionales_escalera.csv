@@ -1,0 +1,8 @@
+bloque,modelo,acierto_pct,bruto_ticks,nota
+escalera,"ARIMA(1,1,1)",56.5,0.621,baseline clásico
+escalera,naive-drift,53.1,1.186,baseline clásico
+escalera,Holt,48.4,0.516,baseline clásico
+escalera,MOMENT fine-tuning completo,47.35,0.082,"fundacional, GPU"
+escalera,MOMENT linear-probing,46.58,-0.175,fundacional
+escalera,MOMENT zero-shot,45.47,-0.585,fundacional
+escalera,kNN-DTW,45.3,-0.209,baseline clásico

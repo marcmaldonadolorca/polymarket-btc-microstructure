@@ -1,0 +1,4 @@
+split,auc_semilla_media,auc_semilla_sd,auc_ensemble,desacuerdo
+train,0.787,0.002,0.8,0.0291
+val,0.564,0.004,0.569,0.0293
+test,0.544,0.005,0.547,0.0304

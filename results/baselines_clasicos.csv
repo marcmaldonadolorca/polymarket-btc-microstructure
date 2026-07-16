@@ -1,0 +1,5 @@
+modelo,n,acierto_pct,bruto_ticks,neto_taker_ticks
+"ARIMA(1,1,1) (mód.3)",161,56.5,0.621,-2.106
+Holt (mód.3),902,48.4,0.516,-2.035
+kNN-DTW (mód.4),232,45.3,-0.209,-2.995
+naive-drift (mód.3),467,53.1,1.186,-1.443

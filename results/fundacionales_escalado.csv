@@ -1,0 +1,11 @@
+via,n_train,acierto_pct,bruto_ticks
+deep (MOMENT),2700,46.03,-0.2002
+deep (MOMENT),8100,46.47,-0.1815
+deep (MOMENT),16200,43.93,-0.3172
+deep (MOMENT),27000,46.14,-0.0898
+deep (MOMENT),40500,46.8,0.1541
+tabular (GBDT),3000,48.23,0.0977
+tabular (GBDT),9000,47.24,0.0006
+tabular (GBDT),18000,47.9,0.1297
+tabular (GBDT),30000,49.45,-0.0425
+tabular (GBDT),41430,50.33,0.4288

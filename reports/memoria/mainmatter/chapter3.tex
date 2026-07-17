@@ -56,7 +56,7 @@ alinean en el tiempo sobre una malla regular de dos segundos, como se detalla a 
 \draw[-{Latex}] (qa) -- (corp);
 \end{tikzpicture}
 }
-\caption{Arquitectura del sistema de captura. Las cuatro fuentes se alinean sobre una malla
+\caption[Arquitectura del sistema de captura]{Arquitectura del sistema de captura. Las cuatro fuentes se alinean sobre una malla
 de dos segundos, pasan un control de calidad por sesión y forman el corpus.}
 \label{fig:captura}
 \end{figure}
@@ -558,7 +558,8 @@ comisión de salida.}
 \label{tab::fees_antes_despues}
 \begin{tabular}{lccc}
 \hline
-Corte & Publicado (fee errónea) & Fee oficial, solo entrada & Fee oficial, ida y vuelta \\
+ & & \multicolumn{2}{c}{Fee oficial 2026} \\
+Corte & Publicado (fee errónea) & solo entrada & ida y vuelta \\
 \hline
 Todos (n=754) & $+0{,}349$ & $-1{,}059$ & $-3{,}304$ \\
 Baja volatilidad (n=318) & $+1{,}069$ & $-0{,}342$ & $-2{,}604$ \\
@@ -789,7 +790,9 @@ a la apertura, con libro saludable y coste visible acotado (Figura~\ref{fig:pres
 segundos respecto a la apertura del mercado, donde el análisis exploratorio detectó una
 densidad atípica de actividad del libro.}
 \label{fig:prestart}
-\end{figure} Ambas cabezas comparten una
+\end{figure}
+
+Ambas cabezas comparten una
 configuración de regularización agresiva (tasa de aprendizaje 0,045, hasta 220 iteraciones
 con parada anticipada, máximo de 15 hojas por árbol, mínimo de 120 muestras por hoja y
 regularización L2 de 0,10), necesaria porque el bloque de entrenamiento del especialista

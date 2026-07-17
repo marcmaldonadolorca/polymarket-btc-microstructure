@@ -19,8 +19,12 @@ El repositorio se organiza en los siguientes directorios:
 \begin{description}[align=right,labelwidth=2.6cm]
 \item [\texttt{config/}] Umbrales congelados de la política y configuraciones del arco.
 \item [\texttt{docs/}] Documentos canónicos del proceso, renumerados de forma secuencial.
-\item [\texttt{notebooks/}] Cuadernos pedagógicos ejecutados (EDA, particiones, objetivo,
-línea base, latencia, secuencias, corrección del \emph{score} adverso y especialista).
+\item [\texttt{notebooks/}] Catorce cuadernos pedagógicos (00--13): el arco ejecutado
+(EDA, particiones, objetivo, línea base, latencia, secuencias, corrección del \emph{score}
+adverso, especialista y auditoría del ledger) más los cuadernos autocontenidos sobre CSV
+públicos (EDA de series temporales, baselines clásicos, regímenes, economía maker y
+fundacionales); cada uno declara qué pregunta responde, qué entradas usa, qué produce y su
+conclusión, y enlaza su fila de \texttt{results/key\_results.csv}.
 \item [\texttt{scripts/}] Puntos de entrada reproducibles de cada experimento.
 \item [\texttt{src/}] Paquete con la lógica compartida (datos, características, modelos,
 evaluación), con pruebas automatizadas.

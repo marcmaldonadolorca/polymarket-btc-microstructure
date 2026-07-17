@@ -24,9 +24,20 @@ out-of-sample block, the specialist obtains a modest positive mean at the refere
 slightly negative under the full-cost stress test. A volatility filter, whose numerical
 threshold came from the training period, is then explored after detecting a regime shift;
 it improves the result on the same block, so it is reported as a post-hoc diagnostic rather
-than as confirmatory evidence. We report every figure in net ticks together with its support
-and uncertainty, and we do not claim real profitability: the deliverable is the
-methodology, the evidence obtained under an auditable protocol, and the explicit
+than as confirmatory evidence. Two further results complete the arc. First, a correction of
+the cost model —documented as a cryptographically timestamped erratum— shows that under
+Polymarket's official 2026 fee schedule no taker cut remains profitable, which confirms the
+thesis structurally and shifts the viable economic vehicle to the maker side: the same fee
+structure that taxes the taker pays the passive liquidity provider, whose economics are
+quantified with a queue-and-fill simulator over the captured L2 book. Second, a ladder of
+reference models shows that a time-series foundation model (MOMENT) improves monotonically
+with adaptation yet never beats naive drift or ARIMA, with a flat data-scaling curve: the
+ceiling is set by the data regime, not by model capacity. The evaluation protocol —frozen
+candidate, pre-committed gate arms and a taker expectation declared negative in advance— is
+pre-registered and timestamped on the Bitcoin blockchain, making its priority over the
+evaluation window independently verifiable. We report every figure in net ticks together
+with its support and uncertainty, and we do not claim real profitability: the deliverable
+is the methodology, the evidence obtained under an auditable protocol, and the explicit
 delimitation of its limits.
 
 \newpage
@@ -55,7 +66,21 @@ muestra, el especialista obtiene un promedio modestamente positivo al coste de r
 ligeramente negativo bajo el coste de estrés completo. Tras detectar un cambio de régimen se
 explora un filtro de volatilidad cuyo umbral numérico procede del entrenamiento; como la
 decisión de incorporarlo se evalúa sobre ese mismo bloque, su mejora se presenta como
-diagnóstico \emph{post-hoc}, no como evidencia confirmatoria. Todos los resultados se reportan
+diagnóstico \emph{post-hoc}, no como evidencia confirmatoria. Dos resultados adicionales
+completan el arco. Primero, una corrección del modelo de costes —documentada como fe de
+erratas con sello criptográfico de tiempo— muestra que, bajo el régimen oficial de
+comisiones de 2026 de Polymarket, ningún corte \emph{taker} es rentable, lo que confirma
+estructuralmente la tesis y desplaza el vehículo económico viable al lado \emph{maker}: la
+misma estructura de comisiones que grava al \emph{taker} paga al proveedor pasivo de
+liquidez, cuya economía se cuantifica con un simulador de colas y \emph{fills} sobre el
+libro L2 capturado. Segundo, una escalera de modelos de referencia muestra que un modelo
+fundacional de series temporales (MOMENT) mejora de forma monótona al adaptarse pero nunca
+supera a la deriva simple ni a un ARIMA, con una curva de escalado plana: el techo lo pone
+el régimen de datos, no la capacidad del modelo. El protocolo de evaluación —candidato
+congelado, brazos de \emph{gate} comprometidos por adelantado y expectativa \emph{taker}
+declarada negativa antes de mirar los datos— queda pre-registrado y sellado en la cadena de
+Bitcoin, de modo que su anterioridad a la ventana de evaluación es verificable de forma
+independiente. Todos los resultados se reportan
 en ticks netos junto a su soporte e incertidumbre, y no se afirma rentabilidad real: lo que
 se entrega es la metodología, la evidencia obtenida bajo un protocolo auditable y la
 delimitación explícita de sus límites.

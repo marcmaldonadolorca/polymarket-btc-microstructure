@@ -1,135 +1,132 @@
-# Polymarket BTC — microestructura y predicción a corto plazo
+# Polymarket BTC — short-horizon microstructure and prediction
 
-> Trabajo Fin de Máster (Máster en Deep Learning, UPM, 2025/26).
-> Autor: **Marc Maldonado Lorca**.
+> Master's thesis (MSc in Deep Learning, UPM, 2025/26).
+> Author: **Marc Maldonado Lorca**.
 >
-> Este repositorio acompaña a la memoria del TFM. Documenta una metodología
-> completa de captura de datos, validación temporal y control de costes para
-> mercados de BTC en Polymarket, y la **escalera de modelos** que va desde un
-> baseline tabular hasta un especialista congelado y un diagnóstico posterior
-> de cambio de régimen.
+> This repository accompanies the thesis. It documents a full methodology for
+> data capture, temporal validation and cost control for BTC markets on
+> Polymarket, and the **model ladder** that runs from a tabular baseline to a
+> frozen specialist and a subsequent regime-change diagnosis.
 
-## Qué es y qué no es
+## What it is and what it isn't
 
-Este es un trabajo **metodológico y académico**. No es un sistema de trading en
-producción y **no afirma rentabilidad real**. Todos los resultados se reportan
-en **ticks netos** (no en dólares ni ROI) y siempre acompañados de su soporte
-(número de trades y días) y de su incertidumbre.
+This is a **methodological, academic** work. It is not a production trading
+system and **makes no claim of real profitability**. All results are reported in
+**net ticks** (not dollars or ROI) and always with their support (number of
+trades and days) and their uncertainty.
 
-La validación fuera de muestra son **5 días** (6–10 de junio de 2026). El
-especialista base estaba congelado antes de ese bloque; el filtro de volatilidad
-se propuso después de observar el cambio de régimen y se reporta como análisis
-post-hoc. Distinguir ambas evidencias es parte central del trabajo.
+The out-of-sample validation is **5 days** (6–10 June 2026). The base specialist
+was frozen before that block; the volatility filter was proposed after observing
+the regime change and is reported as a post-hoc analysis. Distinguishing the two
+kinds of evidence is central to the work.
 
-## La lección central
-
-```text
-Un baseline tabular acierta ~90% la dirección a 16 s... y aun así pierde dinero.
-Con una latencia de entrada realista de 2 s, el neto en el conjunto terminal
-cae a -1.48 ticks. Acertar la dirección no es ganar: el coste y la latencia
-deciden. Todo el proyecto se reorganiza alrededor de esta lección.
-```
-
-## La escalera de modelos (el arco del proyecto)
-
-El relato sigue una progresión incremental de modelos, exigiendo en cada paso que
-la complejidad añadida se justifique con evidencia
-(baseline → lineal → features → modelo profundo → modelo final):
+## The core lesson
 
 ```text
-baseline tabular H16 (90% dir., parece excelente)
-  -> muere con latencia realista (-1.48 ticks con 2 s)          [LECCIÓN CENTRAL]
-  -> modelos latency-aware (AUC 0.79, política económica negativa)
-  -> secuencias + orderbook (GRU, Conv1D, fusión, TCN): representación sí, política no
-  -> corrección metodológica del score adverse                  [RIGOR]
-  -> protocolo OOF estricto + selección de horizonte (H60 vive, H120/H240 colapsan)
-  -> especialista prestart H60 CONGELADO antes de ver datos fresh
-  -> OOS limpio, 5 días: +0.349 ticks/acción @0.5, 3/5 días positivos
-  -> diagnóstico post-hoc: cambio de régimen y filtro de volatilidad
-  -> subconjunto diagnóstico: +1.069 ticks/acción, 5/5 días (no confirmatorio)
-  -> experimentos de adaptación al régimen: todos NO_GO (negativos valiosos)
-  -> replay de sombra offline + diseño de validación prospectiva
+A tabular baseline gets direction right ~90% of the time at 16 s... and still
+loses money. With a realistic 2 s entry latency, net on the terminal set drops
+to -1.48 ticks. Getting the direction right is not winning: cost and latency
+decide. The whole project is reorganized around this lesson.
 ```
 
-## Resultado fuera de muestra y diagnóstico posterior
+## The model ladder (the project's arc)
 
-El especialista prestart H60 (HistGradientBoosting: regresor EV + clasificador
-de sesión "healthy") se evaluó primero sin ningún filtro decidido sobre el
-bloque nuevo:
+The narrative follows an incremental model progression, requiring at each step
+that the added complexity be justified by evidence
+(baseline → linear → features → deep model → final model):
 
 ```text
-OOS limpio: n = 754 unidades, 5 días (6-10 jun 2026)
-Net@0.5 = +0.349 ticks/unidad; 3/5 días positivos
-Sensibilidad: @0.25 = +0.537   @0.5 = +0.349   @1.0 = -0.026
-
-Diagnóstico post-hoc de baja volatilidad: n = 318
-Net@0.5 = +1.069; 5/5 días positivos
-IC90 agrupado por mercado = [+0.193, +2.004]
-Estado = HIPÓTESIS CONGELADA PENDIENTE DE VALIDACIÓN PROSPECTIVA
+tabular baseline H16 (90% dir., looks excellent)
+  -> dies with realistic latency (-1.48 ticks at 2 s)          [CORE LESSON]
+  -> latency-aware models (AUC 0.79, negative economic policy)
+  -> sequences + order book (GRU, Conv1D, fusion, TCN): representation yes, policy no
+  -> methodological correction of the adverse score            [RIGOR]
+  -> strict OOF protocol + horizon selection (H60 lives, H120/H240 collapse)
+  -> prestart H60 specialist FROZEN before seeing fresh data
+  -> clean OOS, 5 days: +0.349 ticks/action @0.5, 3/5 positive days
+  -> post-hoc diagnosis: regime change and volatility filter
+  -> diagnostic subset: +1.069 ticks/action, 5/5 days (non-confirmatory)
+  -> regime-adaptation experiments: all NO_GO (valuable negatives)
+  -> offline shadow replay + prospective validation design
 ```
 
-La política completa queda congelada **después** del diagnóstico y no se
-reentrena para mejorar estos números. Solo fechas posteriores pueden validarla
-(ver [`config/frozen_policy_thresholds.yaml`](config/frozen_policy_thresholds.yaml)).
+## Out-of-sample result and post-hoc diagnosis
 
-
-## Estructura del repositorio
+The prestart H60 specialist (HistGradientBoosting: EV regressor + "healthy"
+session classifier) was first evaluated with no decided filter on the new block:
 
 ```text
-config/        Umbrales congelados de la política + configs del arco
-docs/          18 documentos canónicos del arco (01..18), renombrados
-notebooks/     9 notebooks pedagógicos/de auditoría (EDA, splits, target, baseline,
-               latencia, secuencias, corrección adverse, especialista, ledger final)
-scripts/       Entrypoints reproducibles (scripts/experiments/)
-src/edgerunner/ Paquete con la lógica compartida (data, features, models, eval)
-results/       key_results.csv y decision_register.csv filtrados al arco
-sql/           Esquema de la consulta base de entrenamiento
-data/samples/  Contrato y documentación de los datos publicados
-reports/       Memoria canónica (`memoria.pdf`) y fuente LaTeX oficial
+clean OOS: n = 754 units, 5 days (6-10 Jun 2026)
+Net@0.5 = +0.349 ticks/unit; 3/5 positive days
+Sensitivity: @0.25 = +0.537   @0.5 = +0.349   @1.0 = -0.026
+
+post-hoc low-volatility diagnosis: n = 318
+Net@0.5 = +1.069; 5/5 positive days
+Market-clustered 90% CI = [+0.193, +2.004]
+Status = FROZEN HYPOTHESIS PENDING PROSPECTIVE VALIDATION
 ```
 
-## Reproducibilidad
+The full policy is frozen **after** the diagnosis and is not retrained to improve
+these numbers. Only later dates can validate it (see
+[`config/frozen_policy_thresholds.yaml`](config/frozen_policy_thresholds.yaml)).
+
+
+## Repository structure
+
+```text
+config/         Frozen policy thresholds + arc configs
+docs/           18 canonical arc documents (01..18), renamed
+notebooks/      9 pedagogical/audit notebooks (EDA, splits, target, baseline,
+                latency, sequences, adverse correction, specialist, final ledger)
+scripts/        Reproducible entrypoints (scripts/experiments/)
+src/edgerunner/ Package with the shared logic (data, features, models, eval)
+results/        key_results.csv and decision_register.csv filtered to the arc
+sql/            Schema of the base training query
+data/samples/   Contract and documentation of the published data
+reports/        Canonical thesis (`memoria.pdf`) and official LaTeX source
+```
+
+## Reproducibility
 
 ```bash
 python -m venv .venv && source .venv/bin/activate   # (Windows: .venv\Scripts\activate)
 pip install -r requirements.txt
 ```
 
-Los scripts de `scripts/experiments/` son los entrypoints del arco. Por diseño
-esperan ejecutarse desde la raíz del repositorio (resuelven rutas relativas).
-El conjunto completo (~2.6M filas cross-venue y la fuente SQLite) **no se
-publica** por tamaño. El repositorio incluye el esquema (`sql/`), el código y un
-ledger anonimizado de 754 unidades en
-`results/final_candidate_actions_anonymized.csv`, suficiente para recalcular las
-tablas finales y la incertidumbre agrupada. El entrenamiento completo no es
-reproducible sin el corpus privado y se declara como limitación.
+The scripts in `scripts/experiments/` are the arc's entrypoints. By design they
+expect to run from the repository root (they resolve relative paths). The full
+dataset (~2.6M cross-venue rows and the SQLite source) is **not published** due
+to size. The repository includes the schema (`sql/`), the code and an anonymized
+ledger of 754 units in `results/final_candidate_actions_anonymized.csv`, enough
+to recompute the final tables and the clustered uncertainty. Full training is not
+reproducible without the private corpus and is declared as a limitation.
 
-Documentos clave para entender el pipeline, en orden:
+Key documents to understand the pipeline, in order:
 `docs/01_sistema_de_datos.md` -> `docs/04_splits_validacion_temporal.md` ->
 `docs/07_stress_de_latencia.md` -> `docs/14_especialista_prestart_h60.md` ->
 `docs/16_validacion_fresh.md` -> `docs/18_paper_shadow.md`.
 
-La guía de lectura de `docs/` está en `docs/README.md`: explica qué documentos
-son canónicos, qué artefactos internos no se publican y cómo auditar las cifras
-finales.
+The reading guide for `docs/` is in `docs/README.md`: it explains which documents
+are canonical, which internal artifacts are not published and how to audit the
+final numbers.
 
-La auditoría final no necesita el corpus privado:
+The final audit does not need the private corpus:
 
 ```bash
 python scripts/experiments/recompute_final_summary_from_public_ledger.py --check
 ```
 
-También está disponible como notebook en
+It is also available as a notebook in
 `notebooks/08_auditoria_final_ledger.ipynb`.
-La guía de notebooks está en `notebooks/README.md`.
+The notebooks guide is in `notebooks/README.md`.
 
-## Estado y trabajo futuro
+## Status and future work
 
-Investigación **pausada** a fecha de entrega. Líneas abiertas: validar
-prospectivamente la política completa sin retocar umbrales, definir exposición
-máxima por mercado, comprobar el patrón en U (hipótesis) y revisitar el deep
-learning con 60+ días de datos.
+Research **paused** as of the submission date. Open lines: prospectively validate
+the full policy without touching thresholds, define a maximum per-market
+exposure, test the U-shaped pattern (hypothesis) and revisit deep learning with
+60+ days of data.
 
-## Licencia
+## License
 
-MIT — ver [`LICENSE`](LICENSE).
+MIT — see [`LICENSE`](LICENSE).

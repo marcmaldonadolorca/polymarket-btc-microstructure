@@ -74,6 +74,65 @@ siguiente fotografía real, $t_{k+1}$; es decir, se asume que entre observar la 
 operar transcurre, como mínimo, el intervalo de la malla. Este criterio hace la evaluación
 deliberadamente conservadora y evita el error habitual de suponer ejecución instantánea.
 
+\subsection{El grano del precio: un mercado casi siempre inmóvil}
+\label{sec::grano_temporal}
+
+La malla de dos segundos fija el ritmo de observación, pero no garantiza que el mercado
+tenga algo nuevo que contar en cada fotografía. Medido sobre el corpus horario, la
+respuesta es contundente: \textbf{el 89,8\,\% de los incrementos del punto medio entre
+fotografías consecutivas es exactamente cero}. El precio no se mueve casi nunca a esa
+escala. Ampliar la ventana de observación atenúa el efecto, pero no lo elimina en ningún
+punto razonable (Tabla~\ref{tab::grano}).
+
+\begin{table}[h]
+\centering
+\caption{Grano temporal del punto medio: proporción de intervalos sin ningún cambio de
+precio y observaciones disponibles por mercado, según la ventana de observación.}
+\label{tab::grano}
+\begin{tabular}{rrrr}
+\toprule
+\textbf{Ventana} & \textbf{Intervalos sin cambio} & \textbf{$|\Delta|$ p90 (céntimos)} & \textbf{Obs./mercado} \\
+\midrule
+2\,s   & 89,8\,\% & 0,05 & 2204 \\
+30\,s  & 60,7\,\% & 4    & 134 \\
+60\,s  & 53,7\,\% & 6    & 60 \\
+120\,s & 47,7\,\% & 8    & 24 \\
+300\,s & 36,5\,\% & 15   & 9,5 \\
+600\,s & 29,6\,\% & 21   & 4,5 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+La causa es estructural y no accidental: el \emph{tick} de estos contratos vale un céntimo
+de probabilidad y la horquilla media mide \textbf{3,8 \emph{ticks}}, de modo que el punto
+medio solo se desplaza cuando uno de los dos lados del libro salta de verdad. Conviene
+además descartar la explicación alternativa —que la inmovilidad la produjera el sistema de
+captura y no el mercado—, y cuatro comprobaciones independientes la descartan: en el
+33,8\,\% de las fotografías con el precio inmóvil \emph{sí} cambia la profundidad
+disponible en el toque, luego el capturador observa el libro y registra sus cambios; la
+proporción de intervalos inmóviles es homogénea entre mercados (del 84,3\,\% al 95,0\,\%
+entre los percentiles 10 y 90) y no se concentra en los menos líquidos; y, como referencia
+externa, el activo subyacente se mueve \textbf{2,3 veces más} en los intervalos en que
+nuestro precio sí cambia que en los que permanece quieto, es decir, la relación con el
+subyacente existe y apunta en el sentido correcto.
+
+Para dimensionar el fenómeno con justicia conviene añadir que \emph{tampoco} el mercado al
+contado de Bitcoin —uno de los más líquidos que existen— registra un cambio mediano de su
+punto medio en intervalos de dos segundos dentro de esta misma captura. El grano no es,
+por tanto, una patología de la plataforma estudiada, sino un recordatorio de que dos
+segundos es un intervalo muy fino para observar precios medios en cualquier mercado.
+
+Esta caracterización tiene una consecuencia metodológica de primer orden, y explica
+decisiones que se toman más adelante en este trabajo. Toda la familia de modelos de tiempo
+continuo —difusiones con saltos, cotización óptima al estilo Avellaneda-Stoikov y sus
+derivados— presupone un precio que evoluciona sin interrupción; aplicada a una serie
+inmóvil nueve de cada diez instantes, su estimación degenera. Cuando la observación tiene
+un grano tan grueso, el análisis en clave de tiempo continuo debe realizarse en la banda de
+\textbf{60 a 120 segundos}, donde alrededor de la mitad de los intervalos ya presentan
+movimiento real y todavía quedan entre 24 y 60 observaciones por mercado; por debajo se
+mide el \emph{tick} y por encima se agota la muestra, porque estos contratos viven
+únicamente una hora.
+
 \subsection{Controles de calidad por sesión}
 
 La calidad de los datos es tan crítica como el modelo: una referencia externa retrasada o
@@ -98,6 +157,25 @@ periodo inicial degradado.
 \item[Huecos severos] Detección de saltos temporales grandes que la malla no puede rellenar
 de forma fiable.
 \end{description}
+
+Existe además una distinción en la propia estructura del registro que condiciona qué puede
+usarse como característica y que conviene dejar explícita, porque no es evidente al
+inspeccionar los datos. No todas las columnas capturadas son series temporales: unas se
+observan en \emph{cada} instante de la malla —el punto medio, las mejores posturas de compra
+y venta, la profundidad disponible en cada lado, la horquilla y el último precio operado—
+mientras que otras son \emph{agregados de ventana}, es decir, un único valor calculado para
+toda la sesión y repetido idéntico en cada una de sus fotografías; es el caso de los
+volúmenes y recuentos de operaciones y de las altas y bajas de órdenes. La comprobación es
+inmediata —basta contar valores distintos dentro de cada sesión— y el resultado es
+inequívoco: las columnas del segundo grupo presentan un valor único en la totalidad de las
+sesiones examinadas.
+
+La distinción importa porque una columna agregada es indistinguible de una serie al
+inspeccionar el conjunto: tiene un valor en cada fila, del tipo correcto y sin ausencias.
+Usarla como si midiera actividad instantánea introduce dos errores a la vez —sobreestima
+enormemente el número de observaciones independientes y solapa el predictor con el intervalo
+que pretende anticipar—, sin que ninguna comprobación de software lo delate. Por ese motivo
+las características construidas en este trabajo se restringen al primer grupo.
 
 \begin{figure}[h]
 \centering

@@ -150,10 +150,17 @@ Stoikov~\cite{avellaneda2008}, cuyo \emph{precio de reserva} sesga las cotizacio
 proporción al inventario y al tiempo restante hasta la resolución, y sus extensiones al
 control de riesgo de inventario~\cite{gueant2013}. Una exploración preliminar sobre el
 mismo corpus —fuera del pre-registro— indica que este sesgo, adaptado a la varianza de
-\emph{settlement} binario $p\,(1-p)$, neutraliza la pérdida terminal que penaliza a la
-estrategia pasiva, con una mejora neta modesta cuya magnitud, no obstante, depende del
-mismo modelo de \emph{fill} optimista y de la ausencia de respuesta competitiva ya
-señalados. Su validación real exige el simulador reactivo antes descrito. La reciente
+\emph{settlement} binario $p\,(1-p)$, reduce la pérdida terminal que penaliza a la
+estrategia pasiva. Su magnitud, sin embargo, resultó depender por completo del modelo de
+\emph{fill}: bajo el supuesto más generoso, en el que una orden alcanzada por un barrido
+se ejecuta íntegra, la pérdida terminal llega a neutralizarse y la mejora neta es del
+orden del tres por ciento; bajo el supuesto conservador que fija el propio pre-registro
+—ejecución de la mitad del tamaño en los barridos— la pérdida terminal solo se atenúa y
+la mejora neta desaparece. Esta sensibilidad no es exclusiva de la cotización óptima:
+afecta al orden de mérito de cualquier política que cotice alejada del mejor precio,
+porque el grueso de sus ejecuciones procede precisamente de barridos. Junto con la
+ausencia de respuesta competitiva ya señalada, su validación real exige el simulador
+reactivo antes descrito. La reciente
 sistematización de la microestructura de los mercados de predicción
 descentralizados~\cite{rahman2026sok} enmarca esta línea dentro de un campo en rápida
 consolidación.

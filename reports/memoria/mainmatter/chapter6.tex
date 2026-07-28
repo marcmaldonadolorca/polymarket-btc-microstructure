@@ -63,6 +63,26 @@ cola y por el reparto de \emph{rebates} con participantes que ajustarían su com
 Ningún \emph{replay} puede medir esa reacción; hacerlo exige un simulador reactivo, lo que
 se plantea como línea de trabajo futuro (Capítulo~\ref{ch::conclusiones}).
 
+\textbf{Manipulación de \emph{settlement}.} Dai, Jia y Yu~\cite{dai2026settlement}
+documentan, tras el lanzamiento del contrato de Bitcoin a cinco minutos de Polymarket,
+que el flujo del mercado al contado se dispara en el instante de resolución y provoca
+reversiones de precio posteriores, un fenómeno que desaparece en gran medida en los
+contratos de quince minutos. Como la vía maker de este trabajo se concentra por tamaño
+en los horizontes de una hora y de quince minutos, se auditó si ese patrón aparece en el
+corpus propio, comparando la reversión del precio de Bitcoin en los instantes de
+\emph{settlement} frente a instantes placebo emparejados por hora. El patrón direccional
+aparece con el signo que describe ese trabajo, pero es minúsculo —los contrastes más
+fuertes quedan entre $-0{,}2$ y $-0{,}8$ puntos básicos, con $|t|$ entre $2{,}1$ y
+$2{,}3$— y ninguno de los seis contrastes sobre el mercado al contado sobrevive la
+corrección por comparaciones múltiples de Benjamini-Hochberg al 5\,\%; en los futuros
+perpetuos la dirección coincide con estadísticos aún menores. El componente de flujo del
+mecanismo no es medible con esta captura —sus volúmenes son agregados móviles de varios
+minutos, no cinta instante a instante— y el diseño solo detecta coincidencia temporal,
+no atribución causal: un efecto genérico de las marcas redondas de tiempo produciría el
+mismo contraste. La auditoría se queda, por tanto, en una comprobación de robustez
+favorable a los horizontes empleados, no en una confirmación ni una refutación del
+mecanismo.
+
 \textbf{Reproducibilidad parcial.} El repositorio permite recalcular las tablas públicas desde
 el ledger anonimizado y probar la lógica compartida. La reproducción integral del
 entrenamiento requiere el corpus privado de gran tamaño y se documenta como limitación, no

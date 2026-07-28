@@ -690,7 +690,7 @@ bajo el mismo protocolo de costes y validación (Figura~\ref{fig:escalera}).
 ]
 \node[rung, fill=blue!6] (s1) {Línea base tabular H16 (acierto $\sim$90\,\%, pero deja de ser rentable con latencia)};
 \node[rung, fill=blue!6, below=of s1] (s2) {Modelos sensibles a la latencia (AUC 0,79; política negativa)};
-\node[rung, fill=blue!8, below=of s2] (s3) {Secuencias y libro: GRU, Conv1D (\emph{BookEncoder}), fusión, TCN (representación sí, política no)};
+\node[rung, fill=blue!8, below=of s2] (s3) {Secuencias y libro: GRU, Conv1D (\emph{BookEncoder}), fusión, TCN, auto-atención (representación sí, política no)};
 \node[rung, fill=orange!10, below=of s3] (s4) {Corrección del \emph{score} de selección adversa; selección de horizonte (H60)};
 \node[rung, fill=green!12, thick, below=of s4] (s5) {Especialista \emph{prestart} H60 (HGB de dos cabezas) + diagnóstico de régimen};
 \draw[-{Latex}] (s1)--(s2); \draw[-{Latex}] (s2)--(s3); \draw[-{Latex}] (s3)--(s4); \draw[-{Latex}] (s4)--(s5);
@@ -711,7 +711,7 @@ central: más capacidad de clasificación no implica una política rentable.
 \paragraph{Modelos secuenciales y sobre el libro de órdenes.} El siguiente nivel trata el
 libro como un objeto con estructura espacio-temporal. Se construyen secuencias de ocho
 fotografías consecutivas y un tensor de los diez primeros niveles del libro, y sobre esa
-representación se evalúan cuatro arquitecturas:
+representación se evalúan cinco arquitecturas:
 \begin{itemize}[noitemsep]
 \item una red recurrente \textbf{GRU} (capa oculta de dimensión 56) sobre la secuencia de
 características, que modela la dinámica temporal reciente;
@@ -729,15 +729,24 @@ en mercados poco líquidos;
 \item una \textbf{fusión} que combina la salida de la GRU y la del BookEncoder en una cabeza
 común, para aprovechar simultáneamente la dinámica temporal y la estructura del libro;
 \item una red convolucional temporal (\textbf{TCN}) orientada a clasificar el régimen de
-volatilidad de la sesión.
+volatilidad de la sesión;
+\item un codificador con \textbf{auto-atención} sobre esa misma representación, en dos
+variantes —atención sobre la última fotografía del libro y sobre la secuencia completa—,
+incorporado para comprobar si el mecanismo que domina la literatura reciente de modelos
+de secuencia cambia el diagnóstico.
 \end{itemize}
 Todas estas arquitecturas aprenden representación —obtienen métricas de clasificación y de
 ordenación razonables, y algunas políticas \emph{proxy} resultan positivas dentro de
 muestra—, pero ninguna produce una política rentable y estable cuando se exige selección
 causal día a día y estabilidad en todo el bloque de test. Con un horizonte de entrenamiento
 de unas dos semanas (unos 5\,800 ejemplos) la varianza de estos modelos es demasiado alta:
-memorizan el periodo de entrenamiento y no generalizan al siguiente. Por eso el aprendizaje
-profundo se aparca a la espera de un volumen de datos sustancialmente mayor.
+memorizan el periodo de entrenamiento y no generalizan al siguiente. La auto-atención es el
+caso más nítido de este patrón: con aproximadamente el doble de parámetros mejora el AUC de
+validación (0,568 frente a 0,560--0,563 de las variantes recurrente y convolucional) y, aun
+así, empeora la economía de test ($-1{,}99$ frente a $-1{,}08$ ticks netos al mismo umbral,
+con tres días negativos frente a dos). La capacidad añadida compra ordenación dentro de
+muestra, no política fuera de ella. Por eso el aprendizaje profundo se aparca a la espera de
+un volumen de datos sustancialmente mayor.
 
 Durante la auditoría se detectó y corrigió un error de interpretación en el \emph{score} de
 selección adversa (su orientación correcta es $1 - P(\text{adverso})$), lo que ilustra que

@@ -474,11 +474,11 @@ Una metodología auditable —pre-registrada y sellada criptográficamente— pa
 Es la pregunta más previsible en una defensa que llega tras una primera revisión no superada. La respuesta se ancla en los cuatro puntos concretos que se señalaron y se responde con evidencia, no con promesas:
 
 1. **Estructura y formato.** El glosario estaba como apéndice; ahora está en los preliminares, en su posición correcta, y los anexos se han reordenado (características, hiperparámetros, pre-registro y verificación del sello, auditoría del ledger).
-2. **Rigor bibliográfico.** Se pasó de 15 referencias, en su mayoría anteriores a 2020, a 41 referencias todas citadas en el cuerpo, con más de 25 posteriores a 2020 —incluidos los cinco estudios académicos de Polymarket de 2026 y la teoría canónica de market making (Avellaneda-Stoikov, Guéant)—.
-3. **Contenido visual.** Se pasó de una memoria con pocas figuras a del orden de veinte figuras y una docena de tablas: diagrama del sistema, partición temporal, modelo de dos cabezas, escalera de modelos, curva latencia-PnL, EDA completo, fe de erratas de comisiones, diagnóstico de régimen y economía maker.
+2. **Rigor bibliográfico.** Se pasó de 15 referencias, en su mayoría anteriores a 2020, a 43 referencias todas citadas en el cuerpo, con más de 25 posteriores a 2020 —incluidos los cinco estudios académicos de Polymarket de 2026 y la teoría canónica de market making (Avellaneda-Stoikov, Guéant)—.
+3. **Contenido visual.** Se pasó de una memoria con pocas figuras a 26 figuras y 12 tablas: diagrama del sistema, partición temporal, modelo de dos cabezas, escalera de modelos, curva latencia-PnL, EDA completo, fe de erratas de comisiones, diagnóstico de régimen y economía maker.
 4. **Análisis técnico de series temporales.** Se añadió un EDA formal con las técnicas de la asignatura —ADF/KPSS de estacionariedad, ACF/PACF, descomposición STL, espectro de Fourier— y una escalera de baselines de la asignatura (naive-drift, ARIMA, Holt, kNN-DTW y el fundacional MOMENT), cada uno con su decisión de diseño asociada.
 
-Además, la memoria creció de 46 a 72 páginas, dentro del presupuesto de 60-70 del template, y se incorporaron dos aportaciones nuevas que no estaban en la versión anterior: la fe de erratas de comisiones sellada y el giro maker cuantificado.
+Además, la memoria creció de 46 a 76 páginas, y se incorporaron dos aportaciones nuevas que no estaban en la versión anterior: la fe de erratas de comisiones sellada y el giro maker cuantificado.
 
 Respuesta corta:
 
@@ -491,6 +491,54 @@ Es una debilidad conocida y diagnosticada, no oculta. Se descompuso con un *deep
 Respuesta corta:
 
 > No es varianza ni falta de capacidad: es concept drift diagnosticado con un ensemble (dominio AUC 0,90). No cambia el resultado sellado; fija el techo del reentreno v2.
+
+### 23. El runbook fijaba el corte el 10 de agosto y la ventana termina el 13. ¿Por qué se movió la fecha?
+
+No se movió: se acabó. El 14 de agosto a las 11:05 UTC el disco del recolector se desconectó del bus USB de la Raspberry Pi y la captura se detuvo; el último día completo es el 13. El 10 de agosto era una fecha operativa que yo mismo había elegido y que no llegué a ejecutar. Lo que quedó no es una fecha elegida sino la que impuso el hardware, y quedó fijada tres días antes de que se calculara la primera métrica de resultado. El pre-registro sellado no fija un día concreto: fija el inicio de la ventana —10 de julio, excluyendo del 6 al 9 por contaminación de desarrollo— y una puerta de al menos 25 días evaluados. La ventana real tiene 35 días completos, un 40 % por encima de ese mínimo.
+
+Respuesta corta:
+
+> No la moví yo, la cerró un cable. El pre-registro exige ≥25 días y hay 35 completos; el punto de corte quedó fijado antes de mirar ningún resultado.
+
+### 24. ¿Cómo sé que no miró los datos antes y luego decidió cuándo parar?
+
+Por tres cosas comprobables sin fiarse de mí. Primera: el pre-registro está sellado con OpenTimestamps en la cadena de Bitcoin, con atestación completa, y su fecha es anterior al primer día de la ventana. Segunda: el final de la ventana lo produjo un fallo de hardware que dejó su propio rastro independiente —el registro del kernel de la Raspberry Pi, con marca de tiempo, y el contador de sesiones del recolector reiniciado al reanudarse—. Tercera: la evaluación es una sola corrida, y los tres brazos se reportan siempre, salga lo que salga; no hay ninguna configuración que se pueda tocar después, porque las huellas criptográficas de los cinco artefactos ejecutables están en el documento sellado y se verifican en cada corrida.
+
+Respuesta corta:
+
+> Sello en Bitcoin anterior a la ventana, cierre causado por un fallo con rastro propio en el log del sistema, y una única corrida con los tres brazos reportados pase lo que pase.
+
+### 25. Han estado tres días sin capturar. ¿Eso no rompe la continuidad que exige el protocolo?
+
+El hueco va del 14 de agosto a las 11:05 UTC al 17 a las 09:23 UTC, y está fuera de la ventana de evaluación, que termina el 13. Dentro de la ventana no hay ni un solo día incompleto: se verificó día a día sobre el registro de sesiones del recolector, con unas 225 sesiones diarias sostenidas. El protocolo sellado contempla además este caso explícitamente: permite excluir días por fallo de captura siempre que esté documentado en el monitor de la Pi y se cite el log, que es exactamente lo que se hace. La captura está reanudada desde el 17.
+
+Respuesta corta:
+
+> El hueco cae fuera de la ventana. Dentro no falta ningún día, y el protocolo ya contemplaba la exclusión por fallo documentado.
+
+### 26. Si el disco se desconectó mientras escribía, ¿cómo sabe que los datos no están corruptos?
+
+Porque se verificó antes de evaluar nada, y porque el fallo fue de conexión, no de medio. El registro del kernel muestra una desconexión del bus USB y una reconexión limpia tres segundos después, sin un solo error de lectura ni antes ni después; el sistema de ficheros se recuperó reejecutando su diario, que es el mecanismo diseñado para exactamente este caso, y la base de datos quedó cerrada sin transacciones pendientes. Sobre eso se comprobó la cobertura diaria completa de la ventana. Es la misma disciplina que se aplicó al resto del trabajo: no dar por bueno un dato porque el fichero exista.
+
+Respuesta corta:
+
+> Fue una desconexión del bus, no un fallo de medio: cero errores de lectura, diario reejecutado, base cerrada limpia y cobertura verificada día a día antes de evaluar.
+
+### 27. En el anexo el pre-registro dice que el corte nº 1 es el 24 de agosto, y el capítulo 4 evalúa hasta el 13. ¿Cuál de los dos vale?
+
+Son dos documentos encadenados, no dos versiones del mismo. El pre-registro v2 fija el protocolo general y anuncia que el simulador maker, cuando existiera, tendría su propia adenda sellada; esa adenda es el pre-registro del simulador, con su propia ventana desde el 10 de julio. Lo que evalúa el capítulo 4 es la adenda, y su ventana la cerró el fallo de captura. El corte del protocolo general mantiene su propia fecha y su propia ventana.
+
+Respuesta corta:
+
+> No compiten: el segundo es la adenda sellada que el primero anuncia, con su propia ventana. El capítulo 4 reporta la adenda.
+
+### 28. La huella del motor que consta en el pre-registro no coincide con la del motor que ejecutó. ¿No invalida eso el sello?
+
+Al contrario: es lo que hace que el sello sirva de algo. La divergencia es deliberada, está documentada y tiene su propia marca de tiempo. El 13 de julio se detectó que el motor sellado no podía ejecutar el brazo base —fallaba al invocarlo sin señal—, se corrigió y se selló la corrección. Revertir al artefacto original para que las huellas cuadraran habría dado un experimento imposible de correr, no uno más honesto. Lo que un sello garantiza no es que nada cambie, sino que todo cambio quede fechado y sea auditable, y esta cadena —sello, errata, sello de la errata— lo está.
+
+Respuesta corta:
+
+> La divergencia está sellada aparte y documentada. El motor original no podía ejecutar el brazo base; revertir habría roto el experimento, no salvado el sello.
 
 ---
 

@@ -197,11 +197,134 @@ tanto, tal cual: negativa en la capa taker, lo que motiva el giro al lado maker 
 Capítulo~\ref{ch::despliegue} y no una búsqueda de umbrales que la rescaten.
 
 \subsection{Validación prospectiva pre-registrada}
+\label{sec::validacion_prospectiva}
 
-\emph{[Esqueleto M0 — sección nueva (plan 2026-07-10, §2, cap.~4): resultados del corte
-prospectivo nº~1 (agosto) y nº~2 (pre-entrega) de la política congelada y sellada, con los
-tres brazos de gate y las dos capas de reporte, en tres niveles de evidencia declarados:
-confirmatorio, pre-registrado y exploratorio.]}
+Todo lo anterior en este capítulo comparte una debilidad que ninguna técnica estadística
+puede reparar: se mide sobre datos que ya existían cuando se diseñó la política. Por
+cuidadosa que sea la separación entre entrenamiento y prueba, el analista ha visto el
+periodo, ha iterado sobre él y ha tomado decisiones informadas por lo que allí ocurría. La
+única refutación limpia de esa objeción es evaluar sobre datos que todavía no existían
+cuando la política quedó congelada. Esta sección recoge esa evaluación.
+
+\subsubsection{Cadena de compromiso}
+
+El procedimiento se diseñó para que el autor no pudiera ajustarlo después de ver los
+resultados, y para que un tercero pueda comprobarlo sin tener que fiarse de su palabra.
+Antes de que existiera un solo día de la ventana, se fijaron por escrito y se sellaron:
+el universo de mercados, los filtros, la configuración exacta del simulador, los brazos
+que se ejecutarían, las métricas que se reportarían y las reglas de decisión, junto con
+las huellas criptográficas de los cinco artefactos ejecutables. El documento se registró
+además en la cadena de bloques de Bitcoin mediante OpenTimestamps~\cite{opentimestamps},
+de modo que su fecha es verificable con independencia del repositorio y del autor. El
+Anexo~\ref{anexo:preregistro} reproduce el pre-registro y el procedimiento de
+verificación del sello.
+
+La cadena tiene una divergencia deliberada que conviene declarar aquí y no en una nota al
+pie: la huella del motor de simulación que consta en el pre-registro no es la del motor
+que se ejecutó. El 13 de julio de 2026 se detectó y corrigió una errata que impedía
+ejecutar el brazo base, y la corrección se selló a su vez con su propia marca de tiempo.
+Revertir al artefacto originalmente sellado no habría hecho el experimento más honesto:
+lo habría hecho imposible, porque el brazo de referencia no llegaba a completar una
+corrida. Se conserva por tanto la cadena completa —sello original, errata, sello de la
+errata— y se reporta la divergencia como parte del resultado.
+
+\subsubsection{Ventana de evaluación}
+
+La ventana comprende \textbf{35~días completos, del 10 de julio al 13 de agosto de 2026},
+ambos incluidos. Su comienzo está determinado por el pre-registro, que excluye
+explícitamente los días 6 a 9 de julio por haberse empleado en el desarrollo del
+simulador. Su final no lo decidió el autor: el 14 de agosto la captura se interrumpió por
+una desconexión física del almacenamiento del recolector, descrita en el
+Capítulo~\ref{ch::etica}. El último día íntegro es el 13 de agosto.
+
+Esa circunstancia, que operativamente fue un contratiempo, refuerza metodológicamente el
+resultado. La objeción más natural a cualquier evaluación prospectiva es que el analista
+elija cuándo parar, y que esa elección dependa de lo que va viendo. Aquí el punto de corte
+lo fijó un fallo de hardware tres días antes de que se ejecutara la primera evaluación, y
+la cobertura se verificó sobre el registro de sesiones del recolector —unas 225 sesiones
+diarias, sin un solo día incompleto dentro de la ventana— antes de calcular ninguna
+métrica de resultado. El mínimo declarado en el pre-registro era de 25~días evaluados; la
+ventana disponible lo supera en un 40\,\%.
+
+\subsubsection{Brazos y capas}
+
+Se ejecutan los \textbf{tres brazos declarados}, y los tres se reportan con independencia
+de su signo. El brazo \emph{base} es la configuración congelada operando sin señal. El
+brazo \emph{suppress\_ask} suprime durante 240~segundos la cotización de venta del token
+favorecido por la señal H60. El brazo \emph{tight\_risk} activa, en los mercados
+señalados, un régimen de riesgo estricto que reduce a la mitad el límite de inventario y
+el sesgo de inventario y duplica el número de fotogramas en plano. La partición por el
+gate de regímenes congelado descrito en la Sección~\ref{sec::brazos_gate} se reporta como
+análisis secundario, con su hipótesis registrada de antemano.
+
+Las métricas son las del pre-registro, sin añadidos: equity neta —caja más inventario
+valorado a resolución más \emph{rebates}—, su descomposición en las tres partidas,
+\emph{markout} a corto plazo, peor día y porcentaje de mercados con resultado positivo.
+
+\subsubsection{Reglas de decisión, declaradas antes de mirar}
+
+La Tabla~\ref{tab::puertas_b3} recoge las tres condiciones que el pre-registro declara
+para promover la política a operación en sombra, y la regla de sustitución entre brazos.
+Se rellenan y se obedecen sin interpretación. Conviene subrayar que un resultado negativo
+no es un fracaso del trabajo ni obliga a reescribir nada: el pre-registro declara
+explícitamente que el experimento es informativo en cualquier dirección y que todo corte
+se reporta completo. La contribución de esta sección es el procedimiento y su ejecución
+honesta, no el signo del número que produzca.
+
+\begin{table}[htbp]
+\centering
+\caption[Puertas de decisión pre-declaradas]{Puertas de decisión pre-declaradas para el
+corte prospectivo nº~1, sobre el brazo base. Las tres condiciones deben cumplirse
+simultáneamente.}
+\label{tab::puertas_b3}
+\begin{tabular}{lcc}
+\hline
+\textbf{Condición} & \textbf{Valor medido} & \textbf{¿Cumple?} \\
+\hline
+Equity neta $> 0$ & --- & --- \\
+Peor día $> -150$\,\$ simulados & --- & --- \\
+Días evaluados $\geq 25$ & 35 & Sí \\
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\caption[Resultado del corte prospectivo por brazo]{Resultado del corte prospectivo
+nº~1 por brazo, con la descomposición declarada en el pre-registro.}
+\label{tab::corte_brazos}
+\begin{tabular}{lrrrrr}
+\hline
+\textbf{Brazo} & \textbf{Equity neta} & \textbf{Caja} & \textbf{Terminal} &
+\textbf{\emph{Rebates}} & \textbf{Peor día} \\
+\hline
+Base & --- & --- & --- & --- & --- \\
+\emph{suppress\_ask} & --- & --- & --- & --- & --- \\
+\emph{tight\_risk} & --- & --- & --- & --- & --- \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsubsection{Capas de reporte del protocolo general}
+
+El pre-registro general contempla, además de la adenda del simulador, dos capas de
+reporte sobre la política congelada del lado \emph{taker}: la histórica a 0,5 y la de
+comisión oficial. Su corte prospectivo tiene fecha propia y posterior —el 24 de agosto de
+2026— y se reporta aquí en un segundo bloque. Que las dos fechas sean distintas no es un
+descuido sino la consecuencia de que son dos experimentos encadenados: el del simulador
+maker no podía pre-registrarse hasta que el simulador existió, y por eso tiene su propia
+ventana, más corta y posterior. Ninguna de las dos fechas se ha movido respecto a lo
+sellado.
+
+% TODO M2 — pendiente del corte del 24-ago (capas del pre-registro general). No se
+% adelanta: la fecha está sellada. Al cerrarlo, tabla de las dos capas por brazo de gate.
+
+% TODO M1 — pendiente ÚNICAMENTE de ejecutar el corte (TFM-005). Al cerrarlo:
+%   (a) rellenar tab::puertas_b3 y tab::corte_brazos con los valores medidos;
+%   (b) escribir la lectura de los tres brazos y del análisis secundario por régimen;
+%   (c) figura de equity neta diaria acumulada por brazo sobre los 35 días;
+%   (d) resolver la regla de sustitución (solo si un brazo mejora neta Y terminal).
+% Nada de esto puede escribirse antes: son los números de una corrida única.
 
 \section{Comparativa con otros enfoques y baseline}
 

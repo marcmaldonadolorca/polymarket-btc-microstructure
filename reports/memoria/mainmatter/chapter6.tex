@@ -42,6 +42,24 @@ capturaron antes de que se abriera—, pero delimita el origen real de la ventan
 captura continua sobre la que se apoyará la validación prospectiva
 (Capítulo~\ref{ch::resultados}).
 
+\textbf{Cierre de la ventana prospectiva.} La ventana de evaluación prospectiva no la
+cerró una decisión metodológica sino un fallo de hardware: el 14 de agosto de 2026 a las
+11:05 UTC el disco de almacenamiento del recolector se desconectó del bus USB de la
+Raspberry~Pi y la captura se detuvo, reanudándose el 17 de agosto a las 09:23 UTC. El
+último día completo capturado es el 13 de agosto, y esa es la fecha de cierre de la
+ventana. La integridad de lo capturado se verificó antes de evaluar nada: el sistema de
+ficheros se recuperó mediante la reejecución de su diario, el medio no presentó errores
+de lectura ni antes ni después del incidente, y la cobertura diaria se comprobó una a una
+sobre el registro de sesiones del propio recolector. Resultan 35~días completos e
+ininterrumpidos, del 10 de julio al 13 de agosto, por encima del mínimo de 25~días
+declarado en el pre-registro. La circunstancia tiene una consecuencia metodológica
+favorable que conviene explicitar: el final de la ventana quedó determinado por una causa
+externa y ajena al experimento, y quedó determinado \emph{antes} de que se observara
+ningún resultado, de modo que la elección del punto de corte no pudo verse influida por
+los datos que ese corte iba a revelar. El hueco posterior al 14 de agosto queda
+documentado en el monitor del recolector, tal y como exige el propio pre-registro para
+cualquier exclusión de días por fallo de captura.
+
 \textbf{Dependencia y solapamiento.} Las 318 unidades del diagnóstico pertenecen a 156
 mercados, con hasta ocho señales por mercado y horizontes H60 solapados. El
 \emph{bootstrap} por filas subestima esa dependencia. Un remuestreo agrupado por mercado

@@ -572,6 +572,22 @@ Respuesta corta:
 
 > Estaba registrada de antemano y el clasificador se congeló con datos anteriores a la ventana. +4,06 frente a +3,12 de equity media por serie: se cumple.
 
+### 33. Dice que el riesgo empeoró, pero el peor día está a −2,13 desviaciones típicas y en desarrollo estaba a −2,15. ¿No es el mismo día de siempre en una distribución más ancha?
+
+Exacto, y es así como está escrito en la memoria. La lectura fácil —«la cola izquierda se ha duplicado»— no resiste el contraste, y la descarté precisamente por eso. El peor día ocupa la misma posición relativa en ambas ventanas; lo que cambia es la anchura de la distribución. Y ese ensanchamiento tiene dos componentes medibles: la desviación típica por par mercado-token sube un 12 % (19,11 → 21,45 $, Brown-Forsythe p = 1,7·10⁻⁹) y el número de pares simultáneos por día pasa de 42,4 a 48,1. Componiendo ambos, la desviación diaria crece un 46 %. El retorno medio, en cambio, no se mueve de forma detectable (p = 0,681). No hay un riesgo de cola nuevo: hay más operaciones y cada una es más dispersa.
+
+Respuesta corta:
+
+> Es el mismo día de siempre en una distribución más ancha, sí. Por eso la memoria no habla de cola sino de dispersión: +12 % por par con p = 1,7·10⁻⁹, y de 42 a 48 pares al día.
+
+### 34. Entonces el umbral de −150 $ falló por dispersión, no por riesgo. ¿No debería revisar el veredicto?
+
+No, y creo que esa es la parte importante. La regla estaba escrita antes, dice −150 $ en términos absolutos, y el peor día fue −235,66: el veredicto es NO-GO y se aplica literalmente. Lo que la descomposición añade no es una excusa sino una crítica al diseño, que recojo como limitación: un umbral absoluto codifica una hipótesis implícita sobre la dispersión. Con la del desarrollo equivalía a unas 1,2 desviaciones típicas diarias; con la de la ventana prospectiva cae prácticamente sobre una. La probabilidad de fallarlo no era la misma en los dos escenarios y el pre-registro no lo distinguía. Un diseño más exigente habría declarado el umbral en unidades de dispersión, o habría hecho el análisis de potencia que le correspondía. Eso se aprende ejecutando el experimento, no diseñándolo.
+
+Respuesta corta:
+
+> El veredicto se mantiene literal: la regla estaba escrita y se aplica. Lo que añado es la crítica al diseño —un umbral absoluto esconde una hipótesis sobre la dispersión— y va como limitación, no como atenuante.
+
 ---
 
 ## 7. Cosas que conviene no decir

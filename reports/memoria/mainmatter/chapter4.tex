@@ -329,12 +329,55 @@ las tres condiciones y, por tanto, el veredicto es \textbf{NO-GO}: la política 
 promueve a operación en sombra.
 
 Conviene detenerse en esto, porque es el resultado más informativo del capítulo. La
-puerta no rechazó una estrategia que perdiera dinero: rechazó una que ganó un
-$83$\,\% más por día que en el desarrollo —donde rendía unos $53$\,\$ diarios— porque su
-cola izquierda resultó ser el doble de profunda de lo tolerado. Un criterio
-pre-registrado que solo aprueba no demuestra nada; este tenía dientes, y los enseñó
-contra un resultado económicamente favorable. La disciplina del método es aquí más
-valiosa que el signo del agregado.
+puerta no rechazó una estrategia que perdiera dinero: rechazó una rentable, y lo hizo por
+la única de las tres condiciones que mide riesgo y no retorno. Un criterio pre-registrado
+que solo aprueba no demuestra nada; este tenía dientes, y los enseñó contra un resultado
+económicamente favorable.
+
+Interesa precisar contra qué se compara ese rendimiento, porque la elección del punto de
+referencia puede hacerlo parecer mejor o peor de lo que es. La media de $97{,}4$\,\$
+diarios queda \emph{entre} las dos referencias previas de la misma configuración: los
+$\sim$112\,\$ diarios del ajuste sobre mayo-junio, que es una cifra dentro de muestra, y
+los $\sim$53\,\$ de la validación única de julio, que era fuera de muestra pero se apoyaba
+en solo tres días. El retorno medio, por tanto, no mejora ni empeora de forma
+concluyente: se mantiene dentro de la banda ya conocida.
+
+Lo que sí cambia es la dispersión, y conviene decirlo con precisión porque la lectura
+inmediata —«la cola izquierda se ha duplicado»— no resiste el contraste. El peor día
+pasa de $-118{,}46$ a $-235{,}66$\,\$, pero \textbf{ocupa la misma posición relativa dentro de
+su propia ventana}: su distancia a la media, medida en desviaciones típicas diarias, es
+de $-2{,}15$ en desarrollo y $-2{,}13$ en la ventana prospectiva. No es un día más
+extremo: es el mínimo de una distribución más ancha.
+
+Lo que se ensancha es medible y tiene dos componentes. La desviación típica de la equity
+\emph{por par mercado-token} crece de $19{,}11$ a $21{,}45$\,\$ —un $12$\,\%, con un
+contraste de Brown-Forsythe que da $p = 1{,}7\cdot 10^{-9}$—, y el número de pares
+simultáneos por día sube de $42{,}4$ a $48{,}1$. Ambos efectos se componen: la desviación
+típica \emph{diaria} pasa de $106{,}88$ a $156{,}25$\,\$, un factor $1{,}46$ cuyo
+contraste $F$ queda en $p = 0{,}060$, marginal por el escaso número de días. El retorno
+medio, en cambio, no se mueve de forma detectable ($111{,}53$ frente a $97{,}37$\,\$
+diarios, $p = 0{,}681$). El $70{,}8$\,\% de la varianza de la equity procede del valor
+terminal del inventario, que es precisamente la partida sobre la que actúan los brazos de
+señal.
+
+Esto obliga a una observación crítica sobre el propio diseño de la puerta, que se hace
+aquí como limitación y no como atenuante: \textbf{el umbral se declaró como una cantidad
+absoluta, sin análisis de potencia}. Se fijó en $-150$\,\$ contra el peor día de la
+validación de julio, $-120$\,\$, con un margen del $25$\,\%. Pero un umbral absoluto
+codifica implícitamente una hipótesis sobre la dispersión: con la desviación por par del
+desarrollo equivale a unas $1{,}2$ desviaciones típicas diarias, mientras que con la de la
+ventana prospectiva ($21{,}45 \times \sqrt{48} \approx 148{,}6$) cae prácticamente sobre
+una sola. La probabilidad de fallar la puerta no era la misma en los dos escenarios, y el
+pre-registro no distinguía entre ellos. Un diseño más exigente habría declarado el umbral
+en unidades de dispersión, o habría acompañado la regla de la potencia estadística que le
+correspondía.
+
+Nada de esto altera el veredicto. La regla estaba escrita, es la que se aplica y el
+resultado es NO-GO. Lo que cambia es la explicación de \emph{por qué} se falla: no porque
+aparezca un riesgo de cola nuevo, sino porque cada operación se volvió un $12$\,\% más
+dispersa y se ejecutaron más operaciones simultáneas, de modo que la distribución diaria
+se ensanchó lo suficiente para que su mínimo ordinario cruzara una línea fijada sobre una
+distribución más estrecha.
 
 \textbf{Ninguna variante de señal sustituye a la base.} La regla de sustitución exigía
 mejorar simultáneamente la equity neta y el valor terminal. Las dos variantes mejoran el

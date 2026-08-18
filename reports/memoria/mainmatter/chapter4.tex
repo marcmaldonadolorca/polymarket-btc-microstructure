@@ -553,8 +553,77 @@ mercados a una hora, 96 a quince minutos y 284 a cinco, de modo que la curva se 
 torno al 6\,\% de los mercados disponibles. La conclusión que sostiene, por tanto, es que
 \emph{más muestras solapadas del mismo conjunto de trayectorias} no cierran la brecha; no
 llega a afirmar que no la cerraría un corpus con un orden de magnitud más de trayectorias
-independientes, que es un experimento que este trabajo no ha realizado y que queda
-señalado como línea futura en el Capítulo~\ref{ch::conclusiones}.
+independientes. Ese experimento sí se ha realizado, después de detectar la limitación, y
+se recoge a continuación.
+
+\subsection{Adenda C: la curva de escalado sobre trayectorias independientes}
+\label{sec::escalado_trayectorias}
+
+Detectada la limitación anterior, se diseñó y \textbf{pre-registró} un experimento que
+varía exactamente el eje que faltaba y ningún otro. El protocolo se selló antes de
+entrenar ningún modelo, con las huellas criptográficas de los tres artefactos ejecutables
+y una marca de tiempo de OpenTimestamps, y con las dos redacciones posibles del resultado
+escritas de antemano para que ninguna rama pudiera elegir la narración.
+
+El corpus se amplió a las tres temporalidades capturadas sobre \emph{los mismos 24 días}:
+7.784 mercados y 15.568 pares mercado-token, frente a los 509 y 1.018 originales. Una
+restricción física obliga a un cambio: la rejilla es de dos segundos, de modo que un
+mercado de cinco minutos apenas alcanza los 150 fotogramas y el contexto de 512 de la
+curva publicada no cabe en él. Se fijó por tanto un contexto de \textbf{128 fotogramas en
+todos los brazos}, incluido el de una hora; reducirlo solo en el brazo ampliado habría
+confundido longitud de contexto con número de trayectorias. Los cuatro brazos —tabular y
+profundo, con y sin temporalidades cortas— se evalúan sobre \emph{los mismos} 916 casos
+held-out de mercados horarios, que es la comparación conservadora: el brazo ampliado no
+puede beneficiarse de un conjunto de prueba más benévolo.
+
+\begin{table}[htbp]
+\centering
+\caption[Escalado sobre trayectorias independientes]{Curva de escalado sobre trayectorias
+independientes, en el punto máximo del eje ($n_{\text{train}} = 45.000$). Acierto sobre
+los mismos 916 casos held-out para los cuatro brazos.}
+\label{tab::escalado_trayectorias}
+\begin{tabular}{lrrrr}
+\hline
+\textbf{Brazo} & \textbf{Mercados} & \textbf{Trayectorias} & \textbf{Acierto} & \textbf{Bruto} \\
+\hline
+Tabular, solo 1h & 509 & 950 & $50{,}55$\,\% & $+0{,}5465$ \\
+Profundo, solo 1h & 509 & 950 & $49{,}56$\,\% & $+0{,}6500$ \\
+Tabular, 1h+15m+5m & 7.784 & 2.685 & $\mathbf{50{,}87}$\,\% & $+0{,}5312$ \\
+Profundo, 1h+15m+5m & 7.784 & 2.685 & $49{,}45$\,\% & $+0{,}7701$ \\
+\hline
+\end{tabular}
+\end{table}
+
+El resultado activa la rama declarada como principal: \textbf{la brecha no se cierra}. La
+regla pre-registrada exigía que el brazo profundo superara al tabular por más de un punto
+porcentual para considerar que la conclusión publicada era un artefacto del diseño
+muestral; queda $1{,}42$ puntos por debajo. La tesis del capítulo se sostiene ahora sobre
+el eje correcto, lo que la hace más fuerte, no más débil: ni más muestras solapadas de las
+mismas trayectorias ni un número sensiblemente mayor de trayectorias distintas alteran el
+orden de mérito entre las dos vías.
+
+\subsubsection{Un hallazgo no buscado: la tarea excluye los mercados cortos}
+
+El diseño pretendía multiplicar las trayectorias por quince y solo consiguió multiplicarlas
+por menos de tres. El motivo no es de disponibilidad de datos, y merece quedar escrito
+porque reencuadra la conclusión anterior.
+
+Cada par requiere, para producir una sola ventana válida, 128 fotogramas de contexto, 60
+de horizonte y un margen de seguridad anti-fuga de 188 fotogramas alrededor del corte de
+evaluación, con el muestreo comenzando a mitad de sesión: del orden de 376 fotogramas como
+mínimo. La longitud mediana de un mercado de cinco minutos es de \textbf{160 fotogramas},
+menos que el propio margen de seguridad. De sus 10.812 pares, 7.116 no ofrecen ningún
+rango utilizable y otros 3.662 quedan anulados por el margen; sobreviven 34, que aportan
+332 de las 97.752 ventanas totales. El corpus ampliado resulta ser, en la práctica, un
+87\,\% de ventanas horarias.
+
+La consecuencia es metodológica y no menor: lo que limita el aprendizaje aquí no es solo
+el régimen de los datos, sino \textbf{la geometría de la tarea}, que descarta el 94\,\% de
+los mercados capturados antes de que empiece el entrenamiento. La elección de operar solo
+con mercados horarios, que en la curva original podía parecer una simplificación, resulta
+ser una consecuencia forzada del horizonte elegido. Una línea futura que quiera aprovechar
+los mercados de horizonte corto —que son los más numerosos con diferencia— no necesita más
+datos: necesita redefinir el horizonte de predicción.
 
 \begin{figure}[htbp]
 \centering

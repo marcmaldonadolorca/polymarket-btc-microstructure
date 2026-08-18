@@ -588,6 +588,30 @@ Respuesta corta:
 
 > El veredicto se mantiene literal: la regla estaba escrita y se aplica. Lo que añado es la crítica al diseño —un umbral absoluto esconde una hipótesis sobre la dispersión— y va como limitación, no como atenuante.
 
+### 35. La adenda C es un experimento añadido a nueve días de la entrega. ¿No es una improvisación?
+
+Es lo contrario, y por eso está donde está. Una auditoría del propio expediente encontró que la conclusión publicada —«el techo es el régimen de datos, no la arquitectura»— estaba enunciada más ancha de lo que el experimento medía: la curva hacía crecer ventanas solapadas al 98 % sobre 509 mercados, todos de temporalidad horaria, que son el 6 % de los mercados capturados cada día. El eje de trayectorias independientes nunca se varió. Ante eso caben dos salidas: acotar la frase y callarse, o hacer el experimento. Hice las dos: acoté la frase en el capítulo 4 y después pre-registré el experimento, lo sellé con marca de tiempo antes de entrenar nada, y escribí las dos redacciones posibles del resultado por adelantado. El experimento tardó una tarde; lo que no se podía improvisar era la disciplina, y esa venía de serie.
+
+Respuesta corta:
+
+> Al revés: una auditoría encontró una afirmación más ancha que su evidencia. La acoté y además hice el experimento, pre-registrado y sellado antes de entrenar, con las dos conclusiones escritas de antemano.
+
+### 36. ¿Cómo sé que no pre-registró algo cuyo resultado ya intuía?
+
+Porque la rama contraria estaba escrita con el mismo detalle y me habría obligado a corregir mi propia conclusión publicada. El pre-registro dice literalmente que si la brecha se cerraba, «la conclusión publicada era un artefacto del diseño muestral» y había que corregirla en el capítulo 4. No hay rama en la que el experimento se omita ni en la que yo quede bien por defecto. Y la regla de decisión era numérica y anterior: un punto porcentual de acierto en el punto máximo del eje. El brazo profundo quedó 1,42 puntos por debajo del tabular; si hubiera quedado 1,1 por encima, hoy estaría defendiendo lo contrario.
+
+Respuesta corta:
+
+> Porque la rama contraria estaba escrita y me obligaba a corregirme. La regla era numérica y previa: un punto en el punto máximo. Salió 1,42 en contra.
+
+### 37. ¿Qué aporta la adenda, si confirma lo que ya decía?
+
+Dos cosas, y la segunda no la buscaba. La primera es que la tesis pasa a sostenerse sobre el eje correcto: triplicar las trayectorias independientes tampoco cierra la brecha, así que la afirmación es más fuerte que antes, no igual. La segunda apareció al intentar multiplicar las trayectorias por quince y conseguir solo por tres. El motivo es estructural: la tarea exige unos 376 fotogramas por par —128 de contexto, 60 de horizonte y 188 de margen anti-fuga— y un mercado de cinco minutos tiene 160 de mediana, menos que el margen él solo. De sus 10.812 pares sobreviven 34. Es decir: lo que limita el aprendizaje no es solo el régimen de los datos, es **la geometría de la tarea**, que descarta el 94 % de los mercados antes de empezar. Quien quiera usar los mercados cortos no necesita más datos: necesita otro horizonte.
+
+Respuesta corta:
+
+> Que la tesis se sostiene ya en el eje correcto, y un hallazgo que no buscaba: la tarea descarta el 94 % de los mercados por geometría —376 fotogramas exigidos frente a 160 de mediana en los de 5 minutos—. El límite no es solo el dato, es el horizonte.
+
 ---
 
 ## 7. Cosas que conviene no decir

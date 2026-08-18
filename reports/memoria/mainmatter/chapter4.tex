@@ -277,13 +277,15 @@ honesta, no el signo del número que produzca.
 corte prospectivo nº~1, sobre el brazo base. Las tres condiciones deben cumplirse
 simultáneamente.}
 \label{tab::puertas_b3}
-\begin{tabular}{lcc}
+\begin{tabular}{lrc}
 \hline
 \textbf{Condición} & \textbf{Valor medido} & \textbf{¿Cumple?} \\
 \hline
-Equity neta $> 0$ & --- & --- \\
-Peor día $> -150$\,\$ simulados & --- & --- \\
+Equity neta $> 0$ & $+3.408{,}11$\,\$ & Sí \\
+Peor día $> -150$\,\$ simulados & $-235{,}66$\,\$ (5-ago) & \textbf{No} \\
 Días evaluados $\geq 25$ & 35 & Sí \\
+\hline
+\multicolumn{2}{l}{\textbf{Resultado: NO-GO}} & \\
 \hline
 \end{tabular}
 \end{table}
@@ -291,19 +293,89 @@ Días evaluados $\geq 25$ & 35 & Sí \\
 \begin{table}[htbp]
 \centering
 \caption[Resultado del corte prospectivo por brazo]{Resultado del corte prospectivo
-nº~1 por brazo, con la descomposición declarada en el pre-registro.}
+nº~1 por brazo, con la descomposición declarada en el pre-registro. Valores en dólares
+simulados sobre los 35~días de la ventana y 1.684 pares mercado-token.}
 \label{tab::corte_brazos}
 \begin{tabular}{lrrrrr}
 \hline
 \textbf{Brazo} & \textbf{Equity neta} & \textbf{Caja} & \textbf{Terminal} &
 \textbf{\emph{Rebates}} & \textbf{Peor día} \\
 \hline
-Base & --- & --- & --- & --- & --- \\
-\emph{suppress\_ask} & --- & --- & --- & --- & --- \\
-\emph{tight\_risk} & --- & --- & --- & --- & --- \\
+Base & $+3.408{,}11$ & $+9.425{,}06$ & $-6.712{,}95$ & $+696{,}00$ & $-235{,}66$ \\
+\emph{suppress\_ask} & $+3.397{,}73$ & $+9.139{,}05$ & $-6.430{,}98$ & $+689{,}66$ & $-241{,}43$ \\
+\emph{tight\_risk} & $+2.925{,}10$ & $+8.372{,}26$ & $-6.103{,}28$ & $+656{,}12$ & $-233{,}26$ \\
 \hline
 \end{tabular}
 \end{table}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.92\textwidth]{figures/fig_corte_prospectivo.png}
+\caption[Corte prospectivo pre-registrado nº 1]{Corte prospectivo pre-registrado nº~1.
+Arriba, equity neta acumulada por brazo sobre los 35~días de la ventana. Abajo, equity
+diaria del brazo base con el umbral pre-declarado de $-150$\,\$: el corte no falla por
+rentabilidad —la curva acumulada termina en $+3.408$\,\$— sino por la profundidad de un
+único día, el 5 de agosto.}
+\label{fig:corte_prospectivo}
+\end{figure}
+
+\subsubsection{Lectura del corte}
+
+\textbf{La política congelada gana dinero y aun así no pasa la puerta.} El brazo base
+acumula $+3.408{,}11$\,\$ simulados en 35~días —una media de $97{,}4$\,\$ diarios— con
+10~días negativos y un $50{,}4$\,\% de pares mercado-token en positivo. Pero su peor día
+es $-235{,}66$\,\$, y la regla pre-declarada exigía no bajar de $-150$\,\$. Falla una de
+las tres condiciones y, por tanto, el veredicto es \textbf{NO-GO}: la política no se
+promueve a operación en sombra.
+
+Conviene detenerse en esto, porque es el resultado más informativo del capítulo. La
+puerta no rechazó una estrategia que perdiera dinero: rechazó una que ganó un
+$83$\,\% más por día que en el desarrollo —donde rendía unos $53$\,\$ diarios— porque su
+cola izquierda resultó ser el doble de profunda de lo tolerado. Un criterio
+pre-registrado que solo aprueba no demuestra nada; este tenía dientes, y los enseñó
+contra un resultado económicamente favorable. La disciplina del método es aquí más
+valiosa que el signo del agregado.
+
+\textbf{Ninguna variante de señal sustituye a la base.} La regla de sustitución exigía
+mejorar simultáneamente la equity neta y el valor terminal. Las dos variantes mejoran el
+terminal —\emph{suppress\_ask} lo lleva de $-6.712{,}95$ a $-6.430{,}98$ y
+\emph{tight\_risk} hasta $-6.103{,}28$— pero ninguna mejora la neta. Se documentan y se
+descartan, como estaba escrito.
+
+El detalle importa más que el agregado, porque las variantes solo actúan sobre los
+208~pares que la señal toca. Restringiendo la comparación a ese subconjunto, el efecto
+es inequívoco: \emph{tight\_risk} reduce el inventario terminal de $-1.565{,}57$ a
+$-955{,}91$ —un $39$\,\% menos— mientras la equity neta cae de $+841{,}44$ a
+$+358{,}44$, es decir, un $57$\,\%. La señal H60 hace exactamente lo que el diagnóstico
+del Capítulo~\ref{ch::resultados} anticipaba: incide sobre el inventario terminal, que
+era la palanca identificada. Lo que el corte añade es el precio de accionarla, y ese
+precio no estaba medido: controlar el riesgo terminal cuesta más de la mitad del
+beneficio en caja. La hipótesis era correcta y la palanca funciona; simplemente no
+compensa.
+
+\textbf{El \emph{markout} confirma que la ejecución maker captura spread, pero poco.}
+Los tres brazos quedan en torno a $+0{,}011$~ticks a 30 y 60~segundos. El signo es el
+esperado para un proveedor de liquidez, la magnitud es marginal.
+
+\textbf{Análisis secundario por régimen: la hipótesis registrada se cumple.} Aplicando
+el gate congelado de la adenda~A —entrenado únicamente con datos de mayo y junio, y por
+tanto sin haber visto un solo frame de la ventana— las 1.673 series se reparten en dos
+regímenes, siendo el agitado el de mayor volatilidad realizada ($11{,}5$ frente a
+$6{,}2$). Sobre el brazo base y descartando los terminales ambiguos ($n=1.316$), el
+régimen agitado rinde $+4{,}06$\,\$ de equity media por serie frente a $+3{,}12$\,\$ del
+tranquilo, y concentra además un inventario terminal menos negativo. La hipótesis
+declarada de antemano —que el régimen agitado favorece el neto maker— queda confirmada
+prospectivamente, lo que respalda la observación de desarrollo recogida en el
+Capítulo~\ref{ch::metodos}.
+
+\textbf{Qué se lleva el trabajo de aquí.} Un NO-GO pre-registrado no invalida la vía
+maker: la sitúa. La economía del lado maker es positiva y medible donde la del lado
+\emph{taker} era estructuralmente negativa, que es el giro que motiva el
+Capítulo~\ref{ch::despliegue}; pero su perfil de riesgo diario, con la configuración
+congelada y sin respuesta competitiva del mercado, excede el umbral que este trabajo se
+fijó antes de mirar. La consecuencia práctica no es abandonar la línea sino que
+cualquier continuación debe atacar la cola izquierda —no el retorno medio— y volver a
+someterse a una puerta declarada de antemano.
 
 \subsubsection{Capas de reporte del protocolo general}
 
@@ -319,12 +391,9 @@ sellado.
 % TODO M2 — pendiente del corte del 24-ago (capas del pre-registro general). No se
 % adelanta: la fecha está sellada. Al cerrarlo, tabla de las dos capas por brazo de gate.
 
-% TODO M1 — pendiente ÚNICAMENTE de ejecutar el corte (TFM-005). Al cerrarlo:
-%   (a) rellenar tab::puertas_b3 y tab::corte_brazos con los valores medidos;
-%   (b) escribir la lectura de los tres brazos y del análisis secundario por régimen;
-%   (c) figura de equity neta diaria acumulada por brazo sobre los 35 días;
-%   (d) resolver la regla de sustitución (solo si un brazo mejora neta Y terminal).
-% Nada de esto puede escribirse antes: son los números de una corrida única.
+% M1 CERRADO 2026-08-18 con el corte ejecutado: tablas rellenas, lectura escrita,
+% regla de sustitución resuelta (ninguna variante sustituye) y análisis secundario
+% por régimen contrastado. Queda solo la figura (c) de equity diaria por brazo.
 
 \section{Comparativa con otros enfoques y baseline}
 

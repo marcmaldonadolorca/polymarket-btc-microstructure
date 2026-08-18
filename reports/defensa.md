@@ -540,6 +540,38 @@ Respuesta corta:
 
 > La divergencia está sellada aparte y documentada. El motor original no podía ejecutar el brazo base; revertir habría roto el experimento, no salvado el sello.
 
+### 29. El corte prospectivo gana 3.408 $ en 35 días. ¿Por qué lo declara NO-GO en lugar de presentarlo como un éxito?
+
+Porque la regla estaba escrita antes y decía otra cosa. Las tres condiciones eran equity neta positiva, peor día por encima de −150 $ y al menos 25 días evaluados. Se cumplen la primera y la tercera; la segunda no: el peor día fue −235,66 $ el 5 de agosto. Una puerta pre-registrada solo vale si se obedece cuando incomoda, y esta incomoda: rechaza una estrategia que rindió 97,4 $ diarios, un 83 % más que en desarrollo. Si la hubiera relajado al ver el número, el pre-registro entero —y con él el capítulo 4— dejaría de significar nada. El resultado que presento no es «gané dinero», es «tenía un criterio y lo apliqué».
+
+Respuesta corta:
+
+> Porque la regla se escribió antes de mirar y dice que no. Falla el peor día: −235,66 frente al umbral de −150. Una puerta que solo aprueba no demuestra nada.
+
+### 30. ¿Qué aporta entonces la vía maker, si el veredicto es negativo?
+
+Sitúa el problema, que es distinto de resolverlo. El lado taker es estructuralmente negativo: con la comisión oficial, la comisión media de entrada se come por sí sola el resultado bruto de la señal. El lado maker, en cambio, es positivo y medible: 35 días limpios, equity acumulada positiva, markout de +0,011 ticks —el signo que corresponde a un proveedor de liquidez—. Lo que el corte añade, y no estaba medido, es el perfil de riesgo diario: la cola izquierda es el doble de profunda de lo que este trabajo se fijó como tolerable. La consecuencia práctica es concreta: cualquier continuación tiene que atacar la cola, no el retorno medio, y volver a someterse a una puerta declarada de antemano.
+
+Respuesta corta:
+
+> Que el valor está en el lado maker y es medible, pero su cola izquierda excede el umbral. La línea sigue viva; lo que hay que arreglar es el riesgo diario, no el retorno.
+
+### 31. Las dos variantes de señal mejoran el inventario terminal pero ninguna sustituye a la base. ¿No es contradictorio?
+
+No, y es el hallazgo más fino del corte. La regla de sustitución exigía mejorar la equity neta **y** el terminal a la vez. Restringiendo la comparación a los 208 pares que la señal toca, `tight_risk` reduce el inventario terminal de −1.565,57 a −955,91 —un 39 % menos— mientras la neta cae de +841,44 a +358,44, un 57 %. Es decir: la palanca funciona y hace exactamente lo que el diagnóstico N1 predijo, incidir sobre el terminal. Lo que el corte mide por primera vez es su precio, y el precio es más de la mitad del beneficio en caja. La hipótesis era correcta; simplemente no compensa accionarla.
+
+Respuesta corta:
+
+> La señal hace lo que se esperaba —aplanar el terminal, un 39 %— pero cuesta el 57 % de la neta. Funciona y no compensa; por eso se documenta y se descarta.
+
+### 32. El análisis secundario por régimen, ¿no es un resultado buscado a posteriori?
+
+No, y esa es justamente la razón de que esté declarado. El pre-registro sellado registra la hipótesis con estas palabras: el régimen agitado favorece el neto maker. El clasificador que separa los regímenes es la adenda A, un k-means entrenado únicamente con datos de mayo y junio y congelado con su propio hash: no ha visto un solo frame de la ventana de evaluación. Aplicado a las 1.673 series, el régimen agitado rinde +4,06 $ de equity media por serie frente a +3,12 del tranquilo. La hipótesis se cumple, pero lo que la hace citable no es que se cumpla, sino que estaba escrita y el clasificador congelado antes.
+
+Respuesta corta:
+
+> Estaba registrada de antemano y el clasificador se congeló con datos anteriores a la ventana. +4,06 frente a +3,12 de equity media por serie: se cumple.
+
 ---
 
 ## 7. Cosas que conviene no decir
@@ -608,7 +640,8 @@ Contenido:
 3. OOS limpio: señal modesta (+0.349 ticks, n=754); con la fee oficial, el taker es inviable.
 4. Baja volatilidad: hipótesis post-hoc prometedora (+1.069 ticks, n=318).
 5. El valor se desplaza al lado maker: cuantificado, simulado y pre-registrado.
-6. Próximo paso: validación prospectiva congelada y sellada en Bitcoin.
+6. Validación prospectiva ejecutada: 35 días limpios, +3.408 $ y aun así NO-GO.
+   La puerta tenía dientes.
 ```
 
 Frase de cierre:

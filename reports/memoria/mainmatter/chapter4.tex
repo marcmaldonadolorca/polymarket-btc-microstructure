@@ -542,6 +542,20 @@ lección para el proyecto es coherente con el resto del trabajo: la complejidad 
 no es el cuello de botella, de modo que no compra rendimiento; con dos semanas de datos, la
 capacidad de una red profunda es una desventaja, no una ventaja.
 
+Conviene delimitar con exactitud qué eje recorre esta curva, porque de ello depende el
+alcance de la conclusión. El presupuesto de datos se varió aumentando el número de
+\emph{ventanas} de entrenamiento sobre un corpus fijo de 509 mercados —1.018 pares
+mercado-token— pertenecientes todos a la temporalidad horaria. Como las ventanas se
+solapan casi por completo, lo que crece a lo largo del eje es la densidad de muestreo, no
+el número de trayectorias independientes, que permanece constante. Y la temporalidad
+horaria es solo una de las tres capturadas: un día cualquiera del corpus contiene 24
+mercados a una hora, 96 a quince minutos y 284 a cinco, de modo que la curva se apoya en
+torno al 6\,\% de los mercados disponibles. La conclusión que sostiene, por tanto, es que
+\emph{más muestras solapadas del mismo conjunto de trayectorias} no cierran la brecha; no
+llega a afirmar que no la cerraría un corpus con un orden de magnitud más de trayectorias
+independientes, que es un experimento que este trabajo no ha realizado y que queda
+señalado como línea futura en el Capítulo~\ref{ch::conclusiones}.
+
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=0.72\textwidth]{figures/fig_scaling_tab_vs_deep.png}

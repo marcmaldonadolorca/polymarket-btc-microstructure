@@ -579,28 +579,58 @@ puede beneficiarse de un conjunto de prueba más benévolo.
 \begin{table}[htbp]
 \centering
 \caption[Escalado sobre trayectorias independientes]{Curva de escalado sobre trayectorias
-independientes, en el punto máximo del eje ($n_{\text{train}} = 45.000$). Acierto sobre
-los mismos 916 casos held-out para los cuatro brazos.}
+independientes. Acierto sobre los mismos 916 casos held-out para los cuatro brazos, con
+intervalo de confianza binomial al 95\,\%. El punto inferior de cada bloque agota el
+\emph{pool} disponible y llega a $1{,}65$--$1{,}88$ veces el máximo que la curva publicada
+había explorado.}
 \label{tab::escalado_trayectorias}
-\begin{tabular}{lrrrr}
+\begin{tabular}{lrrrl}
 \hline
-\textbf{Brazo} & \textbf{Mercados} & \textbf{Trayectorias} & \textbf{Acierto} & \textbf{Bruto} \\
+\textbf{Brazo} & \textbf{$n_{\text{train}}$} & \textbf{Trayect.} & \textbf{Acierto} & \textbf{IC\,95\,\%} \\
 \hline
-Tabular, solo 1h & 509 & 950 & $50{,}55$\,\% & $+0{,}5465$ \\
-Profundo, solo 1h & 509 & 950 & $49{,}56$\,\% & $+0{,}6500$ \\
-Tabular, 1h+15m+5m & 7.784 & 2.685 & $\mathbf{50{,}87}$\,\% & $+0{,}5312$ \\
-Profundo, 1h+15m+5m & 7.784 & 2.685 & $49{,}45$\,\% & $+0{,}7701$ \\
+Tabular, solo 1h & 45.000 & 950 & $50{,}55$\,\% & $[47{,}26;\ 53{,}83]$ \\
+Profundo, solo 1h & 45.000 & 950 & $49{,}56$\,\% & $[46{,}28;\ 52{,}85]$ \\
+Tabular, 1h+15m+5m & 45.000 & 2.685 & $50{,}87$\,\% & $[47{,}58;\ 54{,}16]$ \\
+Profundo, 1h+15m+5m & 45.000 & 2.685 & $49{,}45$\,\% & $[46{,}17;\ 52{,}74]$ \\
+\hline
+Tabular, solo 1h & 74.218 & 952 & $49{,}45$\,\% & $[46{,}17;\ 52{,}74]$ \\
+Profundo, solo 1h & 74.218 & 952 & $48{,}03$\,\% & $[44{,}76;\ 51{,}33]$ \\
+Tabular, 1h+15m+5m & 84.438 & 2.834 & $49{,}78$\,\% & $[46{,}49;\ 53{,}07]$ \\
+Profundo, 1h+15m+5m & 84.438 & 2.834 & $48{,}91$\,\% & $[45{,}62;\ 52{,}20]$ \\
 \hline
 \end{tabular}
 \end{table}
 
-El resultado activa la rama declarada como principal: \textbf{la brecha no se cierra}. La
-regla pre-registrada exigía que el brazo profundo superara al tabular por más de un punto
-porcentual para considerar que la conclusión publicada era un artefacto del diseño
-muestral; queda $1{,}42$ puntos por debajo. La tesis del capítulo se sostiene ahora sobre
-el eje correcto, lo que la hace más fuerte, no más débil: ni más muestras solapadas de las
-mismas trayectorias ni un número sensiblemente mayor de trayectorias distintas alteran el
-orden de mérito entre las dos vías.
+Aplicada literalmente, la regla pre-registrada activa la rama principal: el brazo profundo
+no supera al tabular por más de un punto porcentual en ningún punto del eje, de modo que
+la conclusión publicada no queda declarada artefacto del diseño muestral.
+
+Pero la lectura honesta del experimento es más severa que su propia regla, y conviene
+decirlo con claridad: \textbf{ninguno de los ocho puntos se distingue del azar}. Todos los
+intervalos de confianza contienen el 50\,\% y el contraste binomial frente a esa hipótesis
+no baja de $p = 0{,}25$ en ningún caso. La regla de decisión exigía separar los brazos por
+un punto porcentual cuando el error estándar del acierto sobre 916 casos es de $1{,}65$
+puntos y el intervalo de una diferencia entre dos brazos alcanza los $4{,}6$: el umbral se
+declaró \emph{por debajo del suelo de ruido} del propio conjunto de evaluación. Ninguna de
+las dos ramas del pre-registro podía, por tanto, quedar establecida con estos datos.
+
+Es la segunda vez en este trabajo que un criterio de decisión se declara en unidades
+absolutas sin el análisis de potencia que le corresponde —la primera fue el umbral de peor
+día de la Sección~\ref{sec::validacion_prospectiva}— y la coincidencia no es casual: en
+ambos casos el umbral se fijó por analogía con una magnitud observada antes, y no
+derivándolo de la dispersión del estadístico que iba a contrastar. Queda como advertencia
+metodológica para cualquier continuación, y explica por qué el pre-registro, siendo
+condición necesaria para la honestidad de un experimento, no es condición suficiente para
+su poder.
+
+Lo que sí puede afirmarse sin ambigüedad es lo negativo, y no es poco: llevando el eje
+hasta agotar el \emph{pool} —$1{,}88$ veces más ventanas de las que la curva publicada
+llegó a explorar, y casi el triple de trayectorias independientes— \textbf{ninguna de las
+dos vías consigue despegarse del azar en la predicción del signo a H60}. El resultado es
+coherente con el diagnóstico independiente del Capítulo~\ref{ch::metodos}, donde se
+estableció que el precio medio es esencialmente una moneda al aire en la apertura de la
+ventana. La comparación entre arquitecturas se estaba dirimiendo, en realidad, entre dos
+modelos que no resuelven la tarea.
 
 \subsubsection{Un hallazgo no buscado: la tarea excluye los mercados cortos}
 

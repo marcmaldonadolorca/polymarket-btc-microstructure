@@ -606,11 +606,19 @@ Respuesta corta:
 
 ### 37. ¿Qué aporta la adenda, si confirma lo que ya decía?
 
-Dos cosas, y la segunda no la buscaba. La primera es que la tesis pasa a sostenerse sobre el eje correcto: triplicar las trayectorias independientes tampoco cierra la brecha, así que la afirmación es más fuerte que antes, no igual. La segunda apareció al intentar multiplicar las trayectorias por quince y conseguir solo por tres. El motivo es estructural: la tarea exige unos 376 fotogramas por par —128 de contexto, 60 de horizonte y 188 de margen anti-fuga— y un mercado de cinco minutos tiene 160 de mediana, menos que el margen él solo. De sus 10.812 pares sobreviven 34. Es decir: lo que limita el aprendizaje no es solo el régimen de los datos, es **la geometría de la tarea**, que descarta el 94 % de los mercados antes de empezar. Quien quiera usar los mercados cortos no necesita más datos: necesita otro horizonte.
+Dos cosas, y ninguna es la que esperaba. La primera es negativa y sólida: llevando el eje hasta agotar el corpus —1,88 veces más ventanas de las que la curva publicada llegó a explorar— **ninguna de las dos vías se despega del azar**. Los ocho puntos del experimento tienen intervalos de confianza que contienen el 50 % y ningún contraste baja de p = 0,25. Es decir, la comparación entre arquitecturas se estaba dirimiendo entre dos modelos que no resuelven la tarea, lo cual es coherente con el diagnóstico N1: el precio medio es una moneda al aire en la apertura. La segunda apareció al intentar multiplicar las trayectorias por quince y conseguir solo por tres. El motivo es estructural: la tarea exige unos 376 fotogramas por par —128 de contexto, 60 de horizonte y 188 de margen anti-fuga— y un mercado de cinco minutos tiene 160 de mediana, menos que el margen él solo. De sus 10.812 pares sobreviven 34. Es decir: lo que limita el aprendizaje no es solo el régimen de los datos, es **la geometría de la tarea**, que descarta el 94 % de los mercados antes de empezar. Quien quiera usar los mercados cortos no necesita más datos: necesita otro horizonte.
 
 Respuesta corta:
 
-> Que la tesis se sostiene ya en el eje correcto, y un hallazgo que no buscaba: la tarea descarta el 94 % de los mercados por geometría —376 fotogramas exigidos frente a 160 de mediana en los de 5 minutos—. El límite no es solo el dato, es el horizonte.
+> Que ni la vía tabular ni la profunda despegan del azar aunque agotes el corpus, y un hallazgo que no buscaba: la tarea descarta el 94 % de los mercados por geometría —376 fotogramas exigidos frente a 160 de mediana en los de 5 minutos—. El límite no es solo el dato, es el horizonte.
+
+### 38. Su regla de decisión exigía separar los brazos por un punto porcentual, con 916 casos de evaluación. ¿No es un umbral por debajo del ruido?
+
+Sí, y lo es. Con 916 casos el error estándar del acierto es de 1,65 puntos y el intervalo de una diferencia entre brazos llega a 4,6: la regla que escribí no podía separar las ramas ni en principio. El veredicto que reporto es la aplicación literal de un criterio previo, pero el experimento está infrapotenciado y no establece ninguna de las dos ramas. Lo digo yo en la memoria antes de que lo diga usted, porque es la segunda vez que me pasa en este trabajo —la primera fue el umbral de peor día de −150 $— y las dos veces por el mismo motivo: fijé el umbral por analogía con una magnitud observada antes, en lugar de derivarlo de la dispersión del estadístico que iba a contrastar. La lección está escrita en el capítulo: el pre-registro es condición necesaria para la honestidad de un experimento, pero no suficiente para su potencia.
+
+Respuesta corta:
+
+> Sí. 1 punto de umbral contra 1,65 de error estándar: no podía separar nada. Está reconocido en la memoria como limitación, y es la segunda vez que cometo el mismo error de diseño; ambas están documentadas.
 
 ---
 

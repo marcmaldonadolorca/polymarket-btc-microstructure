@@ -356,9 +356,14 @@ simultáneos por día sube de $42{,}4$ a $48{,}1$. Ambos efectos se componen: la
 típica \emph{diaria} pasa de $106{,}88$ a $156{,}25$\,\$, un factor $1{,}46$ cuyo
 contraste $F$ queda en $p = 0{,}060$, marginal por el escaso número de días. El retorno
 medio, en cambio, no se mueve de forma detectable ($111{,}53$ frente a $97{,}37$\,\$
-diarios, $p = 0{,}681$). El $70{,}8$\,\% de la varianza de la equity procede del valor
-terminal del inventario, que es precisamente la partida sobre la que actúan los brazos de
-señal.
+diarios, $p = 0{,}681$). El valor terminal del inventario aporta el $70{,}8$\,\% de la
+varianza de la equity medido como cuota de covarianza —esto es,
+$\operatorname{cov}(\text{terminal},\text{equity})/\operatorname{var}(\text{equity})$—,
+que es la descomposición aditiva pertinente cuando las partidas suman exactamente la
+magnitud descompuesta; conviene precisarlo porque el coeficiente de determinación de una
+regresión simple entre ambas series es bastante menor ($R^{2} = 0{,}28$), y confundir
+ambas cifras exageraría el poder predictivo del terminal. La partida dominante de la
+varianza es, en todo caso, precisamente aquella sobre la que actúan los brazos de señal.
 
 Esto obliga a una observación crítica sobre el propio diseño de la puerta, que se hace
 aquí como limitación y no como atenuante: \textbf{el umbral se declaró como una cantidad
@@ -371,6 +376,42 @@ una sola. La probabilidad de fallar la puerta no era la misma en los dos escenar
 pre-registro no distinguía entre ellos. Un diseño más exigente habría declarado el umbral
 en unidades de dispersión, o habría acompañado la regla de la potencia estadística que le
 correspondía.
+
+La objeción admite además una formulación cuantitativa que conviene hacer explícita,
+porque responde a la pregunta de si el umbral era siquiera alcanzable. Dada la dispersión
+diaria efectivamente observada, ¿cuál era el peor día \emph{esperado} en una ventana de
+35~días? Simulando 50.000 ventanas con la media y la desviación medidas, el mínimo
+esperado es de $-232{,}6$\,\$ —frente a los $-235{,}66$ que se observaron— y la
+probabilidad de cruzar el umbral de $-150$\,\$ alcanza el $87$\,\%. Un remuestreo
+\emph{bootstrap} de los propios días observados, que no supone normalidad, da $-199{,}9$\,\$
+y un $64$\,\%; conviene señalar que esta segunda cifra es una cota inferior por
+construcción, ya que el \emph{bootstrap} del mínimo no puede generar ningún día peor que
+el peor efectivamente observado y por tanto subestima cualquier probabilidad de cola. Las
+dos estimaciones coinciden en lo esencial: \textbf{era más probable fallar la puerta que
+superarla, y el día que la hizo fallar no fue un suceso extraordinario sino el mínimo
+ordinario de una ventana de ese tamaño y esa dispersión} (Figura~\ref{fig:puerta_b3_potencia},
+izquierda).
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.98\textwidth]{figures/fig_puerta_b3_potencia.png}
+\caption[La puerta B3 vista desde la dispersión]{Izquierda: distribución simulada del peor
+día en una ventana de 35 días bajo la dispersión medida. El día observado ($-235{,}66$\,\$)
+cae junto a la moda de lo esperado, y el umbral pre-declarado queda holgadamente dentro de
+la región que la distribución cruza. Derecha: techo de oráculo del riesgo terminal —qué
+ocurriría si se retirase el percentil peor de pares—. Retirar solo el 5\,\% bastaría para
+que la puerta se superase, lo que acota el valor máximo de un modelo de riesgo terminal.}
+\label{fig:puerta_b3_potencia}
+\end{figure}
+
+Esa misma descomposición permite acotar, por el otro extremo, cuánto valdría acertar el
+riesgo terminal, que es la línea que el resultado sugiere. Si se retirase con información
+perfecta el 5\,\% peor de los pares —85 de 1.684— la equity ascendería a $+6.789$\,\$ y el
+peor día quedaría en $-125{,}4$\,\$: la puerta se superaría. Retirando el decil, la equity
+llega a $+9.221$\,\$ y el peor día a $-70{,}2$. No es una política, porque exige conocer el
+futuro, sino la cota superior de lo que un modelo de riesgo terminal podría aportar, y
+justifica que sea esa —y no la predicción direccional— la dirección de trabajo que este
+resultado deja abierta.
 
 Nada de esto altera el veredicto. La regla estaba escrita, es la que se aplica y el
 resultado es NO-GO. Lo que cambia es la explicación de \emph{por qué} se falla: no porque

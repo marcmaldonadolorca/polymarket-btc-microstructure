@@ -165,11 +165,18 @@ una cuestión central en el aprendizaje automático aplicado a finanzas: la dist
 \emph{predecir correctamente} y \emph{obtener beneficio}.
 
 Esa distancia es el hilo conductor. Como se mostrará, un clasificador direccional sencillo
-alcanza una precisión cercana al 90\,\% y, pese a ello, deja de ser rentable en cuanto se
-introduce una latencia de entrada realista de dos segundos. El coste y la ejecución, y no
-el acierto, determinan el resultado. Asumir lo contrario es uno de los errores más comunes
-y costosos en este campo, y documentarlo con evidencia cuantitativa es, en sí mismo, una
-aportación.
+alcanza una precisión cercana al 90\,\% medida como \emph{markout} instantáneo y, pese a
+ello, no sobrevive al primer escalón de latencia que el instrumento de captura permite
+resolver. El coste y la ejecución, y no el acierto, determinan el resultado. Asumir lo
+contrario es uno de los errores más comunes y costosos en este campo, y documentarlo con
+evidencia cuantitativa es, en sí mismo, una aportación.
+
+El argumento no descansa sobre una única medición. A lo largo del trabajo, la misma
+conclusión se alcanza por tres caminos independientes: el efecto de la latencia sobre la
+señal direccional, la estructura oficial de comisiones —que, una vez corregido un error
+en el modelo de costes, resulta suficiente por sí sola para agotar el resultado bruto— y
+la ausencia de cualquier retardo explotable en la incorporación de la información externa.
+Que tres vías distintas converjan es lo que convierte una observación en una conclusión.
 
 Conviene además situar las expectativas. El objetivo no es construir un sistema de trading en
 producción ni demostrar rentabilidad, sino algo más modesto y, a la vez, más exigente
@@ -191,7 +198,9 @@ costes y latencia realistas}. De él se derivan los siguientes objetivos especí
   \item Diseñar un sistema de captura de datos multifuente, con control de calidad por
   sesión, que produzca un corpus alineado temporalmente y libre de fugas.
   \item Definir un protocolo de evaluación que combine validación estrictamente temporal,
-  un modelo explícito de costes y una latencia medida empíricamente.
+  un modelo explícito de costes y una latencia de ejecución medida contra el mercado real,
+  declarando con precisión qué parte de ella es medición y qué parte es la resolución del
+  instrumento.
   \item Cuantificar el impacto de la latencia sobre una señal direccional fuerte, para
   delimitar dónde se rompe la cadena entre predicción y ejecución.
   \item Evaluar una progresión de modelos, de menor a mayor complejidad (líneas base
@@ -199,7 +208,23 @@ costes y latencia realistas}. De él se derivan los siguientes objetivos especí
   órdenes), exigiendo que cada incremento de complejidad se justifique con evidencia.
   \item Determinar si existe un candidato que sobreviva a una validación fuera de muestra
   bajo coste, y delimitar con rigor sus límites y su incertidumbre.
+  \item Auditar el propio modelo de costes hasta sus fuentes primarias y, si resultara
+  erróneo, corregirlo, documentar la corrección con marca de tiempo verificable y
+  reevaluar sin reentrenar nada, extrayendo las consecuencias sobre qué lado del libro es
+  económicamente viable.
+  \item Someter la política resultante a una \textbf{validación prospectiva
+  pre-registrada}: fijar por escrito y sellar criptográficamente, antes de observar los
+  datos, el universo, los brazos, las métricas y las reglas de decisión; ejecutar una
+  única evaluación sobre una ventana posterior al sellado; y reportar el resultado con
+  independencia de su signo.
 \end{enumerate}
+
+Los dos últimos objetivos no figuraban en el planteamiento inicial y se incorporaron
+durante el desarrollo: el sexto, al detectarse que el modelo de comisiones empleado no
+correspondía con la tarifa oficial vigente; el séptimo, como consecuencia natural de que
+toda la evidencia acumulada hasta ese punto era retrospectiva. Se declaran aquí como
+objetivos, y no como incidencias, porque acabaron aportando más al trabajo que varios de
+los previstos desde el principio.
 
 El presente trabajo se organiza como sigue. El Capítulo~\ref{ch::estado} revisa el estado
 de la cuestión. El Capítulo~\ref{ch::metodos} describe los datos, las líneas base y la
@@ -208,5 +233,15 @@ analiza los resultados sobre el conjunto fuera de muestra. El Capítulo~\ref{ch:
 discute la estrategia de despliegue. El Capítulo~\ref{ch::etica} aborda los aspectos éticos
 y las limitaciones. El Capítulo~\ref{ch::reproducibilidad} detalla la reproducibilidad, y
 el Capítulo~\ref{ch::conclusiones} recoge las conclusiones. Por último, los anexos incluyen
-un glosario de términos para el lector no familiarizado con las criptomonedas, el detalle de
-las características y los hiperparámetros de los modelos.
+el detalle de las características y de los hiperparámetros de los modelos, el pre-registro
+completo con el procedimiento para verificar su sello temporal, y una auditoría del registro
+público de operaciones que permite reproducir las cifras principales desde el dato anonimizado.
+En los preliminares se incluye además un glosario para el lector no familiarizado con las
+criptomonedas.
+
+Una advertencia sobre la lectura. La memoria no describe un plan ejecutado sin sobresaltos,
+porque el trabajo no fue así. Recoge un itinerario en el que una señal aparentemente
+excelente resultó no ser explotable, un modelo de costes tuvo que corregirse a mitad de
+camino, el vehículo económico se desplazó de un lado del libro al contrario, y la validación
+final —pre-registrada y sellada— arrojó un resultado negativo que se reporta íntegro. Ese
+itinerario, y no un modelo concreto, es la aportación.

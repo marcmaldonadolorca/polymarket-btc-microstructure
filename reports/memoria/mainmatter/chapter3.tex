@@ -459,6 +459,25 @@ establece es una cota: si la ventaja se agota antes de dos segundos, la polític
 ejecutable. Zanjar la cuestión exigiría capturar el libro a una frecuencia sensiblemente
 mayor, lo que se recoge como línea futura en el Capítulo~\ref{ch::conclusiones}.
 
+Existe, no obstante, una vía independiente para acotar el problema, y conviene recogerla
+porque apunta en la misma dirección sin depender del escalón de latencia. Si el mercado de
+predicción tardase varios segundos en incorporar los movimientos del subyacente, una
+latencia de ejecución inferior al segundo sería irrelevante y quedaría margen explotable.
+Puede comprobarse midiendo la correlación cruzada entre el retorno del futuro perpetuo de
+Bitcoin y la variación posterior del precio medio del contrato, a distintos desfases.
+Aplicada sobre los 841~mercados independientes de la ventana prospectiva y quince desfases
+entre $-8$ y $+20$~segundos, ninguna correlación supera $0{,}004$ en valor absoluto y
+prácticamente todos los intervalos de confianza contienen el cero. Un único desfase resulta
+marginalmente significativo, a los catorce segundos, pero no se interpreta como hallazgo:
+con quince contrastes cabía esperar por azar en torno a un falso positivo, su magnitud es
+económicamente nula y no existe mecanismo que justifique un retardo de esa duración.
+
+La lectura es que el contrato incorpora la información del subyacente dentro del mismo
+intervalo de dos segundos, de modo que \textbf{no se observa ninguna ventana explotable por
+encima de la resolución del instrumento}. Ello refuerza la conclusión por un camino que no
+depende de la latencia asumida: no es solo que la ventaja propia se agote deprisa, es que el
+mercado digiere la información externa más rápido de lo que este montaje permite observar.
+
 Este es, con esa matización, el resultado que vertebra el trabajo: \textbf{acertar la
 dirección no equivale a obtener beneficio}. El problema deja de ser de clasificación y pasa a
 ser de ejecución; a partir de aquí, todo modelo se evalúa por su política económica bajo

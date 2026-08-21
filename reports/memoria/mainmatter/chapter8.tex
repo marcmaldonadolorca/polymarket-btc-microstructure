@@ -3,49 +3,166 @@
 \chapter{Conclusiones}
 \label{ch::conclusiones}
 
-Este trabajo ha presentado una metodología de captura de datos, validación temporal y control
-de costes para la predicción de corto plazo en mercados de Bitcoin de Polymarket. La
-conclusión central es que una precisión direccional cercana al 90\,\% no garantiza una política
-económica: con una latencia de entrada realista, el coste y la ejecución dominan el resultado.
+Este trabajo se planteó averiguar si el aprendizaje profundo puede anticipar el movimiento
+de corto plazo del precio de los contratos binarios sobre Bitcoin de Polymarket y si esa
+capacidad, en caso de existir, sobrevive a los costes y a la latencia de operar. La
+respuesta a la primera pregunta es que sí, parcialmente y con matices; la respuesta a la
+segunda es que no. Lo que da cuerpo a la memoria es el detalle de cómo se ha establecido
+cada una de esas dos respuestas.
 
-El aprendizaje profundo aplicado a secuencias y al libro de órdenes aprende representaciones
-útiles, pero no produce una política estable con unas dos semanas de datos. El especialista
-tabular congelado conserva una señal modesta en cinco días intactos fuera de muestra:
-$+0{,}349$ ticks por unidad al coste de referencia, 754 unidades y tres de cinco días
-positivos; bajo el coste completo, el promedio es $-0{,}026$ ticks.
+\section{La conclusión central, alcanzada por tres caminos}
 
-El análisis posterior detecta un cambio de régimen y propone un filtro de baja volatilidad.
-Sobre el mismo bloque, ese subconjunto alcanza $+1{,}069$ ticks y cinco de cinco días
-positivos. Su valor es el de una hipótesis prometedora, no el de una validación confirmatoria:
-la regla se congela después del diagnóstico y queda pendiente de datos futuros.
+Una precisión direccional cercana al 90\,\% no garantiza una política económica. Esta
+afirmación, que vertebra el trabajo, no descansa sobre una única medición, y su solidez
+proviene precisamente de que tres vías independientes convergen en ella.
 
-Las aportaciones del trabajo son cuatro: un sistema de captura y control de calidad
-multifuente; un protocolo temporal que incorpora coste y latencia medidos; evidencia
-cuantitativa de la ruptura entre predicción y ejecución; y una trazabilidad que conserva tanto
-los resultados negativos como la corrección de errores metodológicos. No se afirma
-rentabilidad real ni se presenta un bot listo para desplegar.
+La primera es la latencia. Medida como \emph{markout} desde el instante exacto de la señal,
+la política produce $+6{,}79$ ticks de media; en el primer escalón que la malla de captura
+permite resolver —dos segundos— el resultado ya es negativo. Conviene ser preciso sobre el
+alcance de este argumento, y el Capítulo~\ref{ch::metodos} lo es: la latencia de ejecución
+se midió contra el mercado real en unos $430$\,ms, incluida una orden efectivamente casada,
+mientras que el escalón de dos segundos es la resolución del instrumento y no una latencia
+observada. Entre ambos valores no existe ninguna observación, de modo que lo demostrado es
+que la ventaja no sobrevive a dos segundos, no que muera a los cuatrocientos milisegundos.
 
-\paragraph{Trabajo futuro.} La prioridad es ejecutar prospectivamente la política completa
-sin retocar umbrales, con una sola regla de exposición por mercado y registro de fills. Solo
-después podrá evaluarse el filtro de volatilidad. Con un horizonte de datos sustancialmente
-mayor podrán reevaluarse arquitecturas como el \emph{Temporal Fusion
-Transformer}~\cite{lim2021tft}.
+La segunda vía es la estructura de comisiones, y es independiente de la anterior. La
+auditoría del modelo de costes hasta las fuentes primarias reveló un error en la tarifa
+empleada. Corregido y documentado con marca de tiempo verificable, el resultado es
+inequívoco: con la tarifa oficial vigente, la comisión media de entrada agota por sí sola
+el resultado bruto de la señal, sin que la latencia intervenga en el argumento. Ninguna
+política del lado agresivo del libro es viable bajo ese régimen de costes.
 
-Una segunda línea, más ambiciosa, ataca la limitación estructural del simulador maker
-—su incapacidad para medir la respuesta competitiva del mercado
-(Capítulo~\ref{ch::etica})—. La reproducción histórica trata el libro como un decorado
-inerte; capturar cómo reaccionarían los creadores de mercado incumbentes a las órdenes
-propias exige un simulador \emph{reactivo}. La línea de simuladores generativos de libros
-de órdenes de los últimos años ofrece el instrumental: modelos de «agente mundo» que
-aprenden de datos históricos una dinámica del libro capaz de reproducir cierto impacto de
+La tercera es la ausencia de retardo explotable en la incorporación de información externa.
+Si el contrato tardase varios segundos en reflejar los movimientos del subyacente, una
+latencia inferior al segundo dejaría margen. La correlación cruzada entre el retorno del
+futuro perpetuo de Bitcoin y la variación posterior del precio del contrato, medida sobre
+841~mercados independientes y quince desfases, no supera $0{,}004$ en ningún caso. El
+mercado digiere la información más rápido de lo que este montaje permite observar.
+
+\section{Qué hizo y qué no hizo el aprendizaje profundo}
+
+La progresión de modelos profundos —arquitecturas recurrentes y convolucionales sobre el
+libro, auto-atención, y un modelo fundacional de series temporales— aprende
+representaciones útiles pero no produce una política estable. El modelo fundacional mejora
+de forma monótona con la adaptación y aun así no alcanza a la deriva ingenua ni a un ARIMA,
+y la curva de escalado de datos es plana.
+
+Esa conclusión se sometió después a una prueba más exigente que la original, motivada por
+una limitación detectada en el propio diseño: la curva publicada hacía crecer el número de
+ventanas de entrenamiento sobre un conjunto fijo de trayectorias, de modo que medía densidad
+de muestreo y no diversidad. Ampliando el corpus a las tres temporalidades capturadas y
+llevando el eje hasta agotar los datos disponibles —casi el doble de ventanas de las
+exploradas originalmente y casi el triple de trayectorias— ninguna de las dos vías, tabular
+o profunda, se despega del azar en la predicción del signo.
+
+De ese experimento surgió además un hallazgo que no se buscaba y que acota el problema mejor
+que el resultado principal: la definición de la tarea excluye estructuralmente a la mayoría
+de los mercados capturados. Entre contexto, horizonte y margen de seguridad, cada serie
+requiere del orden de 376~fotogramas, y la longitud mediana de un mercado de cinco minutos
+es de 160. Lo que limita el aprendizaje aquí no es solo el régimen de los datos: es la
+geometría de la tarea, que descarta el 94\,\% de los mercados antes de que empiece el
+entrenamiento. Una continuación que quiera aprovechar los mercados de horizonte corto no
+necesita más datos, necesita redefinir el horizonte de predicción.
+
+\section{La validación prospectiva}
+
+El giro al lado pasivo del libro —motivado por que la misma estructura de comisiones que
+penaliza a quien cruza el \emph{spread} retribuye a quien provee liquidez— condujo a una
+política candidata que se sometió a validación prospectiva pre-registrada.
+
+El protocolo se selló criptográficamente antes de observar los datos, con las huellas de los
+cinco artefactos ejecutables, y se ejecutó una sola vez sobre una ventana de 35~días
+posteriores al sellado. El resultado es \textbf{NO-GO}: la política acumula $+3.408$\,\$
+simulados, pero su peor día desciende por debajo del umbral de riesgo declarado de antemano,
+y la regla se aplica sin interpretación.
+
+Conviene subrayar por qué este resultado, siendo negativo, es el más informativo del trabajo.
+Un criterio pre-registrado que solo aprueba no demuestra nada; este rechazó una estrategia
+económicamente favorable porque violaba una condición escrita antes de mirar. El análisis
+posterior muestra además que la puerta estaba prácticamente condenada: bajo la dispersión
+efectivamente observada, el peor día esperado en una ventana de ese tamaño era de $-232$\,\$
+frente a un umbral de $-150$, de modo que la probabilidad de fallarla superaba el 60\,\% con
+independencia de la calidad de la política.
+
+Una circunstancia externa reforzó involuntariamente la validez del ejercicio: la ventana no
+se cerró por decisión del autor sino por una desconexión física del almacenamiento del
+recolector, tres días antes de que se calculara la primera métrica. El punto de corte, por
+tanto, no pudo verse influido por los datos que iba a revelar.
+
+\section{Aportaciones}
+
+Las aportaciones de este trabajo son metodológicas antes que predictivas.
+
+\begin{enumerate}[noitemsep]
+  \item Un sistema de captura multifuente con control de calidad por sesión, operando de
+  forma continua, y el corpus alineado que produce.
+  \item Un protocolo de evaluación que combina validación estrictamente temporal, un modelo
+  explícito de costes con la tarifa oficial y una latencia medida contra el mercado real,
+  distinguiendo qué parte de ella es medición y cuál es resolución del instrumento.
+  \item Evidencia cuantitativa, por tres caminos independientes, de la ruptura entre
+  predicción y ejecución.
+  \item Una validación prospectiva pre-registrada y sellada, con resultado negativo
+  reportado íntegro.
+  \item Una trazabilidad que conserva los resultados negativos y las correcciones de error
+  con la misma dignidad que los positivos, incluida una fe de erratas del modelo de costes
+  documentada con marca de tiempo verificable.
+\end{enumerate}
+
+No se afirma rentabilidad real ni se presenta un sistema listo para desplegar.
+
+\section{Lecciones metodológicas}
+
+Un trabajo cuyo objeto es la honestidad estadística debe reportar también dónde falló su
+propia disciplina. Tres patrones se repitieron lo suficiente como para merecer mención.
+
+El primero es la fijación de umbrales de decisión sin análisis de potencia. Ocurrió dos
+veces: el umbral de peor día del pre-registro se declaró en cantidad absoluta, sin advertir
+que codifica implícitamente una hipótesis sobre la dispersión; y el criterio de separación
+entre arquitecturas se fijó por debajo del error estándar del propio conjunto de evaluación,
+de modo que ninguna de sus dos ramas podía establecerse. En ambos casos el umbral se eligió
+por analogía con una magnitud observada antes, en lugar de derivarlo de la dispersión del
+estadístico que iba a contrastar. La lección es que el pre-registro es condición necesaria
+para la honestidad de un experimento, pero no suficiente para su potencia.
+
+El segundo es la confusión entre un oráculo y una política. En dos ocasiones un análisis
+sugirió un margen de mejora considerable que, examinado, resultaba proceder de conocer por
+anticipado qué operaciones perderían dinero y evitarlas. Un techo calculado con información
+del futuro no acota lo que un modelo puede lograr; solo acota lo que lograría alguien que ya
+conoce el resultado.
+
+El tercero afecta al cruce entre fuentes de datos. Los fallos de alineación temporal no
+producen errores: producen tablas vacías, o casi vacías, que superficialmente parecen
+resultados. En este trabajo un desajuste entre dos relojes con precisiones distintas
+devolvió una tabla completa de correlaciones que no significaba nada, y su única señal de
+alarma fue que los valores eran demasiado exactos. Todo cruce entre fuentes debe asertarse,
+nunca suponerse.
+
+\section{Trabajo futuro}
+
+La continuación inmediata es la validación de las conclusiones de política sobre la ventana
+de captura posterior al corte, que permanece sin observar y crece cada día.
+
+Una segunda línea, más ambiciosa, ataca la limitación estructural del simulador maker —su
+incapacidad para medir la respuesta competitiva del mercado (Capítulo~\ref{ch::etica})—. La
+reproducción histórica trata el libro como un decorado inerte; capturar cómo reaccionarían
+los creadores de mercado incumbentes a las órdenes propias exige un simulador
+\emph{reactivo}. La línea de simuladores generativos de libros de órdenes de los últimos
+años ofrece el instrumental: modelos de «agente mundo» que aprenden de datos históricos una
+dinámica del libro capaz de reproducir cierto impacto de
 mercado~\cite{coletta2022worldagent}, modelos generativos autorregresivos del flujo de
-mensajes a nivel de \emph{token}~\cite{nagy2023generative} y, más recientemente, modelos
-de difusión para la simulación y predicción del libro~\cite{backhouse2025diffusion}; una
+mensajes a nivel de \emph{token}~\cite{nagy2023generative} y, más recientemente, modelos de
+difusión para la simulación y predicción del libro~\cite{backhouse2025diffusion}; una
 revisión reciente sistematiza el campo~\cite{jain2024lobreview}. Integrar uno de estos
-simuladores reactivos con la política congelada de este trabajo permitiría estimar la
-selección adversa y el reparto de \emph{rebates} bajo competencia, no bajo el supuesto
-optimista del \emph{replay}. Es, por su alcance, un trabajo de la magnitud de otra tesis;
-aquí se deja señalado como la continuación natural de la vía maker.
+simuladores con la política congelada de este trabajo permitiría estimar la selección
+adversa y el reparto de \emph{rebates} bajo competencia, y no bajo el supuesto optimista de
+la reproducción histórica. Tiene además una motivación cuantificada: el supuesto de
+ejecución sostiene cerca de dos tercios de las órdenes casadas del simulador y hoy no puede
+contrastarse contra nada.
 
-La regla que guía el proyecto permanece: la complejidad y cualquier afirmación económica
+Finalmente, la limitación de resolución temporal del instrumento sugiere una tercera línea:
+capturar el libro a una frecuencia sensiblemente mayor permitiría observar el intervalo
+—entre cero y dos segundos— donde vive la latencia de ejecución realmente medida, y que este
+trabajo no ha podido explorar.
+
+La regla que guió el proyecto permanece: la complejidad y cualquier afirmación económica
 deben ganarse su sitio con evidencia verdaderamente nueva.

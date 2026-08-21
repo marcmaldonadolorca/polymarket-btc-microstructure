@@ -414,20 +414,58 @@ política ejecutable con dos segundos de latencia.}
 
 La lectura de la tabla es contundente. A latencia nula la política sería extraordinaria
 ($+6{,}79$ ticks de media, con un 92\,\% de acierto en las operaciones de subida), porque mide
-el \emph{markout} desde el instante exacto de la señal. Pero a dos segundos —el primer
-escalón realista— el acierto se desploma al 39,7\,\% y el neto pasa a $-1{,}48$ ticks: la
-oportunidad ya se ha consumido cuando la orden podría ejecutarse. Es revelador que a 4 y 8
-segundos el neto \emph{mejore} ligeramente (hacia $-0{,}74$ y $-0{,}30$): no es que operar más
-tarde sea mejor, sino que a esas latencias el modelo ya ni siquiera detecta la señal efímera
-que lo hacía perder, de modo que sus decisiones se vuelven casi aleatorias y el daño se
-diluye. En otras palabras, toda la ventaja vivía en una ventana de pocos segundos que la
-latencia hace inaccesible.
+el \emph{markout} desde el instante exacto de la señal. En el primer escalón que el
+instrumento puede resolver —dos segundos— el acierto cae al 39,7\,\% y el neto pasa a
+$-1{,}48$ ticks: la oportunidad ya se ha consumido cuando la orden podría ejecutarse. Es
+revelador que a 4 y 8 segundos el neto \emph{mejore} ligeramente (hacia $-0{,}74$ y
+$-0{,}30$): no es que operar más tarde sea mejor, sino que a esas latencias el modelo ya ni
+siquiera detecta la señal efímera que lo hacía perder, de modo que sus decisiones se vuelven
+casi aleatorias y el daño se diluye. En otras palabras, toda la ventaja vivía en una ventana
+de pocos segundos.
 
-Este es el resultado que vertebra todo el trabajo: \textbf{acertar la dirección no equivale
-a obtener beneficio}. Con una latencia realista de dos segundos, el neto medio del test
-terminal cae a $-1{,}48$ ticks. El problema deja de ser de clasificación y pasa a ser de
-ejecución; a partir de aquí, todo modelo se evalúa por su política económica bajo coste y
-latencia, no por su acierto.
+\subsubsection{Qué es exactamente el escalón de dos segundos}
+\label{sec::latencia_grid}
+
+Conviene precisar el significado de esa columna, porque de ello depende el alcance de la
+conclusión y porque la cifra se presta a una lectura más fuerte de la que los datos
+sostienen. \textbf{Los dos segundos no son la latencia medida del sistema, sino la
+resolución de la rejilla de captura}, y ambas cosas difieren en casi un orden de magnitud.
+
+La cadena de ejecución se instrumentó extremo a extremo y se midió contra el mercado real,
+incluyendo una orden efectivamente casada. El tiempo desde que el dato se observa hasta que
+el CLOB reconoce y casa la orden resultó ser de \textbf{429{,}7\,ms} en percentil 95, con un
+\emph{fill} real medido en \textbf{426{,}7\,ms}; la firma en caliente cuesta unos 7\,ms y el
+envío hasta el acuse, 144\,ms. La conclusión operativa que se registró entonces fue fijar
+$L=1$\,s como contrato de modelado y reservar $L=2$\,s como escenario de estrés, dejando
+constancia expresa de que la latencia real no debía asumirse en dos segundos.
+
+Lo que impide usar esa cifra es el propio muestreo: la captura se realiza en una malla de
+dos segundos, de modo que un escalón de un segundo no tiene ninguna fila que lo soporte.
+El valor que aparece en la tabla es, por tanto, el mínimo que el instrumento puede
+representar, y sobreestima la latencia real por un factor cercano a cinco. Entre cero y dos
+segundos —justamente el rango donde vive la latencia efectivamente medida— \textbf{no existe
+ninguna observación}, y la forma que la señal tenga ahí no puede deducirse de estos datos.
+
+A ello se añade que el bloque terminal sobre el que se mide es pequeño: con 63~acciones, el
+error estándar del acierto ronda los $6{,}3$~puntos porcentuales, de modo que el 39,7\,\% del
+escalón de dos segundos no es estadísticamente distinguible del azar. La cifra sólida de la
+tabla es la de latencia nula.
+
+La afirmación defendible es entonces más matizada, y también más útil: la ventaja medida
+como \emph{markout} instantáneo es real y grande, pero \textbf{no se ha demostrado que
+sobreviva a la latencia de ejecución, ni se ha demostrado que no lo haga}, porque el
+experimento carece de resolución en el intervalo relevante. Lo que el escenario de estrés sí
+establece es una cota: si la ventaja se agota antes de dos segundos, la política no es
+ejecutable. Zanjar la cuestión exigiría capturar el libro a una frecuencia sensiblemente
+mayor, lo que se recoge como línea futura en el Capítulo~\ref{ch::conclusiones}.
+
+Este es, con esa matización, el resultado que vertebra el trabajo: \textbf{acertar la
+dirección no equivale a obtener beneficio}. El problema deja de ser de clasificación y pasa a
+ser de ejecución; a partir de aquí, todo modelo se evalúa por su política económica bajo
+coste y latencia, no por su acierto. Conviene subrayar que esta conclusión no depende en
+exclusiva del argumento de latencia: la fe de erratas de comisiones de la
+Sección~\ref{sec::fe_erratas_fees} la sostiene por una vía independiente, al mostrar que con
+la tarifa oficial la comisión de entrada agota por sí sola el resultado bruto.
 
 \section{Metodología y entrenamiento}
 

@@ -42,6 +42,21 @@ capturaron antes de que se abriera—, pero delimita el origen real de la ventan
 captura continua sobre la que se apoyará la validación prospectiva
 (Capítulo~\ref{ch::resultados}).
 
+\textbf{Resolución temporal del instrumento.} La captura opera en una malla de dos segundos,
+y esa granularidad limita una de las conclusiones centrales más de lo que su enunciado
+sugiere. La latencia de ejecución se midió extremo a extremo contra el mercado real
+—429{,}7\,ms en percentil 95 hasta el acuse del CLOB, con un \emph{fill} efectivamente casado
+en 426{,}7\,ms— y la decisión operativa registrada fue emplear un segundo como contrato de
+modelado, reservando los dos segundos para el escenario de estrés. Sin embargo, un escalón de
+un segundo no tiene ninguna observación que lo soporte en una malla de dos, de modo que la
+tabla de latencias salta de cero a dos segundos sin ningún punto intermedio. El intervalo
+donde vive la latencia realmente medida queda, por tanto, sin observar, y la conclusión
+correcta es que no se ha demostrado que la ventaja sobreviva a la latencia de ejecución ni
+que deje de hacerlo (Sección~\ref{sec::latencia_grid}). Resolverlo exige capturar a una
+frecuencia sensiblemente mayor, con el coste de almacenamiento y de proceso que ello implica;
+queda como línea futura. Conviene recordar que la conclusión de fondo se apoya además en un
+argumento independiente de la latencia, el de la estructura de comisiones.
+
 \textbf{Cierre de la ventana prospectiva.} La ventana de evaluación prospectiva no la
 cerró una decisión metodológica sino un fallo de hardware: el 14 de agosto de 2026 a las
 11:05 UTC el disco de almacenamiento del recolector se desconectó del bus USB de la

@@ -475,10 +475,10 @@ Es la pregunta más previsible en una defensa que llega tras una primera revisi�
 
 1. **Estructura y formato.** El glosario estaba como apéndice; ahora está en los preliminares, en su posición correcta, y los anexos se han reordenado (características, hiperparámetros, pre-registro y verificación del sello, auditoría del ledger).
 2. **Rigor bibliográfico.** Se pasó de 15 referencias, en su mayoría anteriores a 2020, a 43 referencias todas citadas en el cuerpo, con más de 25 posteriores a 2020 —incluidos los cinco estudios académicos de Polymarket de 2026 y la teoría canónica de market making (Avellaneda-Stoikov, Guéant)—.
-3. **Contenido visual.** Se pasó de una memoria con pocas figuras a 26 figuras y 12 tablas: diagrama del sistema, partición temporal, modelo de dos cabezas, escalera de modelos, curva latencia-PnL, EDA completo, fe de erratas de comisiones, diagnóstico de régimen y economía maker.
+3. **Contenido visual.** Se pasó de una memoria con pocas figuras a 28 figuras y 16 tablas: diagrama del sistema, partición temporal, modelo de dos cabezas, escalera de modelos, curva latencia-PnL, EDA completo, fe de erratas de comisiones, diagnóstico de régimen y economía maker.
 4. **Análisis técnico de series temporales.** Se añadió un EDA formal con las técnicas de la asignatura —ADF/KPSS de estacionariedad, ACF/PACF, descomposición STL, espectro de Fourier— y una escalera de baselines de la asignatura (naive-drift, ARIMA, Holt, kNN-DTW y el fundacional MOMENT), cada uno con su decisión de diseño asociada.
 
-Además, la memoria creció de 46 a 76 páginas, y se incorporaron dos aportaciones nuevas que no estaban en la versión anterior: la fe de erratas de comisiones sellada y el giro maker cuantificado.
+Además, la memoria creció de 46 a 92 páginas, y se incorporaron dos aportaciones nuevas que no estaban en la versión anterior: la fe de erratas de comisiones sellada y el giro maker cuantificado.
 
 Respuesta corta:
 
@@ -542,7 +542,7 @@ Respuesta corta:
 
 ### 29. El corte prospectivo gana 3.408 $ en 35 días. ¿Por qué lo declara NO-GO en lugar de presentarlo como un éxito?
 
-Porque la regla estaba escrita antes y decía otra cosa. Las tres condiciones eran equity neta positiva, peor día por encima de −150 $ y al menos 25 días evaluados. Se cumplen la primera y la tercera; la segunda no: el peor día fue −235,66 $ el 5 de agosto. Una puerta pre-registrada solo vale si se obedece cuando incomoda, y esta incomoda: rechaza una estrategia que rindió 97,4 $ diarios, un 83 % más que en desarrollo. Si la hubiera relajado al ver el número, el pre-registro entero —y con él el capítulo 4— dejaría de significar nada. El resultado que presento no es «gané dinero», es «tenía un criterio y lo apliqué».
+Porque la regla estaba escrita antes y decía otra cosa. Las tres condiciones eran equity neta positiva, peor día por encima de −150 $ y al menos 25 días evaluados. Se cumplen la primera y la tercera; la segunda no: el peor día fue −235,66 $ el 5 de agosto. Una puerta pre-registrada solo vale si se obedece cuando incomoda, y esta incomoda: rechaza una estrategia que rindió 97,4 $ diarios fuera de muestra —solo un 13 % menos que los ~112 $ del ajuste dentro de muestra, una degradación pequeña para este salto—. Si la hubiera relajado al ver el número, el pre-registro entero —y con él el capítulo 4— dejaría de significar nada. El resultado que presento no es «gané dinero», es «tenía un criterio y lo apliqué».
 
 Respuesta corta:
 
@@ -566,7 +566,7 @@ Respuesta corta:
 
 ### 32. El análisis secundario por régimen, ¿no es un resultado buscado a posteriori?
 
-No, y esa es justamente la razón de que esté declarado. El pre-registro sellado registra la hipótesis con estas palabras: el régimen agitado favorece el neto maker. El clasificador que separa los regímenes es la adenda A, un k-means entrenado únicamente con datos de mayo y junio y congelado con su propio hash: no ha visto un solo frame de la ventana de evaluación. Aplicado a las 1.673 series, el régimen agitado rinde +4,06 $ de equity media por serie frente a +3,12 del tranquilo. La hipótesis se cumple, pero lo que la hace citable no es que se cumpla, sino que estaba escrita y el clasificador congelado antes.
+No, y esa es justamente la razón de que esté declarado. El pre-registro sellado registra la hipótesis con estas palabras: el régimen agitado favorece el neto maker. El clasificador que separa los regímenes es la adenda A, un k-means entrenado únicamente con datos de mayo y junio y congelado con su propio hash: no ha visto un solo frame de la ventana de evaluación. Aplicado al brazo base —1.316 series tras descartar los terminales ambiguos—, el régimen agitado rinde +4,06 $ de equity media por serie frente a +3,12 del tranquilo. La hipótesis se cumple, pero lo que la hace citable no es que se cumpla, sino que estaba escrita y el clasificador congelado antes.
 
 Respuesta corta:
 
@@ -598,15 +598,15 @@ Respuesta corta:
 
 ### 36. ¿Cómo sé que no pre-registró algo cuyo resultado ya intuía?
 
-Porque la rama contraria estaba escrita con el mismo detalle y me habría obligado a corregir mi propia conclusión publicada. El pre-registro dice literalmente que si la brecha se cerraba, «la conclusión publicada era un artefacto del diseño muestral» y había que corregirla en el capítulo 4. No hay rama en la que el experimento se omita ni en la que yo quede bien por defecto. Y la regla de decisión era numérica y anterior: un punto porcentual de acierto en el punto máximo del eje. El brazo profundo quedó 1,42 puntos por debajo del tabular; si hubiera quedado 1,1 por encima, hoy estaría defendiendo lo contrario.
+Porque la rama contraria estaba escrita con el mismo detalle y me habría obligado a corregir mi propia conclusión publicada. El pre-registro dice literalmente que si la brecha se cerraba, «la conclusión publicada era un artefacto del diseño muestral» y había que corregirla en el capítulo 4. No hay rama en la que el experimento se omita ni en la que yo quede bien por defecto. Y la regla de decisión era numérica y anterior: un punto porcentual de acierto en el punto máximo del eje. En ese punto (84.438 ventanas, tres temporalidades) el brazo profundo quedó 0,87 puntos por debajo del tabular —por debajo del umbral de un punto, así que la regla no declaró vencedor—, y ambos IC contienen el 50 %: la lección honesta, documentada en la memoria, es que el umbral estaba por debajo del ruido del conjunto de evaluación (±1,65 pp) y ninguna de las dos ramas podía establecerse. En el brazo de una sola temporalidad la brecha sí llega a 1,42 puntos, también dentro del ruido.
 
 Respuesta corta:
 
-> Porque la rama contraria estaba escrita y me obligaba a corregirme. La regla era numérica y previa: un punto en el punto máximo. Salió 1,42 en contra.
+> Porque la rama contraria estaba escrita y me obligaba a corregirme. La regla era numérica y previa: un punto en el punto máximo. Salió 0,87 en contra —bajo el umbral y dentro del ruido—, y esa impotencia del umbral está reportada como lección.
 
 ### 37. ¿Qué aporta la adenda, si confirma lo que ya decía?
 
-Dos cosas, y ninguna es la que esperaba. La primera es negativa y sólida: llevando el eje hasta agotar el corpus —1,88 veces más ventanas de las que la curva publicada llegó a explorar— **ninguna de las dos vías se despega del azar**. Los ocho puntos del experimento tienen intervalos de confianza que contienen el 50 % y ningún contraste baja de p = 0,25. Es decir, la comparación entre arquitecturas se estaba dirimiendo entre dos modelos que no resuelven la tarea, lo cual es coherente con el diagnóstico N1: el precio medio es una moneda al aire en la apertura. La segunda apareció al intentar multiplicar las trayectorias por quince y conseguir solo por tres. El motivo es estructural: la tarea exige unos 376 fotogramas por par —128 de contexto, 60 de horizonte y 188 de margen anti-fuga— y un mercado de cinco minutos tiene 160 de mediana, menos que el margen él solo. De sus 10.812 pares sobreviven 34. Es decir: lo que limita el aprendizaje no es solo el régimen de los datos, es **la geometría de la tarea**, que descarta el 94 % de los mercados antes de empezar. Quien quiera usar los mercados cortos no necesita más datos: necesita otro horizonte.
+Dos cosas, y ninguna es la que esperaba. La primera es negativa y sólida: llevando el eje hasta agotar el corpus —hasta 1,88 veces las ventanas que la curva publicada llegó a explorar— **ninguna de las dos vías se despega del azar**. Los ocho puntos del experimento tienen intervalos de confianza que contienen el 50 % y ningún contraste baja de p = 0,25. Es decir, la comparación entre arquitecturas se estaba dirimiendo entre dos modelos que no resuelven la tarea, lo cual es coherente con el diagnóstico N1: el precio medio es una moneda al aire en la apertura. La segunda apareció al intentar multiplicar las trayectorias por quince y conseguir solo por tres. El motivo es estructural: la tarea exige unos 376 fotogramas por par —128 de contexto, 60 de horizonte y 188 de margen anti-fuga— y un mercado de cinco minutos tiene 160 de mediana, menos que el margen él solo. De sus 10.812 pares sobreviven 34. Es decir: lo que limita el aprendizaje no es solo el régimen de los datos, es **la geometría de la tarea**, que descarta el 94 % de los mercados antes de empezar. Quien quiera usar los mercados cortos no necesita más datos: necesita otro horizonte.
 
 Respuesta corta:
 
@@ -619,6 +619,55 @@ Sí, y lo es. Con 916 casos el error estándar del acierto es de 1,65 puntos y e
 Respuesta corta:
 
 > Sí. 1 punto de umbral contra 1,65 de error estándar: no podía separar nada. Está reconocido en la memoria como limitación, y es la segunda vez que cometo el mismo error de diseño; ambas están documentadas.
+
+
+### 39. Su tutora pidió en el planteamiento inicial pérdidas que penalicen la volatilidad negativa, tipo Sharpe, y una regresión del sizing. ¿Lo hizo?
+
+Sí, al final del trabajo, y está en la adenda D. Hice antes un censo de las pérdidas usadas en todo el proyecto: entropía cruzada binaria, error absoluto y QLIKE — todas estadísticas, cero económicas. Eso era exactamente el hueco que ella señaló. La regresión del sizing la descarté por medición, no por omisión: con el tope de inventario, duplicar el tamaño de orden solo multiplica el volumen casado por 1,5 y la caja no es monótona en el tamaño (máximo en 100 acciones, no en 200), así que el beneficio no es función tratable del tamaño. La decisión de retirada sí lo es —y de forma exacta, porque las ocho acciones simuladas dan el contrafactual completo—, y esa política la entrené directamente contra la puerta de riesgo del pre-registro escrita como pérdida de tipo Sortino: media diaria menos λ veces la desviación a la baja. Es la petición de la tutora, ejecutada sobre la decisión que los datos permiten atacar limpiamente.
+
+Respuesta corta:
+
+> Sí, adenda D: censo de pérdidas (todas estadísticas), sizing descartado por medición —la caja no es monótona en el tamaño— y la retirada entrenada contra una pérdida Sortino con contrafactual exacto.
+
+### 40. ¿Y qué salió de entrenar contra el dinero?
+
+Que un parámetro escalar bien elegido gana a la red en los dieciséis puntos de la frontera riesgo-rendimiento. Con aversión creciente al riesgo la política aprendida recorre las ocho acciones y traza una frontera real; comparada contra la mejor acción constante que protege la cola al menos igual, pierde siempre: 10 $ diarios en el mejor caso, 120 en el peor. Es coherente con los otros dos ejes ya agotados —la curva de escalado plana y el empate secuencial-tabular— y completa la respuesta: tras arquitectura, datos y objetivo, en este mercado y a esta resolución no hay estructura que una red capture y un escalar no.
+
+Respuesta corta:
+
+> Que el mejor modelo para esa decisión es un número: la frontera aprendida queda dominada en 16 de 16 puntos por la de las acciones constantes. Tercer eje agotado.
+
+### 41. ¿Por qué la política aprendida no aprende nada? ¿Está mal entrenada?
+
+Lo estuvo, y lo detecté porque el resultado era demasiado exacto: dieciséis puntos idénticos hasta el último decimal. Instrumenté el optimizador y los logits estaban saturados en −12, donde el gradiente del sigmoide es del orden de 10⁻⁶: la política no elegía la constante, estaba congelada en ella. Lo corregí —logits acotados, entropía con recocido— y la política pasó a moverse de verdad. El veredicto negativo es el de después de la corrección, no el de antes; el de antes medía mi optimizador, no el mercado. Y hay una segunda causa, más profunda que el bug: en mayo-junio no retirarse domina estrictamente —mejor media y mejor cola a la vez—, así que no había compromiso que aprender. El suceso a evitar no estaba en los datos.
+
+Respuesta corta:
+
+> Primera versión: gradiente muerto por saturación, corregido y documentado. Tras el arreglo la política se mueve y aun así pierde con el escalar. Y en el periodo de entrenamiento no había cola que aprender a evitar.
+
+### 42. ¿Eso de que «no había cola en los datos» no invalida todo el enfoque?
+
+Lo acota, y es la limitación más citable de la línea: el día de pérdida severa aparece cuatro veces en treinta y cinco días. Con esa frecuencia, un conjunto de validación de una semana sale limpio el 43 % de las veces, y entonces el término de aversión al riesgo vale cero por construcción y λ no puede elegirse. No es un fallo del modelo ni del mercado: es que aprender gestión de cola exige haber visto la cola, y pocos meses de datos no la garantizan en cada partición. Está en las limitaciones del capítulo 6; lo resuelven ventanas más largas o simular escenarios de cola.
+
+Respuesta corta:
+
+> Aprender a evitar un suceso exige que el suceso esté en los datos. Con 4 días malos de 35, las particiones pequeñas lo pierden casi la mitad de las veces. Limitación estructural, documentada.
+
+### 43. Usó la regla de un token por mercado en unos análisis y no en otros. ¿No es incoherente?
+
+Es deliberado, y la incoherencia sería lo contrario. Para contar muestras independientes en un contraste estadístico, los dos tokens de un mercado son espejo en dirección y hay que quedarse con uno. Para evaluar economía, se cotizan los dos y el umbral de riesgo del pre-registro se calibró sobre el libro completo: evaluar con medio libro reduce el peor día por construcción, y de hecho fabricó un falso cumplimiento de la puerta que retiré al detectarlo. La unidad de análisis correcta depende de la pregunta; usar la misma en las dos habría sido el error.
+
+Respuesta corta:
+
+> Contraste estadístico: un token, muestras independientes. Evaluación económica: los dos, porque así se calibró el umbral. La regla trasladada fabricaba un falso «pasa» — corregido y documentado.
+
+### 44. Con todo lo que ha contado, ¿el aprendizaje profundo sobra en este problema?
+
+Para decidir operaciones, hoy, en este mercado y a esta resolución: sí, y lo digo con las tres mediciones delante. Pero el trabajo también delimita dónde no sobra: el riesgo terminal es predecible al final de la sesión (AUC 0,78 al 90 %), TabPFN ordena candidatos zero-shot mejor que el modelo ajustado, y la geometría que mata a los mercados cortos es una elección de horizonte, no una ley. La respuesta que defiendo no es «el aprendizaje profundo no funciona»; es «funciona donde hay estructura que capturar, y este trabajo midió tres veces que aquí, para la decisión económica, no la hay». Distinguir esas dos frases es el trabajo.
+
+Respuesta corta:
+
+> Para la decisión económica, sí — medido en tres ejes. Para predecir riesgo terminal u ordenar candidatos, no. El valor del TFM es poder distinguir ambas cosas con números.
 
 ---
 

@@ -338,8 +338,8 @@ Interesa precisar contra qué se compara ese rendimiento, porque la elección de
 referencia puede hacerlo parecer mejor o peor de lo que es. La media de $97{,}4$\,\$
 diarios queda \emph{entre} las dos referencias previas de la misma configuración: los
 $\sim$112\,\$ diarios del ajuste sobre mayo-junio, que es una cifra dentro de muestra, y
-los $\sim$53\,\$ de la validación única de julio, que era fuera de muestra pero se apoyaba
-en solo tres días. El retorno medio, por tanto, no mejora ni empeora de forma
+los $\sim$40\,\$ de la validación única de julio, que era fuera de muestra pero se apoyaba
+en solo cuatro días, el primero de ellos parcial. El retorno medio, por tanto, no mejora ni empeora de forma
 concluyente: se mantiene dentro de la banda ya conocida.
 
 Lo que sí cambia es la dispersión, y conviene decirlo con precisión porque la lectura
@@ -381,7 +381,7 @@ La objeción admite además una formulación cuantitativa que conviene hacer exp
 porque responde a la pregunta de si el umbral era siquiera alcanzable. Dada la dispersión
 diaria efectivamente observada, ¿cuál era el peor día \emph{esperado} en una ventana de
 35~días? Simulando 50.000 ventanas con la media y la desviación medidas, el mínimo
-esperado es de $-232{,}6$\,\$ —frente a los $-235{,}66$ que se observaron— y la
+esperado es de $-231{,}8$\,\$ —frente a los $-235{,}66$ que se observaron— y la
 probabilidad de cruzar el umbral de $-150$\,\$ alcanza el $87$\,\%. Un remuestreo
 \emph{bootstrap} de los propios días observados, que no supone normalidad, da $-199{,}9$\,\$
 y un $64$\,\%; conviene señalar que esta segunda cifra es una cota inferior por
@@ -500,6 +500,28 @@ el espacio de hipótesis. Esa combinación conserva un promedio positivo al cost
 en el bloque intacto, aunque todavía no supera el coste de estrés. El resultado no descarta el
 aprendizaje profundo; lo sitúa como una vía a reevaluar cuando el volumen de datos crezca.
 
+\subsection{Un fundacional tabular: TabPFN \emph{zero-shot}}
+\label{sec::tabpfn}
+
+El Capítulo~\ref{ch::estado} anunciaba la evaluación de TabPFN~\cite{hollmann2025tabpfn},
+el modelo fundacional para dato tabular que predice sin entrenar —el conjunto de
+entrenamiento se le pasa como contexto—. Se evaluó sobre el universo del especialista sin
+el filtro de coste, con las dos particiones habituales (validación inicial y test
+terminal), limitado a 10.000 de las 28.095 filas de entrenamiento por su ventana de
+contexto: aproximadamente un tercio de los datos que ve el \emph{gradient boosting}.
+
+El resultado tiene dos caras. En el \emph{ranking} del valor esperado, TabPFN gana a
+ambos competidores en las dos particiones sin haber entrenado: Spearman $0{,}115$ y
+$0{,}120$ frente a $0{,}092$ del \emph{gradient boosting} fresco y $0{,}098$/$0{,}096$
+del especialista congelado, y es el único cuyo $R^2$ es positivo en ambas particiones. En
+la cabeza de salud, en cambio, no domina: su AUC ($0{,}550$) queda por debajo del
+\emph{gradient boosting} en validación ($0{,}585$) y empata en el test terminal. Y la
+traducción económica repite la lección del resto del capítulo: ninguna de esas
+diferencias de ordenación convierte la política en rentable bajo la comisión oficial. El
+interés del resultado es metodológico —un fundacional tabular alcanza \emph{zero-shot},
+con un tercio de los datos, la calidad de ordenación de un modelo ajustado— y delimita
+dónde rinde esta familia: en ordenar candidatos, no en decidir operaciones.
+
 \subsection{Experimentos de adaptación al régimen}
 
 Ante el cambio de régimen se probaron reentrenamiento incremental con ventana móvil,
@@ -511,14 +533,16 @@ negativo sigue siendo informativo, pero no permite declarar vencedor al filtro s
 el mismo bloque usado para proponerlo. La comparación definitiva queda aplazada hasta disponer
 de nuevos datos bajo una política ya congelada.
 
-\subsection{Diagnóstico del fallo fuera de muestra: \emph{deep ensembles} y drift}
+\subsection{Diagnóstico del fallo fuera de muestra: ensembles de semillas y drift}
 \label{sec::n3_diagnostico}
 
 La debilidad conocida de la pieza sellada es la cabeza de salud (\emph{healthy}): su
 capacidad de discriminación cae del entrenamiento a la validación de forma acusada
 (AUC $0{,}79 \to 0{,}56$). Conviene explicar \emph{por qué}, porque la causa determina si
 un reentrenamiento con más datos tiene techo. Se descompone la incertidumbre con un
-\emph{deep ensemble}: diez réplicas de la misma cabeza entrenadas con semillas distintas,
+ensemble de semillas —la técnica que en redes profundas se conoce como \emph{deep
+ensemble}, aplicada aquí a la cabeza de \emph{gradient boosting}—: diez réplicas de la
+misma cabeza entrenadas con semillas distintas,
 midiendo tanto su rendimiento por partición como su desacuerdo mutuo
 (Figura~\ref{fig::n3}).
 
@@ -587,7 +611,8 @@ Conviene delimitar con exactitud qué eje recorre esta curva, porque de ello dep
 alcance de la conclusión. El presupuesto de datos se varió aumentando el número de
 \emph{ventanas} de entrenamiento sobre un corpus fijo de 509 mercados —1.018 pares
 mercado-token— pertenecientes todos a la temporalidad horaria. Como las ventanas se
-solapan casi por completo, lo que crece a lo largo del eje es la densidad de muestreo, no
+solapan casi por completo (en un 98\,\%: paso de 10 sobre ventanas de 512 fotogramas), lo
+que crece a lo largo del eje es la densidad de muestreo, no
 el número de trayectorias independientes, que permanece constante. Y la temporalidad
 horaria es solo una de las tres capturadas: un día cualquiera del corpus contiene 24
 mercados a una hora, 96 a quince minutos y 284 a cinco, de modo que la curva se apoya en
@@ -615,7 +640,9 @@ todos los brazos}, incluido el de una hora; reducirlo solo en el brazo ampliado 
 confundido longitud de contexto con número de trayectorias. Los cuatro brazos —tabular y
 profundo, con y sin temporalidades cortas— se evalúan sobre \emph{los mismos} 916 casos
 held-out de mercados horarios, que es la comparación conservadora: el brazo ampliado no
-puede beneficiarse de un conjunto de prueba más benévolo.
+puede beneficiarse de un conjunto de prueba más benévolo. (Este conjunto pertenece al
+corpus reconstruido para la adenda y no coincide con los 906 casos congelados de la
+escalera; por eso sus cifras no son comparables celda a celda con las de aquella.)
 
 \begin{table}[htbp]
 \centering
@@ -706,3 +733,47 @@ entrenamiento. Con este horizonte de datos, más muestras no hacen que el aprend
 profundo alcance al tabular.}
 \label{fig::escalado_tab_deep}
 \end{figure}
+
+\subsection{Adenda D: entrenar contra el objetivo económico}
+\label{sec::adenda_d}
+
+La última línea experimental del trabajo (metodología en la
+Sección~\ref{sec::politica_parada}) ataca el eje que ningún experimento anterior había
+tocado: en lugar de predecir mejor y decidir después, entrenar la decisión directamente
+contra el dinero. Su carácter es \textbf{exploratorio} —los treinta y cinco días del corte
+ya habían sido observados por los barridos de política—, de modo que nada de esta sección
+constituye validación prospectiva.
+
+\paragraph{La política colapsa a la constante, por razones correctas.} Entrenada sobre
+mayo--junio y evaluada sobre la ventana del corte, la política de parada elige «no
+retirarse nunca» en las 1.323 sesiones de test, con las dos arquitecturas, y ni siquiera
+supera a la mejor acción constante en el propio conjunto de ajuste. El análisis de la
+causa resultó más informativo que el resultado: en el periodo de entrenamiento la acción
+de no retirarse \emph{domina estrictamente} —mejor total (+3.523,9\,\$) y además la mejor
+cola (peor día $-20{,}9$\,\$) de las ocho acciones—, de modo que no existe compromiso que
+aprender y la constante es la respuesta óptima. El suceso que la política debía aprender a
+evitar —el día de pérdida severa— sencillamente no está en sus datos: mayo--junio contiene
+un único día en pérdida (de veinticuatro) y ninguno por debajo de $-100$\,\$, mientras que
+la ventana del corte contiene cuatro y dos, respectivamente.
+
+\paragraph{La frontera aprendida queda dominada por el parámetro.} Sobre una partición
+donde el compromiso media--cola sí existe, la política entrenada con aversión creciente al
+riesgo ($\lambda$ de 0 a 32) recorre las ocho acciones y traza una frontera
+riesgo--rendimiento real. Comparada punto a punto contra la frontera de las ocho acciones
+constantes —para cada nivel de protección de cola, la mejor acción fija que protege al
+menos igual—, la política aprendida pierde en los dieciséis puntos evaluados: en el mejor
+caso rinde $9{,}9$\,\$ diarios menos que el escalar equivalente y en el peor,
+$119{,}9$\,\$ menos. Para esta decisión, el mejor modelo resultó ser un parámetro escalar
+bien elegido, un resultado coherente con la curva de escalado plana y con el empate entre
+el codificador secuencial y el tabular en la predicción del riesgo terminal.
+
+\paragraph{Dos defectos propios, corregidos y documentados.} La primera versión del
+experimento producía dieciséis puntos idénticos hasta el último decimal; la
+instrumentación reveló \emph{logits} saturados en torno a $-12$, donde el gradiente del
+sigmoide ($\approx 6\cdot10^{-6}$) congela la política con independencia de lo que pida la
+pérdida —se corrigió acotando los \emph{logits} y manteniendo exploración con un premio de
+entropía decreciente—. La segunda corrección fue conceptual: la regla de un \emph{token}
+por mercado, correcta para contar muestras independientes en un contraste de AUC, falsea
+la evaluación económica —en la operativa se cotizan los dos \emph{tokens} y el umbral de
+riesgo del pre-registro se calibró sobre el libro completo—, y al deshacerla desapareció
+un aparente cumplimiento de la puerta de riesgo que era un artefacto de la partición.

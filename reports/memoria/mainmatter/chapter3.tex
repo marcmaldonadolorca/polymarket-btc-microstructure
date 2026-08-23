@@ -17,6 +17,10 @@ obsoletos— y después se resume la composición del corpus y su análisis expl
 
 \subsection{Sistema de captura multifuente}
 
+El conjunto de datos es íntegramente \textbf{real}, no sintético ni simulado: se captura en
+vivo del mercado en producción, y todas las operaciones y niveles de libro registrados
+corresponden a órdenes reales de participantes reales.
+
 Los datos de mercado se registran mediante una herramienta de captura propia, desarrollada
 específicamente para este trabajo. Por su carácter sensible, esta herramienta no se publica y
 aquí se describe únicamente a nivel funcional; lo que sí se publica
@@ -31,6 +35,21 @@ datos relacional sobre la que se construyen las características; de ella se pub
 esquema y una muestra representativa, pero no los datos completos. Todas las fuentes se
 alinean en el tiempo sobre una malla regular de dos segundos, como se detalla a continuación
 (Figura~\ref{fig:captura}).
+
+\paragraph{Qué permite hacer la API pública y qué se usa de ella.} Polymarket expone dos
+servicios públicos de solo lectura que bastan para toda la recolección. El primero es la API
+de catálogo (\texttt{gamma-api.polymarket.com}), que enumera los mercados activos con sus
+metadatos: identificadores de mercado y de \emph{token}, pregunta, ventana temporal de la
+sesión, tamaño de \emph{tick} y régimen de comisiones. De ella la herramienta obtiene, en
+cada ciclo, qué contratos de Bitcoin están vivos y cuándo vencen. El segundo es la API del
+libro de órdenes (\texttt{clob.polymarket.com}), que para cada \emph{token} devuelve la
+fotografía completa del libro —todos los niveles de compra y de venta con sus precios y
+volúmenes— y el flujo de operaciones ejecutadas (precio, volumen y lado agresor). La
+herramienta consulta ambas de forma periódica y sella cada respuesta con dos marcas de
+tiempo, la del servidor y la local de recepción, que es lo que después permite medir la
+latencia (Sección~\ref{sec::latencia_grid}) y detectar datos obsoletos. Ninguna de las dos
+API exige autenticación para lectura, de modo que la captura no depende de una cuenta ni
+mueve fondos.
 
 \begin{figure}[h]
 \centering
@@ -134,6 +153,7 @@ mide el \emph{tick} y por encima se agota la muestra, porque estos contratos viv
 únicamente una hora.
 
 \subsection{Controles de calidad por sesión}
+\label{sec::qa}
 
 La calidad de los datos es tan crítica como el modelo: una referencia externa retrasada o
 incompleta puede inducir una señal que en realidad no existe. Por ello, antes de incorporarse
@@ -207,7 +227,7 @@ estrategia de regularización agresiva.
 
 Se denomina \emph{corpus} al conjunto de todas las sesiones aceptadas tras el control de
 calidad; sobre él se definen después las particiones temporales (entrenamiento, validación y
-test). El corpus principal abarca del 11 al 25 de mayo de 2026, con del orden de 2,6 millones
+test). El corpus principal abarca del 11 al 25 de mayo de 2026, con del orden de 2,5 millones
 de filas multifuente (\emph{cross-venue}). Como conjunto fuera
 de muestra se reservó del 6 al 10 de junio de 2026, capturado con posterioridad a la
 congelación del candidato (Sección~\ref{sec:congelacion}). La unidad de observación es la
@@ -238,9 +258,11 @@ posterior:
 
 \begin{enumerate}[noitemsep]
   \item \textbf{Desequilibrio de clases.} La etiqueta direccional está dominada por la
-  clase \textsc{flat} (quietud): a horizonte de 60 segundos, entre el 55 y el 65\,\% de las
-  observaciones caen dentro de la banda de quietud. Esto vuelve engañosa la precisión bruta
-  —un modelo que prediga siempre \textsc{flat} ya supera el 60\,\%— y obliga a usar
+  clase \textsc{flat} (quietud): a horizonte H60, y midiendo sobre los 2,2 millones de
+  pasos del corpus horario, el 52,9\,\% de las observaciones se mueve menos de un tick y
+  el 64,0\,\%, menos de dos —el rango que cubre los umbrales $\theta$ que absorben
+  \emph{spread} y comisión—. Esto vuelve engañosa la precisión bruta —un modelo que
+  prediga siempre \textsc{flat} acierta ya más de la mitad de las veces— y obliga a usar
   precisión equilibrada (\emph{balanced accuracy}) y F1 macro.
   \item \textbf{Calidad de los datos.} En los tramos de alta volatilidad, los retardos de
   actualización de las referencias externas abarcan varios ciclos de la malla; tras el
@@ -272,7 +294,9 @@ elecciones arbitrarias.
 Antes de modelar, el corpus se somete a un análisis exploratorio formal de series
 temporales. Cada análisis de esta sección responde una pregunta concreta de diseño y
 termina en una decisión; el material es una muestra de 285--300 series
-mercado--contrato del corpus completo (2,3 millones de filas, 1.018 series).
+mercado--contrato del corpus completo (2,3 millones de filas de la malla horaria de
+Polymarket —no confundir con los 2,5 millones de filas multifuente, que incluyen las
+referencias externas—, 1.018 series).
 
 \paragraph{Estacionariedad (ADF/KPSS).} Sobre los niveles del precio medio, el
 contraste ADF solo rechaza la raíz unitaria en el 6,3\% de las series, y el KPSS
@@ -494,6 +518,31 @@ progresión de modelos se evaluó hasta llegar al candidato final. El hilo condu
 cada decisión metodológica está orientada a un objetivo: evitar resultados ilusorios y medir
 el rendimiento económico real.
 
+\paragraph{Preprocesado.} Antes de cualquier modelo, el corpus pasa por cuatro
+transformaciones, ya introducidas en las secciones anteriores y resumidas aquí para
+responder de forma compacta a la pregunta: (i)~filtrado de calidad por sesión según los
+controles de la Sección~\ref{sec::qa}; (ii)~imputación por arrastre del último valor
+observado, sin interpolación, con cada valor arrastrado marcado como obsoleto para que los
+filtros puedan excluirlo; (iii)~exclusión de las columnas agregadas de ventana que
+incorporarían información futura; y (iv)~sin normalización para los modelos de árboles
+—invariantes a transformaciones monótonas— y con estandarización robusta por característica
+en los modelos profundos.
+
+\paragraph{Funciones de pérdida.} Cada familia entrena contra la pérdida estándar de su
+tarea: entropía cruzada binaria con \emph{logits} para las cabezas de clasificación (salud,
+signo, riesgo terminal), error absoluto o cuadrático para las cabezas de regresión de valor
+esperado, y QLIKE para la predicción de volatilidad (Sección~\ref{sec::metricas}). Son,
+deliberadamente, pérdidas estadísticas; la única excepción, motivada al final del capítulo,
+es la política de parada de la Sección~\ref{sec::politica_parada}, que entrena directamente
+contra el objetivo económico.
+
+\paragraph{Hardware y tiempos.} Todo el trabajo corre en una estación de consumo: los
+modelos de árboles y los análisis, en CPU; los modelos profundos, en una única GPU
+(Radeon~RX~6800~XT, 16~GB) mediante ROCm. Como referencia de coste, el \emph{linear probe}
+de MOMENT sobre 40.758 ventanas tarda unos 38~segundos por época en CPU y el ajuste
+completo se ejecutó en la GPU; ningún experimento del trabajo exige más de unas horas de
+cómputo, lo que acota también su coste de reproducción (Capítulo~\ref{ch::reproducibilidad}).
+
 \subsection{Definición del objetivo}
 
 Para cada instante $t$ se define el retorno futuro del precio medio a un horizonte $H$,
@@ -648,7 +697,7 @@ las conclusiones económicas — en la dirección que las refuerza.
 
 Desde 2026 Polymarket aplica a los mercados de criptomonedas una comisión sobre el
 lado \emph{taker} de la operación, definida en su documentación
-oficial~\cite{polymarket_trading} como
+oficial~\cite{polymarket_fees} como
 \begin{equation}
 \text{comisión}(C, p) = C \cdot r \cdot p\,(1-p),
 \label{eq::fee_oficial}
@@ -657,8 +706,9 @@ donde $C$ es el número de contratos, $p$ el precio de ejecución y $r=0{,}07$ l
 vigente para cripto. La forma $p\,(1-p)$ hace que la comisión sea máxima en torno a
 $p=0{,}5$ —justo la zona de precios donde opera la mayor parte de este trabajo— y
 decrezca hacia los extremos. La versión implementada originalmente en el código
-elevaba al cuadrado el término $p\,(1-p)$, lo que en torno al precio medio subestima
-el coste real en un factor de aproximadamente ocho: en $p=0{,}5$, la comisión oficial
+calculaba $p\cdot r\cdot\big(p\,(1-p)\big)^{2}$ —elevaba al cuadrado el término
+$p\,(1-p)$ y arrastraba además un factor $p$ adicional—, lo que en torno al precio medio
+subestima el coste real en un factor de aproximadamente ocho: en $p=0{,}5$, la comisión oficial
 es de $1{,}75$ ticks por contrato frente a los $\sim$$0{,}22$ ticks del modelo erróneo
 (Figura~\ref{fig:fees_errata}).
 
@@ -715,6 +765,7 @@ la evaluación prospectiva, con su propio sello de tiempo
 (Capítulo~\ref{ch::reproducibilidad}).
 
 \subsection{Métricas de evaluación}
+\label{sec::metricas}
 
 La elección de métricas es deliberada y responde a las características del problema. Para la
 fase de clasificación no se reporta la precisión bruta (\emph{accuracy}), porque el dominio
@@ -770,8 +821,12 @@ libro como un objeto con estructura espacio-temporal. Se construyen secuencias d
 fotografías consecutivas y un tensor de los diez primeros niveles del libro, y sobre esa
 representación se evalúan cinco arquitecturas:
 \begin{itemize}[noitemsep]
-\item una red recurrente \textbf{GRU} (capa oculta de dimensión 56) sobre la secuencia de
-características, que modela la dinámica temporal reciente;
+\item una red recurrente \textbf{GRU}~\cite{cho2014gru} (capa oculta de dimensión 56) sobre
+la secuencia de características, que modela la dinámica temporal reciente. La GRU es la
+variante recurrente con dos puertas —actualización y reinicio— que deciden cuánto del estado
+anterior se conserva en cada paso, lo que mitiga el desvanecimiento del gradiente de las
+recurrentes simples; se prefiere aquí a la LSTM porque logra una capacidad comparable con
+menos parámetros, algo relevante con los pocos miles de casos etiquetados disponibles;
 \item un codificador convolucional del libro, el \textbf{BookEncoder}, inspirado en
 DeepLOB~\cite{zhang2019deeplob,tsantekidis2017}, que resume cada fotografía con dos
 convoluciones unidimensionales sobre la dimensión de niveles y un \emph{pooling} dual,
@@ -785,12 +840,21 @@ donde $\mathbf{B}_\tau$ es el libro en el paso $\tau$ y $\|$ denota concatenaci�
 en mercados poco líquidos;
 \item una \textbf{fusión} que combina la salida de la GRU y la del BookEncoder en una cabeza
 común, para aprovechar simultáneamente la dinámica temporal y la estructura del libro;
-\item una red convolucional temporal (\textbf{TCN}) orientada a clasificar el régimen de
-volatilidad de la sesión;
-\item un codificador con \textbf{auto-atención} sobre esa misma representación, en dos
-variantes —atención sobre la última fotografía del libro y sobre la secuencia completa—,
-incorporado para comprobar si el mecanismo que domina la literatura reciente de modelos
-de secuencia cambia el diagnóstico.
+\item una red convolucional temporal (\textbf{TCN})~\cite{bai2018tcn} orientada a clasificar
+el régimen de volatilidad de la sesión. Una TCN sustituye la recurrencia por convoluciones
+\emph{causales} —cada salida solo ve el pasado— con dilatación creciente: al duplicar el
+salto entre entradas consecutivas en cada capa, el campo receptivo crece de forma
+exponencial con la profundidad, lo que permite cubrir sesiones largas con pocos parámetros
+y entrenar en paralelo, sin la dependencia secuencial de una recurrente;
+\item un codificador con \textbf{auto-atención}~\cite{vaswani2017attention} sobre esa misma
+representación, en dos variantes —atención sobre la última fotografía del libro y sobre la
+secuencia completa—, incorporado para comprobar si el mecanismo que domina la literatura
+reciente de modelos de secuencia cambia el diagnóstico. En la auto-atención cada posición
+de la entrada emite una consulta que se compara con las claves de todas las demás, y su
+representación de salida es la media de los valores ponderada por esa afinidad; el
+mecanismo aprende así qué partes del libro o de la secuencia son relevantes entre sí sin
+imponer una estructura de vecindad fija, a costa de muchos más parámetros —el motivo, como
+se verá, de su sobreajuste aquí.
 \end{itemize}
 Todas estas arquitecturas aprenden representación —obtienen métricas de clasificación y de
 ordenación razonables, y algunas políticas \emph{proxy} resultan positivas dentro de
@@ -840,6 +904,21 @@ amplio que el especialista final —no aplican su filtro estricto de tradabilida
 modo que la comparación con la cifra sellada del especialista es de contexto, no
 cabeza a cabeza.
 
+\paragraph{Qué declaran estos métodos en sus \emph{benchmarks} y qué se obtiene aquí.}
+La comparación con las cifras publicadas es parte de la pregunta. DeepLOB declara un F1
+del 83,4\,\% prediciendo la dirección a horizonte corto en FI-2010, un conjunto de
+acciones nórdicas de alta liquidez~\cite{zhang2019deeplob}; MOMENT declara resultados
+\emph{zero-shot} competitivos con modelos ajustados en sus colecciones de series de largo
+horizonte~\cite{goswami2024moment}. Nada de eso se reproduce en este corpus, y la
+diferencia no es un fallo de implementación sino de régimen: FI-2010 etiqueta movimientos
+sobre un subyacente que se mueve casi siempre, mientras que aquí el precio queda inmóvil
+en la mayoría de los pasos de dos segundos (Sección~\ref{sec::grano_temporal}), la señal
+útil vive a horizontes donde la comisión oficial de 2026 consume el margen, y la
+geometría contexto–horizonte excluye a la mayor parte de los mercados cortos. Este
+contraste —métodos que rinden donde fueron diseñados y no aquí— es precisamente lo que
+la comparación debe hacer visible, y anticipa la conclusión económica del
+Capítulo~\ref{ch::resultados}.
+
 Los baselines clásicos se ajustan por serie sobre el tramo pre-señal, sin información
 futura. El \textbf{naive-drift} (signo de la deriva reciente) y el \textbf{ARIMA(1,1,1)}
 son los más informativos; el \textbf{suavizado exponencial de Holt} queda por detrás, y
@@ -860,21 +939,25 @@ restringidas al mismo régimen de actividad que el corte de evaluación (Secció
 
 \begin{table}[htbp]
 \centering
-\caption{Escalera de modelos de referencia sobre los 906 casos congelados (H60,
-comisión taker oficial). Acierto direccional y resultado bruto medio en ticks; el neto
-taker es negativo en todos los casos por el régimen de comisiones de 2026.}
+\caption[Escalera de modelos de referencia]{Escalera de modelos de referencia sobre el
+conjunto de 906 casos congelados (H60, comisión taker oficial). La columna $n$ es el
+soporte real de cada modelo: los baselines clásicos solo emiten señal donde su criterio
+interno lo permite, de modo que sus aciertos \emph{no} son comparables cabeza a cabeza
+entre sí ni con MOMENT —que responde en los 906—; el ejemplo extremo es ARIMA, cuyo
+56,5\,\% descansa en el 18\,\% de los casos. El neto taker es negativo en todos los
+casos por el régimen de comisiones de 2026.}
 \label{tab::escalera}
-\begin{tabular}{lcc}
+\begin{tabular}{lrcc}
 \toprule
-Modelo & Acierto direccional & Bruto (ticks) \\
+Modelo & $n$ & Acierto direccional & Bruto (ticks) \\
 \midrule
-ARIMA(1,1,1) & 56,5\,\% & $+0{,}621$ \\
-naive-drift & 53,1\,\% & $+1{,}186$ \\
-Holt (suavizado exponencial) & 48,4\,\% & $+0{,}516$ \\
-\textbf{MOMENT fine-tuning completo} & \textbf{47,3\,\%} & $+0{,}082$ \\
-MOMENT linear-probing & 46,6\,\% & $-0{,}175$ \\
-MOMENT zero-shot & 45,5\,\% & $-0{,}585$ \\
-kNN-DTW & 45,3\,\% & $-0{,}209$ \\
+ARIMA(1,1,1) & 161 & 56,5\,\% & $+0{,}621$ \\
+naive-drift & 467 & 53,1\,\% & $+1{,}186$ \\
+Holt (suavizado exponencial) & 902 & 48,4\,\% & $+0{,}516$ \\
+\textbf{MOMENT fine-tuning completo} & 906 & \textbf{47,3\,\%} & $+0{,}082$ \\
+MOMENT linear-probing & 906 & 46,6\,\% & $-0{,}175$ \\
+MOMENT zero-shot & 906 & 45,5\,\% & $-0{,}585$ \\
+kNN-DTW & 232 & 45,3\,\% & $-0{,}209$ \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -883,10 +966,14 @@ De esta escalera se extraen dos lecturas. La primera es que la adaptación del
 fundacional \emph{ayuda de forma monótona}: cada régimen mejora al anterior, tanto en
 acierto como en resultado bruto (zero-shot $\to$ linear-probing $\to$ fine-tuning
 completo), lo que confirma que el modelo capta algo de la estructura local al
-especializarse. La segunda, más importante, es que \emph{ni siquiera el fine-tuning
-completo supera a los baselines clásicos}: naive-drift y ARIMA, con una fracción del
-coste computacional, se sitúan claramente por encima. El fundacional de series
-temporales, la herramienta más sofisticada de la escalera, no es aquí la más precisa.
+especializarse; los tres regímenes responden sobre los mismos 906 casos, así que esta
+comparación sí es cabeza a cabeza. La segunda, más importante, es que \emph{ni siquiera
+el fine-tuning completo supera a los baselines clásicos}: Holt, que responde en 902 de
+los 906 casos —soporte casi idéntico—, lo supera ligeramente con una fracción del coste
+computacional, y naive-drift y ARIMA se sitúan por encima aunque sobre soportes menores
+(467 y 161 casos donde su criterio interno emite señal), de modo que su ventaja debe
+leerse con la cautela que la columna $n$ impone. El fundacional de series temporales, la
+herramienta más sofisticada de la escalera, no es en ningún caso la más precisa.
 
 Cabe preguntarse si el fundacional mejoraría con más datos. La
 Figura~\ref{fig::escalado} responde con una curva de escalado: se re-entrena el
@@ -939,8 +1026,9 @@ densidad atípica de actividad del libro.}
 Ambas cabezas comparten una
 configuración de regularización agresiva (tasa de aprendizaje 0,045, hasta 220 iteraciones
 con parada anticipada, máximo de 15 hojas por árbol, mínimo de 120 muestras por hoja y
-regularización L2 de 0,10), necesaria porque el bloque de entrenamiento del especialista
-tiene del orden de mil observaciones útiles. La política congelada opera cuando el valor
+regularización L2 de 0,10), necesaria porque, aunque el bloque de entrenamiento del especialista
+tiene 28.095 filas, estas pertenecen a solo unas 1.400 sesiones independientes, y es ese
+número —no el de filas— el que gobierna la varianza efectiva. La política congelada opera cuando el valor
 esperado predicho supera 0,75 y la probabilidad de salud no baja de 0,50; ambos umbrales se
 seleccionaron sobre el conjunto de validación, nunca sobre el test terminal.
 
@@ -1012,3 +1100,37 @@ constituye, por ello, la prueba fuera de muestra genuina y previene el sobreajus
 selección múltiple~\cite{bailey2014deflated}. El filtro de volatilidad queda fuera de esa
 afirmación de congelación: se definió como política candidata después del diagnóstico del
 bloque y solo podrá validarse con observaciones posteriores al 10 de junio.
+
+\subsection{Entrenar contra el dinero: política de parada con contrafactual exacto}
+\label{sec::politica_parada}
+
+Un censo de las funciones de pérdida empleadas a lo largo de este trabajo revela un patrón
+que ningún experimento aislado hacía visible: entropía cruzada binaria, error absoluto y
+QLIKE —todas pérdidas estadísticas—. En los veintiséis programas que entrenan un modelo
+profundo, la decisión económica se tomó siempre \emph{después}, aplicando un umbral sobre
+una probabilidad. Nunca se entrenó nada directamente contra el dinero, pese a que el
+planteamiento inicial del trabajo contemplaba funciones de pérdida que penalizasen la
+volatilidad negativa durante el entrenamiento, al estilo del ratio de Sharpe.
+
+La última línea experimental cierra ese hueco. La regresión del tamaño de la posición se
+descartó primero por medición directa: con el tope de inventario de la política maker,
+duplicar el tamaño de orden de 50 a 100 acciones solo multiplica el volumen casado por
+1,50, y la caja ni siquiera es monótona en el tamaño (22.390, 26.939 y 25.826~\$ para 50,
+100 y 200 acciones), de modo que el beneficio no es una función tratable del tamaño y una
+política de \emph{sizing} exigiría un simulador diferenciable. La decisión de
+\emph{retirada}, en cambio, sí lo es, y de forma exacta: el parámetro de aplanado
+—«dejar de cotizar en los últimos $k$ fotogramas»— se simuló para ocho valores de $k$, de
+modo que se conoce el \emph{contrafactual completo} de cada sesión: cuánto habría ganado
+con cada acción posible. El beneficio esperado de una política estocástica
+$\pi_\theta$ es entonces $\mathbb{E}[\text{P\&L}] = \sum_k \pi_k(\theta)\,e_k$, exacto y
+diferenciable, sin estimadores \emph{off-policy}.
+
+La política se implementa como parada secuencial causal: en cada punto de decisión, de más
+lejano a más cercano al cierre, la red observa la trayectoria disponible hasta ese instante
+y emite la probabilidad de retirarse. Como función de pérdida se emplea la propia puerta
+de riesgo del pre-registro escrita como objetivo: maximizar la media diaria menos
+$\lambda$ veces la desviación a la baja (Sortino), agregada por día. Se comparan una
+variante tabular (resúmenes de la trayectoria) y una secuencial (codificador convolucional
+dilatado), con $\lambda$ elegido en validación. El carácter de esta línea es exploratorio
+—los treinta y cinco días del corte ya habían sido observados por los barridos previos— y
+sus resultados se reportan en el Capítulo~\ref{ch::resultados} con esa etiqueta.

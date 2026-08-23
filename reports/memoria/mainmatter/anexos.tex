@@ -60,6 +60,24 @@ Dimensión oculta de la GRU & 56 \\
 \end{tabular}
 \end{table}
 
+\begin{table}[h]
+\centering
+\caption{Hiperparámetros de los modelos fundacionales evaluados.}
+\begin{tabular}{lll}
+\toprule
+\textbf{Hiperparámetro} & \textbf{MOMENT (ajuste)} & \textbf{TabPFN (\emph{zero-shot})} \\
+\midrule
+Modelo base & MOMENT-1-small & TabPFN v2 \\
+Modo & \emph{linear probe} & sin entrenamiento \\
+Ventana de contexto & 512 pasos & 10.000 filas (tope) \\
+Optimizador & AdamW & — \\
+Épocas & 15 & — \\
+Ventanas de entrenamiento & 40.758 & — \\
+Semilla & 20260714 & 20260713 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
 El especialista base congelado opera con dos umbrales: valor esperado predicho superior a
 0,75 y probabilidad de salud no inferior a 0,50. Tras el diagnóstico del bloque fuera de
 muestra se propone una política futura que exige, además, volatilidad realizada a 5 segundos

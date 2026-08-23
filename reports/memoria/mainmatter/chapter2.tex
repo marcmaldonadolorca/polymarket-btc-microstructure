@@ -68,7 +68,15 @@ Polygon y un marco contable a nivel de transacción, incluyendo la detección de
 Zou~\cite{cheng2026arbitrage} buscan oportunidades de arbitraje en los mercados de
 baloncesto y encuentran que las anomalías de mercado único son rarísimas y de vida
 mediana de pocos segundos — una advertencia empírica directa contra las estrategias
-\emph{taker} de latencia que este trabajo confirma por otra vía.
+\emph{taker} de latencia que este trabajo confirma por otra vía. Ese hallazgo acota
+también la alternativa práctica más visible fuera de la literatura académica: los
+\emph{bots} de arbitraje de código abierto que circulan en repositorios públicos,
+que cruzan desajustes elementales —los dos lados de un mercado sumando menos de uno,
+o el mismo suceso cotizado distinto en dos mercados— sin modelo alguno. De ellos este
+trabajo aprovecha la lección de ingeniería (la conexión continua a la API y la
+contabilidad de costes por operación son la mitad del problema) y se diferencia en el
+objetivo: no ejecutar la anomalía obvia, que la evidencia muestra escasa y efímera,
+sino medir si existe señal explotable bajo costes y latencia reales.
 Nechepurenko~\cite{nechepurenko2026nonretail} estudia la composición del flujo
 ejecutado y muestra que la liquidez de Polymarket descansa en niveles de
 participantes no minoristas con firmas de microestructura diferenciadas; para este
@@ -110,6 +118,47 @@ la secuencia) y documenta, además, que el rendimiento de todos estos modelos se
 al acercarse a condiciones de mercado realistas — observación que anticipa el resultado
 central de este trabajo.
 
+La Figura~\ref{fig::deeplob_esquema} ilustra la idea que da nombre a la «lectura visual»
+del libro: el estado del mercado en cada instante se apila como una columna —precios y
+volúmenes de los mejores niveles de compra y de venta— y la sucesión de instantes forma
+una matriz que la convolución recorre igual que recorrería una imagen, buscando motivos
+locales (desequilibrios entre lados, escalones de profundidad) que la recurrencia integra
+después a lo largo del tiempo.
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[
+  font=\small,
+  caja/.style={draw, rounded corners=2pt, minimum height=9mm, align=center},
+  flecha/.style={-{Stealth[length=2.5mm]}, thick}
+]
+% matriz del libro
+\foreach \x in {0,...,7} {
+  \foreach \y in {0,...,4} {
+    \pgfmathsetmacro{\g}{85 - mod(\x*13+\y*29,45)}
+    \fill[black!\g!white] (\x*0.42, \y*0.42) rectangle ++(0.38, 0.38);
+  }
+}
+\draw[thick] (-0.15,-0.05) rectangle (3.35, 2.15);
+\node[below, align=center] at (1.6,-0.15) {tiempo $\rightarrow$\\[-2pt]\scriptsize (fotografías cada 2\,s)};
+\node[rotate=90, above, align=center] at (-0.35,1.05) {niveles del libro};
+% flechas y bloques
+\coordinate (mat) at (3.35,1.05);
+\node[caja, right=9mm of mat] (conv) {convoluciones\\\scriptsize estructura espacial};
+\node[caja, right=7mm of conv] (rec) {recurrencia /\\atención\\\scriptsize dinámica temporal};
+\node[caja, right=7mm of rec] (out) {señal\\\scriptsize sube / baja / nada};
+\draw[flecha] (3.45,1.05) -- (conv);
+\draw[flecha] (conv) -- (rec);
+\draw[flecha] (rec) -- (out);
+\end{tikzpicture}
+\caption[La «lectura visual» del libro de órdenes]{Esquema de la familia DeepLOB: el libro
+se representa como una matriz niveles$\times$tiempo —cada celda, un precio o volumen— que
+los módulos convolucionales procesan como una imagen antes de que la parte recurrente (o
+de atención) integre la evolución temporal. El BookEncoder del Capítulo~\ref{ch::metodos}
+es la adaptación de esta idea al libro de Polymarket.}
+\label{fig::deeplob_esquema}
+\end{figure}
+
 De esta literatura este trabajo adopta una decisión de diseño —tratar el libro de órdenes
 como un objeto con estructura espacio-temporal, y no como una tabla plana— y, sobre ella,
 introduce dos cambios. El primero es metodológico: evaluar cada modelo bajo un modelo de
@@ -139,8 +188,8 @@ una red pre-entrenada sobre el prior de millones de conjuntos sintéticos que
 clasifica conjuntos pequeños por inferencia en contexto, sin entrenar. Su inclusión
 en la escalera de este trabajo permite formular la pregunta simétrica —¿qué aporta
 un fundacional \emph{del tipo de dato que ganó} (tabular), y no solo del tipo de
-dato aparente (serie temporal)?— cuyos resultados se presentan en el
-Capítulo~\ref{ch::resultados}.
+dato aparente (serie temporal)?— cuyos resultados se presentan en la
+Sección~\ref{sec::tabpfn}.
 
 El pre-entrenamiento auto-supervisado es el mecanismo que sostiene a estos modelos y
 una línea propia de literatura. Las estrategias dominantes son la reconstrucción de
@@ -239,6 +288,49 @@ comprometidos, favorables o no— es, hasta donde alcanza la revisión de este c
 inédita en la literatura de mercados de predicción, y constituye la aportación
 metodológica central del trabajo (el protocolo se detalla en el
 Capítulo~\ref{ch::metodos}).
+
+La Tabla~\ref{tab::familias} condensa el balance de las familias revisadas: qué fortaleza
+motiva incluir cada una, qué debilidad documenta la literatura o anticipa este corpus, y
+qué se adopta de ella en el trabajo.
+
+\begin{table}[htbp]
+\centering
+\caption[Balance de las familias de modelos revisadas]{Puntos fuertes y débiles de cada
+familia revisada y qué adopta este trabajo de cada una.}
+\label{tab::familias}
+\small
+\begin{tabular}{>{\raggedright\arraybackslash}p{0.21\textwidth}>{\raggedright\arraybackslash}p{0.24\textwidth}>{\raggedright\arraybackslash}p{0.25\textwidth}>{\raggedright\arraybackslash}p{0.21\textwidth}}
+\toprule
+\textbf{Familia} & \textbf{Punto fuerte} & \textbf{Punto débil} & \textbf{Qué se adopta} \\
+\midrule
+CNN/LSTM sobre el libro (DeepLOB, TLOB) &
+Estructura espacial del libro; F1 $\sim$83\,\% en FI-2010 &
+Exige subyacente en movimiento continuo; frágil ante coste y latencia &
+Representación matriz niveles$\times$tiempo (BookEncoder) \\
+\addlinespace
+Fundacionales de series (MOMENT, Chronos, TimesFM) &
+\emph{Zero-shot} y ajuste barato; contexto largo &
+No baten a baselines simples en régimen casi inmóvil; contexto de 512 no cabe en mercados
+cortos &
+MOMENT como brazo profundo de la escalera \\
+\addlinespace
+Fundacional tabular (TabPFN) &
+Ordenación \emph{zero-shot} competitiva con un tercio de los datos &
+Tope de contexto; no mejora la cabeza de decisión &
+Pregunta simétrica de la escalera (Sección~\ref{sec::tabpfn}) \\
+\addlinespace
+Auto-supervisión (TS2Vec, TCN propio) &
+Aprovecha datos sin etiquetar; regulariza &
+Sin etiqueta económica, la representación no encuentra señal que no exista &
+Encoder TCN auto-supervisado como peldaño \\
+\addlinespace
+Tabulares con regularización (HGB) &
+Varianza baja con pocos casos; robustos a escala y ruido &
+Sesgo alto; no capturan estructura secuencial fina &
+Especialista de dos cabezas —el modelo final \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 \section{Limitaciones en la literatura}
 

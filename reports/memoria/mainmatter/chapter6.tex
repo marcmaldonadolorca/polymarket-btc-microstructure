@@ -33,6 +33,18 @@ $+1{,}069$ ticks sobre el mismo bloque es exploratorio y necesita fechas posteri
 positivos para la política base y cinco de cinco dentro del subconjunto diagnóstico. Ninguna
 de las dos cifras constituye una validación definitiva.
 
+\textbf{Ausencia del suceso de cola en particiones pequeñas.} La línea de la adenda~D
+(Sección~\ref{sec::adenda_d}) reveló una limitación estructural que afecta a cualquier
+intento de \emph{aprender} gestión del riesgo con pocos meses de datos: el suceso que la
+política debe evitar —el día de pérdida severa— es tan infrecuente (cuatro días de
+treinta y cinco en la ventana del corte) que las particiones pequeñas lo pierden con alta
+probabilidad. El periodo de entrenamiento de mayo--junio no contiene ni un solo día por
+debajo de $-100$\,\$, y un conjunto de validación de una semana sale sin ningún día en
+pérdida el 43\,\% de las veces. Cuando eso ocurre, el término de aversión al riesgo de la
+función de pérdida vale cero por construcción y el hiperparámetro que la gobierna no puede
+seleccionarse: no es un fallo del modelo sino del diseño experimental, y solo lo resuelven
+ventanas más largas o la simulación de escenarios de cola.
+
 \textbf{Continuidad de la captura.} El recolector no operó de forma ininterrumpida durante
 todo el periodo del proyecto: hay un hueco documentado entre el 14 de junio y la
 reanudación real, confirmada el 3 de julio de 2026 a las 08:42 UTC. El hueco no afecta a

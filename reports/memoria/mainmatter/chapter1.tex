@@ -41,13 +41,25 @@ calibradas~\cite{wolfers2004prediction}.
 
 Polymarket es una plataforma de mercados de predicción descentralizada. A diferencia de
 una casa de apuestas, donde el operador fija las cuotas, en Polymarket son los propios
-participantes quienes ponen precios mediante un \emph{libro de órdenes}: el emparejamiento
+participantes quienes ponen precios mediante un \emph{libro de órdenes} central
+(\emph{Central Limit Order Book}, CLOB): el emparejamiento
 de compras y ventas ocurre fuera de la cadena de bloques (de forma rápida) y la
 liquidación final del dinero se registra en cadena (sobre una \emph{blockchain})
 \cite{polymarket_trading}. En los mercados sobre el precio de Bitcoin, cada contrato
 binario toma valores entre 0 y 1 y se interpreta como una
 probabilidad~\cite{polymarket_prices}. Esto convierte cada mercado en un pequeño
 \emph{mercado electrónico} (\emph{exchange}) con su propia dinámica de oferta y demanda.
+
+Que la liquidación viva en una cadena de bloques tiene una consecuencia directa para un
+trabajo de datos: nada se borra. Cada operación liquidada queda registrada de forma
+permanente y pública; si una posición se deshace, no se elimina el apunte original, sino
+que se añade otro en sentido contrario. Esa propiedad es la que hace posible la auditoría
+del registro público de operaciones del Anexo~D —reproducir las cifras del trabajo desde
+un dato que nadie puede reescribir— y la que garantiza que el flujo de operaciones
+capturado no depende de la buena voluntad del operador de la plataforma. El libro de
+órdenes en sí, en cambio, vive fuera de cadena por velocidad, y por eso su captura
+continua (Capítulo~\ref{ch::metodos}) es aportación de este trabajo: es la parte del
+sistema que no deja huella permanente.
 
 \subsection{El libro de órdenes y el vocabulario de la microestructura}
 
@@ -67,6 +79,14 @@ Sus elementos esenciales son:
   una referencia ``limpia'' del precio sin el ruido del \emph{spread}.
   \item \textbf{Tick}: la variación mínima de precio que admite el mercado. Es la unidad
   natural en la que mediremos todos los resultados de este trabajo.
+  \item \textbf{Taker}: quien cruza el \emph{spread} con una orden inmediata contra el
+  libro. Obtiene ejecución al instante y, en los mercados de criptomonedas de 2026, paga
+  la comisión.
+  \item \textbf{Maker} (creador de mercado): quien publica órdenes límite y espera a que
+  otro las cruce. Provee liquidez, cobra el \emph{spread} y una parte de las comisiones
+  de los \emph{takers} (\emph{rebate}), y a cambio asume el riesgo de quedarse con
+  inventario cuando el mercado se mueve en su contra. La distinción \emph{maker}/\emph{taker}
+  vertebra la segunda mitad de este trabajo.
 \end{itemize}
 
 La Tabla~\ref{tab:lob} muestra, a modo de ejemplo ilustrativo, el aspecto de un libro de
@@ -226,16 +246,26 @@ toda la evidencia acumulada hasta ese punto era retrospectiva. Se declaran aquí
 objetivos, y no como incidencias, porque acabaron aportando más al trabajo que varios de
 los previstos desde el principio.
 
-El presente trabajo se organiza como sigue. El Capítulo~\ref{ch::estado} revisa el estado
-de la cuestión. El Capítulo~\ref{ch::metodos} describe los datos, las líneas base y la
-metodología de modelado y entrenamiento. El Capítulo~\ref{ch::resultados} presenta y
-analiza los resultados sobre el conjunto fuera de muestra. El Capítulo~\ref{ch::despliegue}
-discute la estrategia de despliegue. El Capítulo~\ref{ch::etica} aborda los aspectos éticos
-y las limitaciones. El Capítulo~\ref{ch::reproducibilidad} detalla la reproducibilidad, y
-el Capítulo~\ref{ch::conclusiones} recoge las conclusiones. Por último, los anexos incluyen
-el detalle de las características y de los hiperparámetros de los modelos, el pre-registro
-completo con el procedimiento para verificar su sello temporal, y una auditoría del registro
-público de operaciones que permite reproducir las cifras principales desde el dato anonimizado.
+\paragraph{Estructura del documento.} El presente trabajo se organiza como sigue:
+\begin{itemize}[noitemsep]
+  \item \textbf{Capítulo~\ref{ch::estado}} — Estado de la cuestión: literatura de
+  microestructura y aprendizaje profundo sobre libros de órdenes, y sus limitaciones.
+  \item \textbf{Capítulo~\ref{ch::metodos}} — Material y métodos: el sistema de captura,
+  el corpus y su análisis exploratorio, las líneas base y la metodología de modelado,
+  validación y costes.
+  \item \textbf{Capítulo~\ref{ch::resultados}} — Resultados y análisis: la evaluación
+  fuera de muestra, la fe de erratas de comisiones, el giro al lado \emph{maker} y la
+  validación prospectiva pre-registrada.
+  \item \textbf{Capítulo~\ref{ch::despliegue}} — Despliegue: arquitectura del sistema y
+  condiciones bajo las que tendría sentido operarlo.
+  \item \textbf{Capítulo~\ref{ch::etica}} — Aspectos éticos y limitaciones.
+  \item \textbf{Capítulo~\ref{ch::reproducibilidad}} — Reproducibilidad: qué se publica
+  y cómo reproducir las cifras.
+  \item \textbf{Capítulo~\ref{ch::conclusiones}} — Conclusiones y trabajo futuro.
+  \item \textbf{Anexos} — detalle de características e hiperparámetros, el pre-registro
+  completo con el procedimiento de verificación del sello temporal, y una auditoría del
+  registro público de operaciones desde el dato anonimizado.
+\end{itemize}
 En los preliminares se incluye además un glosario para el lector no familiarizado con las
 criptomonedas.
 

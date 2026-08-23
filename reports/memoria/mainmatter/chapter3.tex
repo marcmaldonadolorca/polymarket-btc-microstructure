@@ -16,6 +16,7 @@ conceptos necesarios —fuentes de datos, malla temporal y contrato de latencia,
 obsoletos— y después se resume la composición del corpus y su análisis exploratorio.
 
 \subsection{Sistema de captura multifuente}
+\label{sec::captura}
 
 El conjunto de datos es íntegramente \textbf{real}, no sintético ni simulado: se captura en
 vivo del mercado en producción, y todas las operaciones y niveles de libro registrados
@@ -517,6 +518,42 @@ en fugas temporales, cómo se modelan los costes y la latencia, qué métricas d
 progresión de modelos se evaluó hasta llegar al candidato final. El hilo conductor es que
 cada decisión metodológica está orientada a un objetivo: evitar resultados ilusorios y medir
 el rendimiento económico real.
+
+La Figura~\ref{fig::pipeline_global} sirve de índice general del proceso: encadena las
+etapas que las secciones siguientes desarrollan, de la captura al corte prospectivo.
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[
+  font=\footnotesize,
+  etapa/.style={draw, rounded corners=2pt, align=center, minimum height=8mm,
+                inner sep=3pt, text width=24mm},
+  sello/.style={etapa, thick},
+  fl/.style={-{Stealth[length=2mm]}, thick},
+  node distance=4mm and 5mm
+]
+\node[etapa] (cap) {Captura multifuente\\\scriptsize §\ref{sec::captura}};
+\node[etapa, right=of cap] (qa) {Control de calidad por sesión\\\scriptsize §\ref{sec::qa}};
+\node[etapa, right=of qa] (eda) {EDA y series\\\scriptsize §\ref{sec::eda_series}};
+\node[etapa, right=of eda] (feat) {Objetivo y características\\\scriptsize esta sección};
+\node[etapa, below=9mm of feat] (esc) {Escalera de modelos\\\scriptsize §\ref{sec::escalera}};
+\node[sello, left=of esc] (cong) {Congelación del especialista\\\scriptsize §\ref{sec:congelacion}};
+\node[etapa, left=of cong] (oos) {Fuera de muestra 6--10 jun\\\scriptsize Cap.~\ref{ch::resultados}};
+\node[sello, left=of oos] (prosp) {Giro \emph{maker} y corte prospectivo sellado\\\scriptsize Cap.~\ref{ch::resultados}};
+\draw[fl] (cap) -- (qa);
+\draw[fl] (qa) -- (eda);
+\draw[fl] (eda) -- (feat);
+\draw[fl] (feat) -- (esc);
+\draw[fl] (esc) -- (cong);
+\draw[fl] (cong) -- (oos);
+\draw[fl] (oos) -- (prosp);
+\end{tikzpicture}
+\caption[Índice general del proceso]{Las ocho etapas del proceso, en orden. Los recuadros
+de trazo grueso marcan los dos puntos de no retorno: la congelación del especialista antes
+del bloque fuera de muestra y el sellado criptográfico del pre-registro antes de la
+ventana prospectiva.}
+\label{fig::pipeline_global}
+\end{figure}
 
 \paragraph{Preprocesado.} Antes de cualquier modelo, el corpus pasa por cuatro
 transformaciones, ya introducidas en las secciones anteriores y resumidas aquí para

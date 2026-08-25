@@ -10,11 +10,11 @@ respuesta a la primera pregunta es que sí, parcialmente y con matices; la respu
 segunda es que no. Lo que da cuerpo a la memoria es el detalle de cómo se ha establecido
 cada una de esas dos respuestas.
 
-\section{La conclusión central, alcanzada por tres caminos}
+\section{La conclusión central, alcanzada por cuatro caminos}
 
 Una precisión direccional cercana al 90\,\% no garantiza una política económica. Esta
 afirmación, que vertebra el trabajo, no descansa sobre una única medición, y su solidez
-proviene precisamente de que tres vías independientes convergen en ella.
+proviene precisamente de que cuatro vías independientes convergen en ella.
 
 La primera es la latencia. Medida como \emph{markout} desde el instante exacto de la señal,
 la política produce $+6{,}79$ ticks de media; en el primer escalón que la malla de captura
@@ -38,6 +38,20 @@ latencia inferior al segundo dejaría margen. La correlación cruzada entre el r
 futuro perpetuo de Bitcoin y la variación posterior del precio del contrato, medida sobre
 841~mercados independientes y quince desfases, no supera $0{,}004$ en ningún caso. El
 mercado digiere la información más rápido de lo que este montaje permite observar.
+
+La cuarta es la única que llegó por validación prospectiva del lado \emph{taker}, y es la
+que cierra el argumento con la potencia que a las demás les faltaba. El corte del
+protocolo general, ejecutado una sola vez sobre cincuenta días y 25.011 unidades de
+acción, sitúa la capa histórica en $-0{,}004$~ticks con un intervalo que contiene el cero
+—esto es, indistinguible del azar— y las capas que cobran la comisión oficial entre
+$-0{,}77$ y $-3{,}65$~ticks, con intervalos que lo excluyen holgadamente. Su valor no
+está solo en el signo. Al calcular el intervalo de la cifra de referencia contra la que
+se iba a comparar, los $+0{,}349$~ticks de la validación de junio, resultó que
+\textbf{aquella nunca había sido significativa}: $[-0{,}194;\ +0{,}892]$ por filas y
+$[-0{,}655;\ +1{,}337]$ por mercado. La conclusión correcta no es, por tanto, que la
+señal se deteriorase entre junio y agosto, sino que con treinta y tres veces más datos
+sigue sin distinguirse del azar. Lo que el corte aporta es lo que a la validación
+original le faltaba: potencia suficiente para afirmar la ausencia en lugar de sugerirla.
 
 \section{Qué hizo y qué no hizo el aprendizaje profundo}
 
@@ -87,13 +101,19 @@ posteriores al sellado. El resultado es \textbf{NO-GO}: la política acumula $+3
 simulados, pero su peor día desciende por debajo del umbral de riesgo declarado de antemano,
 y la regla se aplica sin interpretación.
 
-Conviene subrayar por qué este resultado, siendo negativo, es el más informativo del trabajo.
-Un criterio pre-registrado que solo aprueba no demuestra nada; este rechazó una estrategia
-económicamente favorable porque violaba una condición escrita antes de mirar. El análisis
-posterior muestra además que la puerta estaba prácticamente condenada: bajo la dispersión
-efectivamente observada, el peor día esperado en una ventana de ese tamaño era de $-232$\,\$
-frente a un umbral de $-150$, de modo que la probabilidad de fallarla superaba el 60\,\% con
-independencia de la calidad de la política.
+Conviene precisar qué demuestra y qué no. Lo que demuestra es disciplina: un criterio
+pre-registrado que solo aprueba no prueba nada, y este rechazó una estrategia
+económicamente favorable porque violaba una condición escrita antes de mirar. Lo que no
+demuestra es que la política careciera de valor, y el análisis posterior obliga a decirlo
+sin rodeos: la puerta estaba prácticamente condenada de antemano. Bajo la dispersión
+efectivamente observada, el peor día esperado en una ventana de ese tamaño era de
+$-232$\,\$ frente a un umbral de $-150$, de modo que la probabilidad de fallarla superaba
+el 60\,\% \emph{con independencia de la calidad de la política}. Dicho de otro modo: el
+sub-criterio que firmó el veredicto era el único de los tres que carecía de potencia para
+distinguir una política buena de una mala, mientras el que sí la tenía —equidad neta
+positiva— se cumplía con holgura. El NO-GO es un resultado sobre el procedimiento, no una
+medición del valor económico de la estrategia, y presentarlo como lo segundo sería
+justamente el tipo de confusión que este trabajo intenta evitar.
 
 Una circunstancia externa reforzó involuntariamente la validez del ejercicio: la ventana no
 se cerró por decisión del autor sino por una desconexión física del almacenamiento del
@@ -110,8 +130,9 @@ Las aportaciones de este trabajo son metodológicas antes que predictivas.
   \item Un protocolo de evaluación que combina validación estrictamente temporal, un modelo
   explícito de costes con la tarifa oficial y una latencia medida contra el mercado real,
   distinguiendo qué parte de ella es medición y cuál es resolución del instrumento.
-  \item Evidencia cuantitativa, por tres caminos independientes, de la ruptura entre
-  predicción y ejecución.
+  \item Evidencia cuantitativa, por cuatro caminos independientes, de la ruptura entre
+  predicción y ejecución, incluida una validación prospectiva del lado agresivo con
+  potencia suficiente para afirmar la ausencia de señal, y no solo para sugerirla.
   \item Una validación prospectiva pre-registrada y sellada, con resultado negativo
   reportado íntegro.
   \item Una trazabilidad que conserva los resultados negativos y las correcciones de error

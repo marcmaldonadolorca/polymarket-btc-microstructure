@@ -526,11 +526,11 @@ Respuesta corta:
 
 ### 27. En el anexo el pre-registro dice que el corte nº 1 es el 24 de agosto, y el capítulo 4 evalúa hasta el 13. ¿Cuál de los dos vale?
 
-Son dos documentos encadenados, no dos versiones del mismo. El pre-registro v2 fija el protocolo general y anuncia que el simulador maker, cuando existiera, tendría su propia adenda sellada; esa adenda es el pre-registro del simulador, con su propia ventana desde el 10 de julio. Lo que evalúa el capítulo 4 es la adenda, y su ventana la cerró el fallo de captura. El corte del protocolo general mantiene su propia fecha y su propia ventana.
+Son dos documentos encadenados, no dos versiones del mismo, y el capítulo 4 reporta los dos. El pre-registro v2 fija el protocolo general y anuncia que el simulador maker, cuando existiera, tendría su propia adenda sellada; esa adenda es el pre-registro del simulador, con su ventana desde el 10 de julio, y su corte lo cerró el fallo de captura. El corte del protocolo general mantuvo su propia fecha —el 24 de agosto— y su propia ventana, del 2 de julio al 23 de agosto, y está reportado en la subsección de capas de reporte: 25.011 unidades, capa histórica −0,004 ticks IC95 [−0,223, +0,212], capas con comisión oficial entre −0,77 y −3,65. Ninguna de las dos fechas se movió.
 
 Respuesta corta:
 
-> No compiten: el segundo es la adenda sellada que el primero anuncia, con su propia ventana. El capítulo 4 reporta la adenda.
+> No compiten: el segundo es la adenda sellada que el primero anuncia. Ambos cortes están reportados, cada uno con su ventana y su fecha, y ninguna se movió.
 
 ### 28. La huella del motor que consta en el pre-registro no coincide con la del motor que ejecutó. ¿No invalida eso el sello?
 
@@ -668,6 +668,31 @@ Para decidir operaciones, hoy, en este mercado y a esta resolución: sí, y lo d
 Respuesta corta:
 
 > Para la decisión económica, sí — medido en tres ejes. Para predecir riesgo terminal u ordenar candidatos, no. El valor del TFM es poder distinguir ambas cosas con números.
+
+
+### 45. El corte del protocolo general dice que la capa histórica da −0,004. ¿No era +0,349 en junio? ¿Se murió la señal?
+
+Esa es la lectura tentadora y es incorrecta, y lo sé porque fui a medir el intervalo de la propia cifra de junio. El +0,349 tiene un IC95 de [−0,194, +0,892] por filas y [−0,655, +1,337] agrupando por mercado: **nunca excluyó el cero**. No era un resultado, era una estimación puntual sin potencia sobre 754 unidades y cinco días. Lo que aporta el corte no es un deterioro, es potencia: con 25.011 unidades y cincuenta días la capa comparable sigue sin distinguirse del azar, ahora con un intervalo estrecho que lo afirma en vez de sugerirlo. Y cuando se cobra la comisión oficial, el signo deja de ser ambiguo en las tres capas.
+
+Respuesta corta:
+
+> No se murió: nunca estuvo viva con significación. El +0,349 tenía IC [−0,19, +0,89]. El corte no la degrada, la mide con 33× más datos: sigue en cero, y negativa con la fee real.
+
+### 46. Ha reconstruido una columna del filtro después de ver que el camino literal daba cero filas. ¿No es eso ajustar el experimento al resultado?
+
+Es un grado de libertad y lo declaro como tal en el capítulo, sin adornos. El contexto: el §1 del pre-registro exige el filtro con la fórmula de comisión antigua, pero el propio commit del sello incorporó el módulo que calcula esa columna ya con la fórmula corregida — texto y código sellados se contradicen. Aplicando la columna tal cual salía, el filtro dejaba 42 unidades de 2.837.137, porque el umbral se comparaba contra una escala ocho veces mayor. Restaurar la definición histórica es lo que el texto manda; hacerlo después de ver que la otra vía daba cero es lo que no puedo maquillar. Por eso la reconstrucción lleva un guardarraíl que exige reproducir la columna almacenada al aplicarle la fórmula vigente, el manifiesto registra los conteos de ambas variantes, y el commit está sellado con OpenTimestamps para que la desviación tenga fecha demostrable.
+
+Respuesta corta:
+
+> Sí, y está declarado. El pre-registro se contradice consigo mismo; ejecuté lo que dice el texto, pero lo decidí tras ver que el código sellado daba cero filas. Va como desviación documentada y sellada, no como continuidad.
+
+### 47. De tres brazos de gate pre-registrados solo reporta uno. ¿No es eso reportar lo que conviene?
+
+Lo contrario: reportar dos ausencias cuesta más que callarlas. El brazo GARCH es inejecutable en el punto de decisión y lo demuestro con la medición: su especificación pide sesenta barras de un minuto por sesión y el tramo previo a la apertura tiene mediana de cuatro barras y máximo de seis, así que ninguna sesión llega al mínimo. El brazo de regímenes sí se ejecutó, pero su agrupamiento se congeló sobre la malla del lado maker y solo cubre el 4,9 % de las unidades de este corte, de modo que lo declaro no concluyente. Y añado el detalle incómodo: una primera versión de mi análisis sustituyó el GARCH por un sucedáneo sobre la misma variable del brazo estático, que filtraba 46 unidades de 24.966 y publicaba un «no cambia el signo» vacuo. Lo detecté verificando y lo retiré. Un brazo comprometido que no se reporta es información perdida; uno sustituido en silencio es peor, porque parece un resultado.
+
+Respuesta corta:
+
+> Porque dos no eran ejecutables y lo demuestro con números. Y digo también que mi primera versión sustituyó el GARCH por un sucedáneo vacuo: lo cacé verificando y lo retiré.
 
 ---
 

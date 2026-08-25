@@ -472,8 +472,79 @@ maker no podía pre-registrarse hasta que el simulador existió, y por eso tiene
 ventana, más corta y posterior. Ninguna de las dos fechas se ha movido respecto a lo
 sellado.
 
-% TODO M2 — pendiente del corte del 24-ago (capas del pre-registro general). No se
-% adelanta: la fecha está sellada. Al cerrarlo, tabla de las dos capas por brazo de gate.
+El corte se ejecutó una sola vez sobre la ventana elegible, del 2 de julio al 23 de agosto
+de 2026, con 50~días de captura efectiva: faltan el 2 de julio —la reanudación real se
+confirmó el día 3 a las 08:42~UTC— y los días 15 y 16 de agosto, por el incidente de
+almacenamiento del recolector. Las tres ausencias caen bajo la única excepción que el
+protocolo admite, el fallo de captura documentado, y ninguna se decidió después de ver
+resultado alguno. La política congelada selecciona 25.011 unidades de acción.
+
+\begin{table}[htbp]
+\centering
+\caption[Corte prospectivo del pre-registro general]{Corte prospectivo del pre-registro
+general (50~días, 25.011 unidades de acción). Los intervalos se calculan por
+\emph{bootstrap} agrupando por mercado, que es el pertinente: varias unidades del mismo
+mercado comparten horizonte y el remuestreo por filas las trataría como independientes.}
+\label{tab::corte_v2}
+\begin{tabular}{llrrr}
+\toprule
+\textbf{Capa} & \textbf{Gate} & \textbf{Media (ticks)} & \textbf{IC 95\,\%} & \textbf{Días $>0$} \\
+\midrule
+Histórica @0,5      & ninguno & $-0{,}004$ & $[-0{,}223;\ +0{,}212]$ & 23/50 \\
+Histórica @0,5      & estático & $+0{,}009$ & $[-0{,}233;\ +0{,}257]$ & 25/50 \\
+\addlinespace
+Histórica, fee real & ninguno & $-0{,}770$ & $[-0{,}989;\ -0{,}554]$ & 10/50 \\
+\emph{Taker} entrada& ninguno & $-1{,}411$ & $[-1{,}631;\ -1{,}195]$ & 3/50 \\
+\emph{Taker} ida-vuelta & ninguno & $-3{,}646$ & $[-3{,}866;\ -3{,}431]$ & 0/50 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+La lectura tiene dos partes y conviene no confundirlas. En la capa histórica —la que
+existe únicamente para ser comparable con lo ya publicado— el resultado es
+\textbf{indistinguible de cero}: $-0{,}004$~ticks con un intervalo que contiene
+holgadamente el cero y 23 días positivos de 50. El filtro de volatilidad no lo cambia. En
+las capas que cobran la comisión oficial, en cambio, el signo es inequívoco y el intervalo
+excluye el cero por amplio margen en las tres, hasta los $-3{,}65$~ticks de la operación
+completa, que no tiene un solo día positivo en toda la ventana.
+
+Una precisión que altera el marco de la comparación y que solo apareció al calcular los
+intervalos de la referencia. La cifra que este corte venía a contrastar —los
+$+0{,}349$~ticks del bloque de junio, reproducidos aquí dígito a dígito como control del
+instrumento— \textbf{nunca fue estadísticamente significativa}: su intervalo al 95\,\% es
+$[-0{,}194;\ +0{,}892]$ por filas y $[-0{,}655;\ +1{,}337]$ agrupando por mercado. La
+conclusión defendible, por tanto, no es que la señal se haya deteriorado, sino que con
+treinta y tres veces más datos sigue sin distinguirse del azar, y que la comisión vigente
+la vuelve decisivamente negativa. Es el mismo desenlace al que llegan las otras vías del
+trabajo, alcanzado ahora con la potencia que a la validación original le faltaba.
+
+\paragraph{Una contradicción interna del pre-registro, y cómo se resolvió.} El protocolo
+declara que el filtro de tradabilidad debe aplicarse con la definición histórica de la
+columna de coste —con la fórmula de comisión anterior, «para no des-congelar el filtro»—
+mientras las capas de reporte usan la comisión real. Ocurre que el propio acto de sellado
+incorporó al control de versiones el módulo que calcula esa columna \emph{ya con la
+fórmula corregida}, de modo que el texto sellado y el código sellado se contradicen.
+Reconstruido el conjunto con el código actual, el filtro dejaba 42 unidades de
+2.837.137 —cero tras la ventana temporal—, no porque la política no seleccionase nada
+sino porque el umbral se estaba aplicando a una escala ocho veces mayor que la suya. Se
+restauró la definición histórica, con una comprobación que exige reproducir la columna
+almacenada al aplicarle la fórmula vigente. Debe decirse con claridad que esa decisión se
+tomó \emph{después} de observar que la vía literal no producía datos: es un grado de
+libertad ejercido con conocimiento de un resultado intermedio, y por eso se declara aquí
+como desviación documentada y no como continuidad silenciosa.
+
+\paragraph{Dos brazos que no se ejecutaron.} De los tres \emph{gates} pre-registrados solo
+el estático pudo evaluarse. El brazo GARCH resultó \textbf{inejecutable en el punto de
+decisión}: su especificación exige sesenta barras de un minuto por sesión, y el tramo
+previo a la apertura —el único disponible cuando la política decide— tiene una mediana de
+cuatro barras y un máximo de seis, de modo que ninguna sesión alcanza el mínimo. No es que
+el \emph{gate} no funcione: es que la historia intra-sesión que necesita no existe. El
+brazo de regímenes sí pudo aplicarse, pero el agrupamiento congelado se entrenó sobre la
+malla del lado \emph{maker} y solo cubre el 4,9\,\% de las unidades de este corte, así que
+se reporta como no concluyente en lugar de extrapolarlo. Ambos casos se documentan porque
+un brazo comprometido que no se reporta es información perdida, y la tentación de
+sustituirlo por un sucedáneo —que en una primera versión de este análisis llegó a
+materializarse— produce cifras que parecen resultados sin serlo.
 
 % M1 CERRADO 2026-08-18 con el corte ejecutado: tablas rellenas, lectura escrita,
 % regla de sustitución resuelta (ninguna variante sustituye) y análisis secundario

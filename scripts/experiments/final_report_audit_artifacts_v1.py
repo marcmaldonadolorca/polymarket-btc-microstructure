@@ -120,7 +120,8 @@ def configure_plotting() -> None:
             "axes.grid": True,
             "axes.axisbelow": True,
             "grid.alpha": 0.25,
-            "figure.dpi": 160,
+            "figure.dpi": 300,
+            "savefig.dpi": 300,
         }
     )
 
@@ -128,7 +129,8 @@ def configure_plotting() -> None:
 def save_figures(low: pd.DataFrame, high: pd.DataFrame, figures: Path) -> None:
     configure_plotting()
     figures.mkdir(parents=True, exist_ok=True)
-    teal, coral, grey, dark = "#2A9D8F", "#E76F51", "#BFC3C9", "#264653"
+    # paleta canonica del documento: azul / tierra / gris / tinta
+    teal, coral, grey, dark = "#2E5E8C", "#B5651D", "#8A8F98", "#1A1A1A"
 
     # Cost sensitivity of the post-hoc diagnostic.
     cost_values = [float(low[column].mean()) for column in COST_COLUMNS.values()]

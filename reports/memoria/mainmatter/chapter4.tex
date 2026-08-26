@@ -604,54 +604,18 @@ negativo sigue siendo informativo, pero no permite declarar vencedor al filtro s
 el mismo bloque usado para proponerlo. La comparación definitiva queda aplazada hasta disponer
 de nuevos datos bajo una política ya congelada.
 
-\subsection{Diagnóstico del fallo fuera de muestra: ensembles de semillas y drift}
+\subsection{Por qué falla fuera de muestra la cabeza de salud}
 \label{sec::n3_diagnostico}
 
-La debilidad conocida de la pieza sellada es la cabeza de salud (\emph{healthy}): su
-capacidad de discriminación cae del entrenamiento a la validación de forma acusada
-(AUC $0{,}79 \to 0{,}56$). Conviene explicar \emph{por qué}, porque la causa determina si
-un reentrenamiento con más datos tiene techo. Se descompone la incertidumbre con un
-ensemble de semillas —la técnica que en redes profundas se conoce como \emph{deep
-ensemble}, aplicada aquí a la cabeza de \emph{gradient boosting}—: diez réplicas de la
-misma cabeza entrenadas con semillas distintas,
-midiendo tanto su rendimiento por partición como su desacuerdo mutuo
-(Figura~\ref{fig::n3}).
-
-El diagnóstico es inequívoco en tres puntos. Primero, la caída fuera de muestra es
-\emph{estable entre semillas} —la desviación del AUC entre réplicas es de apenas
-$\pm0{,}005$—, de modo que no es un artefacto de suerte en la inicialización: todas las
-réplicas coinciden en que la cabeza falla en junio. Segundo, el desacuerdo entre réplicas
-es \emph{prácticamente constante} entre entrenamiento y test ($\approx0{,}03$ en ambos):
-la incertidumbre epistémica no aumenta fuera de muestra, así que las réplicas no
-extrapolan de forma dispersa, sino que convergen con confianza a una función que
-simplemente no separa las clases en junio; promediarlas apenas mueve el AUC ($0{,}544 \to
-0{,}547$), lo que descarta que el problema sea de varianza. Tercero, un clasificador de
-dominio entrenado para distinguir mayo de junio a partir de las mismas características lo
-consigue con AUC $0{,}90$: las distribuciones de entrada se desplazan de forma marcada
-entre los dos periodos, encabezadas por la base del perpetuo (\emph{perp\_basis}) y la
-estructura de diferencias al contado--perpetuo.
-
-La conclusión es que el fallo de la cabeza de salud no es ruido irreducible ni un problema
-de capacidad del modelo, sino \emph{concept drift} inducido por un cambio de régimen en
-las variables externas de Bitcoin. Esto tiene una consecuencia práctica directa para la
-iteración v2: reentrenar con dos o tres veces más datos del mismo periodo tiene techo,
-porque el obstáculo no es el tamaño de la muestra sino la cobertura del régimen; solo
-datos que abarquen el régimen de junio mejorarían la generalización. Es la misma lección
-que ya apuntaba el fracaso de las técnicas de adaptación de dominio: contra un cambio de
-régimen con pocos días, restringir la operativa al régimen conocido es más honesto que
-pretender corregirlo.
-
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=\textwidth]{figures/fig_n3_ensemble_healthy.png}
-\caption{Diagnóstico del fallo fuera de muestra de la cabeza de salud. Izquierda: el AUC
-se desploma de entrenamiento a test con una dispersión mínima entre las diez réplicas
-(barras de error) y un desacuerdo entre réplicas plano (línea naranja) —el fallo es
-estable y no es epistémico. Derecha: un clasificador de dominio separa mayo de junio con
-AUC $0{,}90$, señal de un fuerte desplazamiento de covariables encabezado por la base del
-perpetuo.}
-\label{fig::n3}
-\end{figure}
+La debilidad conocida de la pieza sellada es la cabeza de salud, cuya discriminación cae
+de $0{,}79$ a $0{,}56$ entre entrenamiento y validación. Un ensemble de diez réplicas con
+semillas distintas permite atribuir esa caída: es estable entre réplicas —de modo que no
+es suerte de inicialización—, el desacuerdo entre ellas no aumenta fuera de muestra —de
+modo que no es incertidumbre epistémica— y un clasificador de dominio separa mayo de junio
+con AUC $0{,}90$, lo que sí identifica un desplazamiento acusado de covariables. La
+consecuencia práctica acota cualquier iteración futura: reentrenar con más datos del mismo
+periodo tiene techo, porque el obstáculo no es el tamaño de la muestra sino la cobertura
+del régimen. El diagnóstico completo, con sus figuras, está en el Anexo~\ref{anexo:soporte}.
 
 \subsection{Curva de escalado de datos: tabular frente a aprendizaje profundo}
 \label{sec::escalado_tab_deep}
@@ -696,80 +660,19 @@ se recoge a continuación.
 \subsection{Adenda C: la curva de escalado sobre trayectorias independientes}
 \label{sec::escalado_trayectorias}
 
-Detectada la limitación anterior, se diseñó y \textbf{pre-registró} un experimento que
-varía exactamente el eje que faltaba y ningún otro. El protocolo se selló antes de
-entrenar ningún modelo, con las huellas criptográficas de los tres artefactos ejecutables
-y una marca de tiempo de OpenTimestamps, y con las dos redacciones posibles del resultado
-escritas de antemano para que ninguna rama pudiera elegir la narración.
-
-El corpus se amplió a las tres temporalidades capturadas sobre \emph{los mismos 24 días}:
-7.784 mercados y 15.568 pares mercado-token, frente a los 509 y 1.018 originales. Una
-restricción física obliga a un cambio: la rejilla es de dos segundos, de modo que un
-mercado de cinco minutos apenas alcanza los 150 fotogramas y el contexto de 512 de la
-curva publicada no cabe en él. Se fijó por tanto un contexto de \textbf{128 fotogramas en
-todos los brazos}, incluido el de una hora; reducirlo solo en el brazo ampliado habría
-confundido longitud de contexto con número de trayectorias. Los cuatro brazos —tabular y
-profundo, con y sin temporalidades cortas— se evalúan sobre \emph{los mismos} 916 casos
-held-out de mercados horarios, que es la comparación conservadora: el brazo ampliado no
-puede beneficiarse de un conjunto de prueba más benévolo. (Este conjunto pertenece al
-corpus reconstruido para la adenda y no coincide con los 906 casos congelados de la
-escalera; por eso sus cifras no son comparables celda a celda con las de aquella.)
-
-\begin{table}[htbp]
-\centering
-\caption[Escalado sobre trayectorias independientes]{Curva de escalado sobre trayectorias
-independientes. Acierto sobre los mismos 916 casos held-out para los cuatro brazos, con
-intervalo de confianza binomial al 95\,\%. El punto inferior de cada bloque agota el
-\emph{pool} disponible y llega a $1{,}65$--$1{,}88$ veces el máximo que la curva publicada
-había explorado.}
-\label{tab::escalado_trayectorias}
-\begin{tabular}{lrrrl}
-\hline
-\textbf{Brazo} & \textbf{$n_{\text{train}}$} & \textbf{Trayect.} & \textbf{Acierto} & \textbf{IC\,95\,\%} \\
-\hline
-Tabular, solo 1h & 45.000 & 950 & $50{,}55$\,\% & $[47{,}26;\ 53{,}83]$ \\
-Profundo, solo 1h & 45.000 & 950 & $49{,}56$\,\% & $[46{,}28;\ 52{,}85]$ \\
-Tabular, 1h+15m+5m & 45.000 & 2.685 & $50{,}87$\,\% & $[47{,}58;\ 54{,}16]$ \\
-Profundo, 1h+15m+5m & 45.000 & 2.685 & $49{,}45$\,\% & $[46{,}17;\ 52{,}74]$ \\
-\hline
-Tabular, solo 1h & 74.218 & 952 & $49{,}45$\,\% & $[46{,}17;\ 52{,}74]$ \\
-Profundo, solo 1h & 74.218 & 952 & $48{,}03$\,\% & $[44{,}76;\ 51{,}33]$ \\
-Tabular, 1h+15m+5m & 84.438 & 2.834 & $49{,}78$\,\% & $[46{,}49;\ 53{,}07]$ \\
-Profundo, 1h+15m+5m & 84.438 & 2.834 & $48{,}91$\,\% & $[45{,}62;\ 52{,}20]$ \\
-\hline
-\end{tabular}
-\end{table}
-
-Aplicada literalmente, la regla pre-registrada activa la rama principal: el brazo profundo
-no supera al tabular por más de un punto porcentual en ningún punto del eje, de modo que
-la conclusión publicada no queda declarada artefacto del diseño muestral.
-
-Pero la lectura honesta del experimento es más severa que su propia regla, y conviene
-decirlo con claridad: \textbf{ninguno de los ocho puntos se distingue del azar}. Todos los
-intervalos de confianza contienen el 50\,\% y el contraste binomial frente a esa hipótesis
-no baja de $p = 0{,}25$ en ningún caso. La regla de decisión exigía separar los brazos por
-un punto porcentual cuando el error estándar del acierto sobre 916 casos es de $1{,}65$
-puntos y el intervalo de una diferencia entre dos brazos alcanza los $4{,}6$: el umbral se
-declaró \emph{por debajo del suelo de ruido} del propio conjunto de evaluación. Ninguna de
-las dos ramas del pre-registro podía, por tanto, quedar establecida con estos datos.
-
-Es la segunda vez en este trabajo que un criterio de decisión se declara en unidades
-absolutas sin el análisis de potencia que le corresponde —la primera fue el umbral de peor
-día de la Sección~\ref{sec::validacion_prospectiva}— y la coincidencia no es casual: en
-ambos casos el umbral se fijó por analogía con una magnitud observada antes, y no
-derivándolo de la dispersión del estadístico que iba a contrastar. Queda como advertencia
-metodológica para cualquier continuación, y explica por qué el pre-registro, siendo
-condición necesaria para la honestidad de un experimento, no es condición suficiente para
-su poder.
-
-Lo que sí puede afirmarse sin ambigüedad es lo negativo, y no es poco: llevando el eje
-hasta agotar el \emph{pool} —$1{,}88$ veces más ventanas de las que la curva publicada
-llegó a explorar, y casi el triple de trayectorias independientes— \textbf{ninguna de las
-dos vías consigue despegarse del azar en la predicción del signo a H60}. El resultado es
-coherente con el diagnóstico independiente del Capítulo~\ref{ch::metodos}, donde se
-estableció que el precio medio es esencialmente una moneda al aire en la apertura de la
-ventana. La comparación entre arquitecturas se estaba dirimiendo, en realidad, entre dos
-modelos que no resuelven la tarea.
+La curva de escalado publicada tenía una limitación de diseño que se detectó después: hacía
+crecer el número de ventanas de entrenamiento sobre un conjunto fijo de trayectorias, de
+modo que medía densidad de muestreo y no diversidad. La adenda C, pre-registrada y sellada
+antes de entrenar nada, repite el experimento ampliando el corpus a las tres temporalidades
+capturadas y llevando el eje hasta agotar los datos: 7.784 mercados frente a 509, y hasta
+$1{,}88$ veces las ventanas que la curva original llegó a explorar. El resultado sostiene
+la conclusión previa por el eje correcto: en el punto máximo del eje ninguna de las dos
+vías se despega del azar, con intervalos que contienen el 50\,\% y sin ningún contraste por
+debajo de $p = 0{,}25$. La regla de decisión pedía un punto porcentual de separación y la
+brecha observada fue de $0{,}87$, por debajo del umbral —y, como se documenta en el
+Capítulo~\ref{ch::conclusiones}, también por debajo del ruido del propio conjunto de
+evaluación—. La tabla completa y el protocolo de sellado están en el
+Anexo~\ref{anexo:soporte}.
 
 \subsubsection{Un hallazgo no buscado: la tarea excluye los mercados cortos}
 

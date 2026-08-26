@@ -15,9 +15,9 @@ una nueva validación fuera de muestra.
 
 El especialista congelado selecciona 754 unidades de acción en los cinco días fuera de
 muestra. Sin aplicar ningún filtro decidido a partir de esos datos, obtiene un neto medio de
-$+0{,}349$ ticks al coste de referencia. El promedio es positivo en tres de cinco días y
-pasa a ser ligeramente negativo ($-0{,}026$ ticks) cuando se carga el coste visible completo
-(Tabla~\ref{tab:fresh}). Esta es la estimación limpia del rendimiento fuera de muestra.
+$+0{,}349$ ticks al coste de referencia. El promedio es positivo en tres de cinco días
+(Tabla~\ref{tab:base_daily}) y pasa a ser ligeramente negativo ($-0{,}026$ ticks) cuando se
+carga el coste visible completo (Tabla~\ref{tab:fresh}). Esta es la estimación limpia del rendimiento fuera de muestra.
 
 \begin{table}[h]
 \centering
@@ -98,34 +98,11 @@ Total sin filtro   & 754 & $+0{,}537$ & $+0{,}349$ & $-0{,}026$ \\
 \end{tabular}
 \end{table}
 
-\begin{figure}[h]
-\centering
-\includegraphics[width=0.56\textwidth]{figures/fig_regimen_neto.png}
-\caption{Contraste \emph{post-hoc} del neto medio entre baja y alta volatilidad. La separación
-es una hipótesis de política que requiere datos posteriores.}
-\label{fig:regimenneto}
-\end{figure}
-
 Si se aplica retrospectivamente el filtro de baja volatilidad, el subconjunto de 318 acciones
-mantiene signo positivo en los tres niveles de coste (Figura~\ref{fig:coste}) y en los cinco
-días (Figura~\ref{fig:netodiario}). Su suma cronológica presenta un drawdown diagnóstico de
+mantiene signo positivo en los tres niveles de coste (Figura~\ref{fig:coste}) y en los
+cinco días (Figura~\ref{fig:netodiario}), ambas en el Anexo~\ref{anexo:soporte}. Su suma cronológica presenta un drawdown diagnóstico de
 88,1 ticks (Figura~\ref{fig:drawdown}). Estas magnitudes describen el subconjunto observado;
 no son PnL de una cartera ejecutada.
-
-\begin{figure}[h]
-\centering
-\includegraphics[width=0.55\textwidth]{figures/fig_coste.png}
-\caption{Sensibilidad al coste del subconjunto de baja volatilidad. Resultado exploratorio
-obtenido tras inspeccionar el mismo bloque.}
-\label{fig:coste}
-\end{figure}
-
-\begin{figure}[h]
-\centering
-\includegraphics[width=0.62\textwidth]{figures/fig_neto_diario.png}
-\caption{Neto medio diario del subconjunto \emph{post-hoc} de baja volatilidad.}
-\label{fig:netodiario}
-\end{figure}
 
 \begin{figure}[h]
 \centering
@@ -141,19 +118,6 @@ del mismo mercado. Hay 156 mercados y hasta ocho acciones por mercado. Un \emph{
 agrupado por mercado amplía el IC90 a $[+0{,}193,+2{,}004]$ y reduce la probabilidad estimada
 a 97,6~\%. Ambos cálculos son descriptivos: la selección \emph{post-hoc} impide darles una
 lectura confirmatoria.
-
-\subsection{Registro de sombra retrospectivo}
-
-Para auditar la mecánica de la política candidata se construyó un registro de sombra
-\emph{offline}: conserva cada unidad de acción, su mercado, el resumen diario y las reglas de
-promoción. Es una reproducción retrospectiva de lo que la regla habría indicado, no una
-ejecución prospectiva ni un sistema activo en tiempo real. El filtro queda congelado después
-del 10 de junio; solo observaciones posteriores pueden contar para las puertas de promoción.
-
-Además, varias señales pertenecen al mismo mercado y sus horizontes H60 se solapan. Por ello
-se denominan \emph{unidades de acción}, no operaciones independientes, y la suma acumulada no
-incorpora una regla de exposición máxima. Una futura sombra prospectiva deberá decidir si
-permite apilar posiciones o admite una sola posición por mercado.
 
 \subsection{Resultados con la comisión oficial de 2026 (capa taker-real)}
 \label{sec::taker_real}
@@ -321,8 +285,9 @@ rentabilidad —la curva acumulada termina en $+3.408$\,\$— sino por la profun
 
 \subsubsection{Lectura del corte}
 
-\textbf{La política congelada gana dinero y aun así no pasa la puerta.} El brazo base
-acumula $+3.408{,}11$\,\$ simulados en 35~días —una media de $97{,}4$\,\$ diarios— con
+\textbf{La política congelada gana dinero y aun así no pasa la puerta.} La
+Tabla~\ref{tab::corte_brazos} desglosa los tres brazos y la Figura~\ref{fig:corte_prospectivo}
+muestra su evolución diaria. El brazo base acumula $+3.408{,}11$\,\$ simulados en 35~días —una media de $97{,}4$\,\$ diarios— con
 10~días negativos y un $50{,}4$\,\% de pares mercado-token en positivo. Pero su peor día
 es $-235{,}66$\,\$, y la regla pre-declarada exigía no bajar de $-150$\,\$. Falla una de
 las tres condiciones y, por tanto, el veredicto es \textbf{NO-GO}: la política no se
@@ -500,7 +465,8 @@ Histórica, fee real & ninguno & $-0{,}770$ & $[-0{,}989;\ -0{,}554]$ & 10/50 \\
 \end{tabular}
 \end{table}
 
-La lectura tiene dos partes y conviene no confundirlas. En la capa histórica —la que
+La Tabla~\ref{tab::corte_v2} recoge el resultado, cuya lectura tiene dos partes que
+conviene no confundir. En la capa histórica —la que
 existe únicamente para ser comparable con lo ya publicado— el resultado es
 \textbf{indistinguible de cero}: $-0{,}004$~ticks con un intervalo que contiene
 holgadamente el cero y 23 días positivos de 50. El filtro de volatilidad no lo cambia. En

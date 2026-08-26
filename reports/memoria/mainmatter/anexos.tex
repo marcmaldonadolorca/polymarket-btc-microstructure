@@ -244,6 +244,8 @@ perpetuo.}
 
 \section{Adenda C: tabla completa del escalado sobre trayectorias}
 
+La Tabla~\ref{tab::escalado_trayectorias} recoge los ocho puntos del experimento.
+
 
 Detectada la limitación anterior, se diseñó y \textbf{pre-registró} un experimento que
 varía exactamente el eje que faltaba y ningún otro. El protocolo se selló antes de
@@ -319,3 +321,42 @@ coherente con el diagnóstico independiente del Capítulo~\ref{ch::metodos}, don
 estableció que el precio medio es esencialmente una moneda al aire en la apertura de la
 ventana. La comparación entre arquitecturas se estaba dirimiendo, en realidad, entre dos
 modelos que no resuelven la tarea.
+
+
+\section{Figuras del diagnóstico \emph{post-hoc} de régimen}
+
+Sensibilidad al coste y desglose diario del subconjunto de baja volatilidad. Ambas
+describen un subconjunto elegido tras observar el bloque, de modo que su lectura es
+diagnóstica y no confirmatoria.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.55\textwidth]{figures/fig_coste.png}
+\caption{Sensibilidad al coste del subconjunto de baja volatilidad. Resultado exploratorio
+obtenido tras inspeccionar el mismo bloque.}
+\label{fig:coste}
+\end{figure}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.62\textwidth]{figures/fig_neto_diario.png}
+\caption{Neto medio diario del subconjunto \emph{post-hoc} de baja volatilidad.}
+\label{fig:netodiario}
+\end{figure}
+
+
+
+\section{Registro de sombra retrospectivo}
+
+
+Para auditar la mecánica de la política candidata se construyó un registro de sombra
+\emph{offline}: conserva cada unidad de acción, su mercado, el resumen diario y las reglas de
+promoción. Es una reproducción retrospectiva de lo que la regla habría indicado, no una
+ejecución prospectiva ni un sistema activo en tiempo real. El filtro queda congelado después
+del 10 de junio; solo observaciones posteriores pueden contar para las puertas de promoción.
+
+Además, varias señales pertenecen al mismo mercado y sus horizontes H60 se solapan. Por ello
+se denominan \emph{unidades de acción}, no operaciones independientes, y la suma acumulada no
+incorpora una regla de exposición máxima. Una futura sombra prospectiva deberá decidir si
+permite apilar posiciones o admite una sola posición por mercado.
+

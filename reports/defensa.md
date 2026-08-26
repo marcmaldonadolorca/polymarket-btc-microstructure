@@ -475,7 +475,7 @@ Es la pregunta más previsible en una defensa que llega tras una primera revisi�
 
 1. **Estructura y formato.** El glosario estaba como apéndice; ahora está en los preliminares, en su posición correcta, y los anexos se han reordenado (características, hiperparámetros, pre-registro y verificación del sello, auditoría del ledger).
 2. **Rigor bibliográfico.** Se pasó de 15 referencias, en su mayoría anteriores a 2020, a 47 referencias todas citadas en el cuerpo, con más de 25 posteriores a 2020 —incluidos los cinco estudios académicos de Polymarket de 2026 y la teoría canónica de market making (Avellaneda-Stoikov, Guéant)—.
-3. **Contenido visual.** Se pasó de una memoria con pocas figuras a 30 figuras y 18 tablas: diagrama del sistema, partición temporal, modelo de dos cabezas, escalera de modelos, curva latencia-PnL, EDA completo, fe de erratas de comisiones, diagnóstico de régimen y economía maker.
+3. **Contenido visual.** Se pasó de una memoria con pocas figuras a 29 figuras y 18 tablas: diagrama del sistema, partición temporal, modelo de dos cabezas, escalera de modelos, curva latencia-PnL, EDA completo, fe de erratas de comisiones, diagnóstico de régimen y economía maker.
 4. **Análisis técnico de series temporales.** Se añadió un EDA formal con las técnicas de la asignatura —ADF/KPSS de estacionariedad, ACF/PACF, descomposición STL, espectro de Fourier— y una escalera de baselines de la asignatura (naive-drift, ARIMA, Holt, kNN-DTW y el fundacional MOMENT), cada uno con su decisión de diseño asociada.
 
 Además, la memoria creció de 46 a 96 páginas, y se incorporaron dos aportaciones nuevas que no estaban en la versión anterior: la fe de erratas de comisiones sellada y el giro maker cuantificado.
@@ -693,6 +693,15 @@ Lo contrario: reportar dos ausencias cuesta más que callarlas. El brazo GARCH e
 Respuesta corta:
 
 > Porque dos no eran ejecutables y lo demuestro con números. Y digo también que mi primera versión sustituyó el GARCH por un sucedáneo vacuo: lo cacé verificando y lo retiré.
+
+
+### 48. Su tutora dijo que 60-70 páginas «va bien» y usted entrega 97. ¿Por qué?
+
+Porque de esas 97, veintiocho son anexos, que su propia guía deja fuera del presupuesto («lo que sea necesario»). El ámbito comparable —preliminares, ocho capítulos y referencias— son 82, y el exceso está concentrado en un sitio: el capítulo de resultados ocupa quince páginas frente a las cuatro orientativas. Antes de entregar moví allí todo lo que era análisis de soporte y no resultado: el diagnóstico del fallo de la cabeza de salud, la tabla completa de la adenda C, el registro de sombra y dos de las tres figuras del diagnóstico exploratorio de régimen; y retiré una figura que estaba declarada y nunca se citaba. Lo que queda en el capítulo son cuatro validaciones pre-registradas con su evidencia mínima: el corte maker, el corte del protocolo general, la adenda C y la adenda D. Recortarlas para acercarme a la cifra habría hecho el documento más corto y peor, y la guía dice «va bien», no «máximo».
+
+Respuesta corta:
+
+> 28 de las 97 son anexos, que su guía deja fuera del presupuesto; el ámbito comparable son 82. El exceso está en resultados, y es porque hay cuatro validaciones pre-registradas. Todo el soporte ya está movido a anexos.
 
 ---
 

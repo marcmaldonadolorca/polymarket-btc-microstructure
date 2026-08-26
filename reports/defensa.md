@@ -83,7 +83,7 @@ Las doce diapositivas siguen el arco en cinco actos de `docs/NARRATIVA_MAESTRA_T
 
 **Guion:**
 
-> Construí un sistema multifuente que alinea el libro de órdenes de Polymarket, trades, referencias externas y oráculo en una malla temporal de dos segundos. El corpus principal contiene del orden de 2,6 millones de filas. La unidad no es simplemente un mercado, sino una observación temporal del contrato con información causal disponible hasta ese instante.
+> Construí un sistema multifuente que alinea el libro de órdenes de Polymarket, trades, referencias externas y oráculo en una malla temporal de dos segundos. El corpus principal contiene del orden de 2,5 millones de filas. La unidad no es simplemente un mercado, sino una observación temporal del contrato con información causal disponible hasta ese instante.
 
 **Frase clave:** “La parte de datos no es decorativa: define qué se puede afirmar después.”
 
@@ -246,7 +246,7 @@ Buenos días. En este trabajo estudio si señales de microestructura pueden anti
 
 Polymarket es un mercado de predicción. En este caso, los contratos son binarios y están relacionados con el comportamiento futuro de Bitcoin. Pero el precio del contrato no es Bitcoin: es una probabilidad negociada. Aun así, ese precio se mueve influido por referencias externas como el mercado spot, los futuros perpetuos y el oráculo de precios. El objetivo del trabajo es aprovechar ese acoplamiento para anticipar movimientos locales del contrato en ventanas de segundos.
 
-Para poder estudiar esto construí un sistema de captura multifuente. El sistema alinea el libro de órdenes de Polymarket, trades, referencias externas y oráculo en una malla temporal de dos segundos. Sobre esa base se aplica control de calidad por sesión y se construye un corpus con del orden de 2,6 millones de filas. Esta parte es relevante porque en un problema de microestructura los detalles de alineación temporal, latencia y calidad de datos condicionan completamente lo que se puede afirmar después.
+Para poder estudiar esto construí un sistema de captura multifuente. El sistema alinea el libro de órdenes de Polymarket, trades, referencias externas y oráculo en una malla temporal de dos segundos. Sobre esa base se aplica control de calidad por sesión y se construye un corpus con del orden de 2,5 millones de filas. Esta parte es relevante porque en un problema de microestructura los detalles de alineación temporal, latencia y calidad de datos condicionan completamente lo que se puede afirmar después.
 
 El protocolo de validación se diseñó para evitar leakage. Las particiones son temporales y las variables son causales: solo usan información disponible hasta el instante de decisión. Además, el trabajo reserva un bloque fuera de muestra del 6 al 10 de junio de 2026, capturado después de congelar el candidato base. Los resultados no se evalúan solo con métricas de clasificación, sino en ticks netos después de coste y latencia.
 
@@ -279,7 +279,7 @@ En resumen: hay señal, pero es frágil; el coste y la latencia deciden — con 
 | Concepto | Valor |
 |---|---:|
 | Malla temporal | 2 segundos |
-| Corpus principal | ~2,6 millones de filas |
+| Corpus principal | ~2,5 millones de filas |
 | Bloque fuera de muestra | 6-10 junio 2026 |
 | Ventana del especialista | -60 a -45 segundos antes de apertura |
 | Horizonte final | H60 |
@@ -474,11 +474,11 @@ Una metodología auditable —pre-registrada y sellada criptográficamente— pa
 Es la pregunta más previsible en una defensa que llega tras una primera revisión no superada. La respuesta se ancla en los cuatro puntos concretos que se señalaron y se responde con evidencia, no con promesas:
 
 1. **Estructura y formato.** El glosario estaba como apéndice; ahora está en los preliminares, en su posición correcta, y los anexos se han reordenado (características, hiperparámetros, pre-registro y verificación del sello, auditoría del ledger).
-2. **Rigor bibliográfico.** Se pasó de 15 referencias, en su mayoría anteriores a 2020, a 43 referencias todas citadas en el cuerpo, con más de 25 posteriores a 2020 —incluidos los cinco estudios académicos de Polymarket de 2026 y la teoría canónica de market making (Avellaneda-Stoikov, Guéant)—.
-3. **Contenido visual.** Se pasó de una memoria con pocas figuras a 28 figuras y 16 tablas: diagrama del sistema, partición temporal, modelo de dos cabezas, escalera de modelos, curva latencia-PnL, EDA completo, fe de erratas de comisiones, diagnóstico de régimen y economía maker.
+2. **Rigor bibliográfico.** Se pasó de 15 referencias, en su mayoría anteriores a 2020, a 47 referencias todas citadas en el cuerpo, con más de 25 posteriores a 2020 —incluidos los cinco estudios académicos de Polymarket de 2026 y la teoría canónica de market making (Avellaneda-Stoikov, Guéant)—.
+3. **Contenido visual.** Se pasó de una memoria con pocas figuras a 30 figuras y 18 tablas: diagrama del sistema, partición temporal, modelo de dos cabezas, escalera de modelos, curva latencia-PnL, EDA completo, fe de erratas de comisiones, diagnóstico de régimen y economía maker.
 4. **Análisis técnico de series temporales.** Se añadió un EDA formal con las técnicas de la asignatura —ADF/KPSS de estacionariedad, ACF/PACF, descomposición STL, espectro de Fourier— y una escalera de baselines de la asignatura (naive-drift, ARIMA, Holt, kNN-DTW y el fundacional MOMENT), cada uno con su decisión de diseño asociada.
 
-Además, la memoria creció de 46 a 92 páginas, y se incorporaron dos aportaciones nuevas que no estaban en la versión anterior: la fe de erratas de comisiones sellada y el giro maker cuantificado.
+Además, la memoria creció de 46 a 96 páginas, y se incorporaron dos aportaciones nuevas que no estaban en la versión anterior: la fe de erratas de comisiones sellada y el giro maker cuantificado.
 
 Respuesta corta:
 

@@ -576,9 +576,11 @@ contra el objetivo económico.
 \paragraph{Hardware y tiempos.} Todo el trabajo corre en una estación de consumo: los
 modelos de árboles y los análisis, en CPU; los modelos profundos, en una única GPU
 (Radeon~RX~6800~XT, 16~GB) mediante ROCm. Como referencia de coste, el \emph{linear probe}
-de MOMENT sobre 40.758 ventanas tarda unos 38~segundos por época en CPU y el ajuste
-completo se ejecutó en la GPU; ningún experimento del trabajo exige más de unas horas de
-cómputo, lo que acota también su coste de reproducción (Capítulo~\ref{ch::reproducibilidad}).
+de MOMENT sobre 40.758 ventanas tarda unos 16~segundos por época en la GPU —la primera
+sube a 38 por el calentamiento— frente a unos 700 en CPU, es decir un factor cercano a
+cuarenta; el ajuste completo de todas las capas ronda los 58~segundos por época. Ningún
+experimento del trabajo exige más de unas horas de cómputo, lo que acota también su coste
+de reproducción (Capítulo~\ref{ch::reproducibilidad}).
 
 \subsection{Definición del objetivo}
 
@@ -1016,7 +1018,7 @@ Cabe preguntarse si el fundacional mejoraría con más datos. La
 Figura~\ref{fig::escalado} responde con una curva de escalado: se re-entrena el
 linear-probing sobre subconjuntos crecientes de ventanas (de 2.700 a 40.500) y se evalúa
 cada uno sobre los mismos casos congelados. La curva es esencialmente plana —el acierto
-oscila entre el 44 y el 47\,\% sin tendencia clara al alza— y se mantiene por debajo del
+oscila entre el 43,9 y el 46,8\,\% sin tendencia clara al alza— y se mantiene por debajo del
 baseline clásico en todo el rango. La conclusión es que el cuello de botella no es la
 cantidad de datos de entrenamiento ni la capacidad del modelo, sino el régimen de datos:
 a horizonte de 2 segundos, el precio medio de estos mercados apenas contiene estructura

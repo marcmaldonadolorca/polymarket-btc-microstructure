@@ -585,7 +585,8 @@ ambos competidores en las dos particiones sin haber entrenado: Spearman $0{,}115
 $0{,}120$ frente a $0{,}092$ del \emph{gradient boosting} fresco y $0{,}098$/$0{,}096$
 del especialista congelado, y es el único cuyo $R^2$ es positivo en ambas particiones. En
 la cabeza de salud, en cambio, no domina: su AUC ($0{,}550$) queda por debajo del
-\emph{gradient boosting} en validación ($0{,}585$) y empata en el test terminal. Y la
+\emph{gradient boosting} en validación ($0{,}585$), y en el test terminal la ordenación se
+invierte —$0{,}549$ frente a $0{,}535$— sin que ninguno de los dos se despegue del azar. Y la
 traducción económica repite la lección del resto del capítulo: ninguna de esas
 diferencias de ordenación convierte la política en rentable bajo la comisión oficial. El
 interés del resultado es metodológico —un fundacional tabular alcanza \emph{zero-shot},
@@ -824,16 +825,24 @@ cola (peor día $-20{,}9$\,\$) de las ocho acciones—, de modo que no existe co
 aprender y la constante es la respuesta óptima. El suceso que la política debía aprender a
 evitar —el día de pérdida severa— sencillamente no está en sus datos: mayo--junio contiene
 un único día en pérdida (de veinticuatro) y ninguno por debajo de $-100$\,\$, mientras que
-la ventana del corte contiene cuatro y dos, respectivamente.
+la ventana del corte contiene cuatro y dos, respectivamente, bajo la configuración de
+esta adenda. Conviene precisar la comparación: esas cifras proceden del contrafactual sin
+aplanado de la adenda, no del brazo base del corte reportado más arriba, que sobre la
+misma ventana registra diez días negativos y seis por debajo de ese umbral. Son dos
+simulaciones distintas del mismo periodo —difieren en tamaño de orden y en el conjunto de
+pares— y lo que interesa aquí es la comparación interna entre entrenamiento y prueba
+dentro de una misma configuración, no el nivel absoluto.
 
 \paragraph{La frontera aprendida queda dominada por el parámetro.} Sobre una partición
 donde el compromiso media--cola sí existe, la política entrenada con aversión creciente al
 riesgo ($\lambda$ de 0 a 32) recorre las ocho acciones y traza una frontera
 riesgo--rendimiento real. Comparada punto a punto contra la frontera de las ocho acciones
 constantes —para cada nivel de protección de cola, la mejor acción fija que protege al
-menos igual—, la política aprendida pierde en los dieciséis puntos evaluados: en el mejor
-caso rinde $9{,}9$\,\$ diarios menos que el escalar equivalente y en el peor,
-$119{,}9$\,\$ menos. Para esta decisión, el mejor modelo resultó ser un parámetro escalar
+menos igual—, ninguno de los dieciséis puntos evaluados bate a la
+frontera fija. En ocho de ellos la política ni siquiera se diferencia: con aversión al
+riesgo baja colapsa a la acción constante y empata con ella por construcción. En los ocho
+restantes, donde sí elige, pierde: $9{,}6$\,\$ diarios menos que el escalar equivalente en
+el mejor caso y $119{,}9$\,\$ menos en el peor. Para esta decisión, el mejor modelo resultó ser un parámetro escalar
 bien elegido, un resultado coherente con la curva de escalado plana y con el empate entre
 el codificador secuencial y el tabular en la predicción del riesgo terminal.
 

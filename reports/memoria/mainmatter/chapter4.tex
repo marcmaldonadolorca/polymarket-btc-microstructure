@@ -473,9 +473,9 @@ ventana, más corta y posterior. Ninguna de las dos fechas se ha movido respecto
 sellado.
 
 El corte se ejecutó una sola vez sobre la ventana elegible, del 2 de julio al 23 de agosto
-de 2026, con 50~días de captura efectiva: faltan el 2 de julio —la reanudación real se
-confirmó el día 3 a las 08:42~UTC— y los días 15 y 16 de agosto, por el incidente de
-almacenamiento del recolector. Las tres ausencias caen bajo la única excepción que el
+de 2026. De sus 53~días hay captura efectiva en 50. Falta el 2 de julio, porque la
+reanudación real no se confirmó hasta el día 3 a las 08:42~UTC, y faltan el 15 y el 16 de
+agosto por el incidente de almacenamiento del recolector. Las tres ausencias caen bajo la única excepción que el
 protocolo admite, el fallo de captura documentado, y ninguna se decidió después de ver
 resultado alguno. La política congelada selecciona 25.011 unidades de acción.
 
@@ -512,21 +512,20 @@ Una precisión que altera el marco de la comparación y que solo apareció al ca
 intervalos de la referencia. La cifra que este corte venía a contrastar —los
 $+0{,}349$~ticks del bloque de junio, reproducidos aquí dígito a dígito como control del
 instrumento— \textbf{nunca fue estadísticamente significativa}: su intervalo al 95\,\% es
-$[-0{,}194;\ +0{,}892]$ por filas y $[-0{,}655;\ +1{,}337]$ agrupando por mercado. La
-conclusión defendible, por tanto, no es que la señal se haya deteriorado, sino que con
-treinta y tres veces más datos sigue sin distinguirse del azar, y que la comisión vigente
-la vuelve decisivamente negativa. Es el mismo desenlace al que llegan las otras vías del
+$[-0{,}194;\ +0{,}892]$ por filas y $[-0{,}655;\ +1{,}337]$ agrupando por mercado. Hablar de deterioro, por tanto, sería impreciso: lo que muestra el corte es que
+con treinta y tres veces más datos la señal sigue sin distinguirse del azar, y que la
+comisión vigente la vuelve decisivamente negativa. Es el mismo desenlace al que llegan las otras vías del
 trabajo, alcanzado ahora con la potencia que a la validación original le faltaba.
 
 \paragraph{Una contradicción interna del pre-registro, y cómo se resolvió.} El protocolo
 declara que el filtro de tradabilidad debe aplicarse con la definición histórica de la
-columna de coste —con la fórmula de comisión anterior, «para no des-congelar el filtro»—
-mientras las capas de reporte usan la comisión real. Ocurre que el propio acto de sellado
+columna de coste, esto es, con la fórmula de comisión anterior y «para no des-congelar el
+filtro», mientras las capas de reporte usan la comisión real. Ocurre que el propio acto de sellado
 incorporó al control de versiones el módulo que calcula esa columna \emph{ya con la
 fórmula corregida}, de modo que el texto sellado y el código sellado se contradicen.
-Reconstruido el conjunto con el código actual, el filtro dejaba 42 unidades de
-2.837.137 —cero tras la ventana temporal—, no porque la política no seleccionase nada
-sino porque el umbral se estaba aplicando a una escala ocho veces mayor que la suya. Se
+Reconstruido el conjunto con el código actual, el filtro dejaba 42 unidades de 2.837.137,
+y ninguna tras aplicar la ventana temporal. No porque la política no seleccionase nada,
+sino porque el umbral se estaba comparando contra una escala ocho veces mayor que la suya. Se
 restauró la definición histórica, con una comprobación que exige reproducir la columna
 almacenada al aplicarle la fórmula vigente. Debe decirse con claridad que esa decisión se
 tomó \emph{después} de observar que la vía literal no producía datos: es un grado de
@@ -536,8 +535,8 @@ como desviación documentada y no como continuidad silenciosa.
 \paragraph{Dos brazos que no se ejecutaron.} De los tres \emph{gates} pre-registrados solo
 el estático pudo evaluarse. El brazo GARCH resultó \textbf{inejecutable en el punto de
 decisión}: su especificación exige sesenta barras de un minuto por sesión, y el tramo
-previo a la apertura —el único disponible cuando la política decide— tiene una mediana de
-cuatro barras y un máximo de seis, de modo que ninguna sesión alcanza el mínimo. No es que
+previo a la apertura, que es el único disponible cuando la política decide, tiene una
+mediana de cuatro barras y un máximo de seis. Ninguna sesión alcanza el mínimo. No es que
 el \emph{gate} no funcione: es que la historia intra-sesión que necesita no existe. El
 brazo de regímenes sí pudo aplicarse, pero el agrupamiento congelado se entrenó sobre la
 malla del lado \emph{maker} y solo cubre el 4,9\,\% de las unidades de este corte, así que

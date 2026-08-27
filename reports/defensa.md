@@ -703,6 +703,15 @@ Respuesta corta:
 
 > 28 de las 97 son anexos, que su guía deja fuera del presupuesto; el ámbito comparable son 82. El exceso está en resultados, y es porque hay cuatro validaciones pre-registradas. Todo el soporte ya está movido a anexos.
 
+
+### 49. Dos tercios de sus fills dependen de un supuesto que usted mismo llama optimista. ¿Por qué habría de creerme ninguna cifra maker?
+
+Porque ese supuesto ya no es un acto de fe: está calibrado contra 1,1 millones de eventos de barrido observados en la ventana de desarrollo. El simulador asume que en un barrido la orden ejecuta el 50 % de lo pendiente; lo medido es que el flujo agresor consume en media el 47,6 % del tamaño visible del nivel cruzado, y que el 98 % del volumen que desaparece en esos cruces es consumo negociado, no cancelaciones. El supuesto cae en el rango empírico, no por encima. Lo que sigue sin modelar —y lo digo yo antes que usted— es la posición en cola de una orden concreta y el detalle intra-frame de la malla de dos segundos; por eso las adendas confirman con tres capas de sensibilidad al fill, incluida una sin barridos en absoluto.
+
+Respuesta corta:
+
+> El 50 % supuesto contra 47,6 % medido en 1,1 M de eventos, y el 98 % del volumen desaparecido es consumo real. Calibrado, no acto de fe — y aun así confirmo con capas de sensibilidad.
+
 ---
 
 ## 7. Cosas que conviene no decir

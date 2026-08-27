@@ -2,7 +2,7 @@
 
 - `defensa.tex` → `defensa.pdf` (15 diapositivas, 16:9). Compilar con
   `tectonic -X compile defensa.tex` desde este directorio.
-- El **guion oral** y las 60 preguntas del tribunal viven en `../defensa.md`.
+- El **guion oral** y las 49 preguntas del tribunal viven en `../defensa.md`.
   Este deck sigue su estructura, actualizada con el trabajo del 21 al 26 de agosto.
 - Las figuras se toman de `../memoria/figures/`: el deck y la memoria comparten
   las mismas, así que una figura corregida en la memoria se propaga al recompilar.

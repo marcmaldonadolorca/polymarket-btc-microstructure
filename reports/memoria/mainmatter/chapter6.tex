@@ -96,16 +96,16 @@ amplía el IC90\,\% a $[+0{,}193,+2{,}004]$, pero sigue describiendo un subconju
 acumulada no es PnL de cartera.
 
 \textbf{Validación \emph{offline}.} La evaluación usa un modelo de ejecución simplificado:
-no reconstruye la cola orden por orden y su supuesto central —en un barrido, la orden
-ejecuta la mitad de lo pendiente— sostiene cerca de dos tercios de las órdenes casadas
-del simulador \emph{maker}. Ese supuesto, no obstante, ya no está sin contrastar: sobre
+no reconstruye la cola orden por orden, y su supuesto central (en un barrido, la orden
+ejecuta la mitad de lo pendiente) sostiene cerca de dos tercios de las órdenes casadas
+del simulador \emph{maker}. Ese supuesto, no obstante, ya no está sin contrastar. Sobre
 1,1~millones de eventos de barrido observados en la ventana de desarrollo, el flujo
-agresor consume en media el $47{,}6$\,\% del tamaño visible del nivel cruzado —frente al
-$50$\,\% supuesto— y el $98$\,\% del volumen que desaparece en el cruce corresponde a
-consumo negociado, no a cancelaciones. La calibración no sustituye a una ejecución real
-—la malla de dos segundos agrega el detalle intra-\emph{frame} y la posición en cola de
-una orden concreta sigue sin modelar—, pero acota el supuesto en el rango correcto en
-lugar de dejarlo como acto de fe. El registro de sombra actual es retrospectivo; falta
+agresor consume en media el $47{,}6$\,\% del tamaño visible del nivel cruzado, frente al
+$50$\,\% supuesto, y el $98$\,\% del volumen que desaparece en el cruce corresponde a
+consumo negociado, no a cancelaciones. La calibración no sustituye a una ejecución real:
+la malla de dos segundos agrega el detalle intra-\emph{frame} y la posición en cola de
+una orden concreta sigue sin modelar. Acota, eso sí, el supuesto en el rango correcto en
+lugar de darlo por bueno sin medirlo. El registro de sombra actual es retrospectivo; falta
 una ejecución prospectiva de mayor fidelidad.
 
 \textbf{Respuesta competitiva del mercado.} Más allá de la fidelidad de la cola, el

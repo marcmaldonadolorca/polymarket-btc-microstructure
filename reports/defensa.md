@@ -526,7 +526,7 @@ Respuesta corta:
 
 ### 27. En el anexo el pre-registro dice que el corte nº 1 es el 24 de agosto, y el capítulo 4 evalúa hasta el 13. ¿Cuál de los dos vale?
 
-Son dos documentos encadenados, no dos versiones del mismo, y el capítulo 4 reporta los dos. El pre-registro v2 fija el protocolo general y anuncia que el simulador maker, cuando existiera, tendría su propia adenda sellada; esa adenda es el pre-registro del simulador, con su ventana desde el 10 de julio, y su corte lo cerró el fallo de captura. El corte del protocolo general mantuvo su propia fecha —el 24 de agosto— y su propia ventana, del 2 de julio al 23 de agosto, y está reportado en la subsección de capas de reporte: 25.011 unidades, capa histórica −0,004 ticks IC95 [−0,223, +0,212], capas con comisión oficial entre −0,77 y −3,65. Ninguna de las dos fechas se movió.
+Son dos documentos encadenados, no dos versiones del mismo, y el capítulo 4 reporta los dos. El pre-registro v2 fija el protocolo general y anuncia que el simulador maker, cuando existiera, tendría su propia adenda sellada; esa adenda es el pre-registro del simulador, con su ventana desde el 10 de julio, y su corte lo cerró el fallo de captura. El corte del protocolo general mantuvo su propia fecha —el 24 de agosto— y su propia ventana, del 2 de julio al 23 de agosto, y está reportado en la subsección de capas de reporte: 25.011 unidades, capa histórica −0,004 ticks IC95 [−0,223, +0,212], capas con comisión oficial entre −0,77 y −3,65. Ese protocolo contemplaba además un segundo corte «justo antes de la entrega», que se ejecutó el 29 de agosto sobre 55 días y 27.208 unidades y está reportado a continuación del primero. Ninguna de las fechas se movió.
 
 Respuesta corta:
 
@@ -674,9 +674,13 @@ Respuesta corta:
 
 Esa es la lectura tentadora y es incorrecta, y lo sé porque fui a medir el intervalo de la propia cifra de junio. El +0,349 tiene un IC95 de [−0,194, +0,892] por filas y [−0,655, +1,337] agrupando por mercado: **nunca excluyó el cero**. No era un resultado, era una estimación puntual sin potencia sobre 754 unidades y cinco días. Lo que aporta el corte no es un deterioro, es potencia: con 25.011 unidades y cincuenta días la capa comparable sigue sin distinguirse del azar, ahora con un intervalo estrecho que lo afirma en vez de sugerirlo. Y cuando se cobra la comisión oficial, el signo deja de ser ambiguo en las tres capas.
 
+Y si me pregunta por el segundo corte, que da **+0,075**, la respuesta es la misma en la otra dirección. Ese corte añade cinco días —del 24 al 28 de agosto— que salen los cinco positivos y promedian +0,97 ticks; son el 8,1 % de las unidades y mueven la media casi ocho centésimas. Con cinco días no hay forma de separar una racha del principio de otra cosa, y no he ejecutado ningún contraste de ruptura sobre la serie diaria: lo que decide sigue siendo el intervalo, [−0,132, +0,286] agrupando por mercado, que contiene el cero igual que antes. El *deflated Sharpe* de la serie diaria queda en 0,14, muy por debajo del 95 % de Bailey y López de Prado. Y con la comisión oficial el signo no se mueve: −0,691, −1,334 y −3,570 ticks, con cero días positivos de 55 en la operación completa. No defiendo el −0,004 ni el +0,075: defiendo que el intervalo contiene el cero en los dos cortes.
+
+Que los cincuenta días del primer corte se recalculen dentro del segundo y devuelvan valores idénticos —doscientas cincuenta celdas sin una sola diferencia— es la parte que sí me importa: dice que la ampliación no tocó nada de lo ya reportado.
+
 Respuesta corta:
 
-> No se murió: nunca estuvo viva con significación. El +0,349 tenía IC [−0,19, +0,89]. El corte no la degrada, la mide con 33× más datos: sigue en cero, y negativa con la fee real.
+> No se murió: nunca estuvo viva con significación. El +0,349 tenía IC [−0,19, +0,89]. Los dos cortes la miden con más de 30× datos y dan −0,004 y +0,075, ambos con el cero dentro del intervalo. Y negativa con la fee real en los dos.
 
 ### 46. Ha reconstruido una columna del filtro después de ver que el camino literal daba cero filas. ¿No es eso ajustar el experimento al resultado?
 
@@ -695,13 +699,13 @@ Respuesta corta:
 > Porque dos no eran ejecutables y lo demuestro con números. Y digo también que mi primera versión sustituyó el GARCH por un sucedáneo vacuo: lo cacé verificando y lo retiré.
 
 
-### 48. Su tutora dijo que 60-70 páginas «va bien» y usted entrega 97. ¿Por qué?
+### 48. Su tutora dijo que 60-70 páginas «va bien» y usted entrega 100. ¿Por qué?
 
-Porque de esas 97, veintiocho son anexos, que su propia guía deja fuera del presupuesto («lo que sea necesario»). El ámbito comparable —preliminares, ocho capítulos y referencias— son 82, y el exceso está concentrado en un sitio: el capítulo de resultados ocupa quince páginas frente a las cuatro orientativas. Antes de entregar moví allí todo lo que era análisis de soporte y no resultado: el diagnóstico del fallo de la cabeza de salud, la tabla completa de la adenda C, el registro de sombra y dos de las tres figuras del diagnóstico exploratorio de régimen; y retiré una figura que estaba declarada y nunca se citaba. Lo que queda en el capítulo son cuatro validaciones pre-registradas con su evidencia mínima: el corte maker, el corte del protocolo general, la adenda C y la adenda D. Recortarlas para acercarme a la cifra habría hecho el documento más corto y peor, y la guía dice «va bien», no «máximo».
+Porque de esas 100, diecisiete son preliminares —índices, resumen, glosario— y quince son referencias y anexos, que su propia guía deja fuera del presupuesto («lo que sea necesario»). El cuerpo, que son los ocho capítulos, son 68 páginas: dentro del 60-70 que usted llamó «va bien». El exceso frente al presupuesto por capítulos de la plantilla está concentrado en un sitio: el capítulo de resultados ocupa dieciséis páginas frente a las cuatro orientativas. Antes de entregar moví allí todo lo que era análisis de soporte y no resultado: el diagnóstico del fallo de la cabeza de salud, la tabla completa de la adenda C, el registro de sombra y dos de las tres figuras del diagnóstico exploratorio de régimen; y retiré una figura que estaba declarada y nunca se citaba. Lo que queda en el capítulo son cuatro validaciones pre-registradas con su evidencia mínima: el corte maker, el corte del protocolo general, la adenda C y la adenda D. Recortarlas para acercarme a la cifra habría hecho el documento más corto y peor, y la guía dice «va bien», no «máximo».
 
 Respuesta corta:
 
-> 28 de las 97 son anexos, que su guía deja fuera del presupuesto; el ámbito comparable son 82. El exceso está en resultados, y es porque hay cuatro validaciones pre-registradas. Todo el soporte ya está movido a anexos.
+> El cuerpo son 68 páginas, dentro del 60-70 que usted dio por bueno; las otras 32 son preliminares, referencias y anexos. El exceso por capítulos está en resultados, y es porque hay cuatro validaciones pre-registradas. Todo el soporte ya está movido a anexos.
 
 
 ### 49. Dos tercios de sus fills dependen de un supuesto que usted mismo llama optimista. ¿Por qué habría de creerme ninguna cifra maker?

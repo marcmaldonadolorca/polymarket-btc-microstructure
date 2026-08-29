@@ -511,6 +511,69 @@ un brazo comprometido que no se reporta es información perdida, y la tentación
 sustituirlo por un sucedáneo —que en una primera versión de este análisis llegó a
 materializarse— produce cifras que parecen resultados sin serlo.
 
+\subsubsection{Segundo corte, justo antes de la entrega}
+
+El protocolo general contempla un segundo corte «justo antes de la entrega de
+septiembre», sobre la misma ventana acumulativa y el mismo \emph{pipeline} congelado. Se
+ejecutó el 29 de agosto de 2026 con la regla derivada que fija el cierre en el último día
+UTC completo anterior a la ejecución —el 28 de agosto—, valor escrito en los guiones antes
+de lanzarlos. La ventana elegible pasa así del 2 de julio al 28 de agosto: 58~días, con
+captura efectiva en 55. Las tres ausencias son las mismas de antes y por la misma causa
+documentada. La política congelada selecciona ahora 27.208 unidades de acción.
+
+\begin{table}[htbp]
+\centering
+\caption[Segundo corte prospectivo del pre-registro general]{Segundo corte prospectivo del
+pre-registro general (55~días, 27.208 unidades de acción). Mismas capas, misma política
+congelada y mismo \emph{bootstrap} agrupado por mercado que la Tabla~\ref{tab::corte_v2}.}
+\label{tab::corte_v2_n2}
+\begin{tabular}{llrrr}
+\toprule
+\textbf{Capa} & \textbf{Gate} & \textbf{Media (ticks)} & \textbf{IC 95\,\%} & \textbf{Días $>0$} \\
+\midrule
+Histórica @0,5      & ninguno  & $+0{,}075$ & $[-0{,}132;\ +0{,}286]$ & 28/55 \\
+Histórica @0,5      & estático & $+0{,}039$ & $[-0{,}202;\ +0{,}278]$ & 29/55 \\
+\addlinespace
+Histórica, fee real & ninguno  & $-0{,}691$ & $[-0{,}898;\ -0{,}480]$ & 13/55 \\
+\emph{Taker} entrada & ninguno & $-1{,}334$ & $[-1{,}541;\ -1{,}122]$ & 5/55 \\
+\emph{Taker} ida-vuelta & ninguno & $-3{,}570$ & $[-3{,}776;\ -3{,}359]$ & 0/55 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+El control que hace comparable este corte con el anterior es la reutilización. La
+extracción fue incremental: solo se extrajeron los cinco días nuevos y los cincuenta
+anteriores se reaprovecharon. Recalculada la serie diaria completa dentro del conjunto
+ampliado, esos cincuenta días devuelven las mismas 25.011 unidades y valores idénticos a
+los del primer corte en las cuatro capas y en el recuento diario —doscientas cincuenta
+celdas sin una sola diferencia—, incluida la media de $-0{,}004$~ticks.
+
+La conclusión que recoge la Tabla~\ref{tab::corte_v2_n2} no cambia, pero el aspecto de su
+primera fila sí, y hay que explicar por qué. En la capa histórica la media pasa de
+$-0{,}004$ a $+0{,}075$~ticks y los días positivos de 23 de 50 a 28 de 55. Todo ese
+movimiento cabe en los cinco días nuevos: aportan el 8,1\,\% de las unidades, los cinco
+salen positivos y esas 2.197 unidades promedian $+0{,}97$~ticks. Con cinco días no hay
+forma de separar una racha del principio de otra cosa, y sobre la serie diaria no se ha
+ejecutado ningún contraste de ruptura; lo que decide, en cambio, sigue en su sitio. El
+intervalo contiene el cero con holgura, $[-0{,}132;\ +0{,}286]$ agrupando por mercado, y
+el \emph{deflated Sharpe} de la serie diaria queda en $0{,}14$, muy por debajo del
+95\,\% de confianza con que Bailey y López de Prado~\cite{bailey2014deflated} identifican
+habilidad. Que cinco días de cincuenta y cinco muevan la media casi ocho centésimas de
+tick ilustra por qué aquí manda el intervalo y no el punto.
+
+En las capas que cobran la comisión oficial el signo vuelve a ser inequívoco. El intervalo
+excluye el cero en las tres, hasta los $-3{,}57$~ticks de la operación completa, que no
+tiene un solo día positivo en los cincuenta y cinco. Los dos brazos que no se ejecutaron
+en el primer corte siguen sin ejecutarse por las mismas razones —el GARCH por falta de
+barras en el punto de decisión, el de regímenes por cobertura insuficiente, ahora del
+4,5\,\%— y se reportan como tales.
+
+\paragraph{Qué queda observado y qué sigue sin mirarse.} Este corte observa el lado
+\emph{taker} hasta el 28 de agosto. La ventana del lado \emph{maker} posterior a la de la
+adenda del simulador sigue sin observarse: sus mallas no se han regenerado y su corte está
+pre-registrado para después de la entrega. La separación entre ambas se mantiene en los
+términos en que se selló.
+
 % M1 CERRADO 2026-08-18 con el corte ejecutado: tablas rellenas, lectura escrita,
 % regla de sustitución resuelta (ninguna variante sustituye) y análisis secundario
 % por régimen contrastado. Queda solo la figura (c) de equity diaria por brazo.

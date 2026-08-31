@@ -1060,6 +1060,79 @@ Top 35\,\% test, coste $1{,}0$ & $+0{,}058$ & $-1{,}491$ \\
 \end{tabular}
 \end{table}
 
+\subsection{Cobertura del temario de series temporales}
+
+La Tabla~\ref{tab:cobertura_temario} sitúa el trabajo frente al temario de la asignatura de
+series temporales, módulo a módulo, diciendo también qué no se aplicó y por qué. Un
+método que no encaja con la geometría del problema y se declara vale más que uno forzado.
+
+\begin{table}[htbp]
+\centering
+\caption[Cobertura del temario de series temporales]{Correspondencia entre los cinco módulos
+de la asignatura y su lugar en este trabajo. Las técnicas no ejecutadas se declaran con su
+motivo, no se omiten.}
+\label{tab:cobertura_temario}
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{>{\raggedright\arraybackslash}p{2.1cm}>{\raggedright\arraybackslash}p{4.3cm}>{\raggedright\arraybackslash}p{6.4cm}}
+\toprule
+\textbf{Módulo} & \textbf{Técnicas} & \textbf{Dónde aparece aquí} \\
+\midrule
+I. Introducción & Uni/multivariante, estacionariedad, espaciado, descomposición aditiva &
+Malla uniforme de 2\,s y contrato de latencia; ADF y KPSS; la descomposición
+tendencia--residuo reaparece como modelo (Sección~\ref{sec:ampliacion_triaje}) \\
+\addlinespace
+II. Preprocesado & ETL, datos faltantes, ventanas deslizantes y expandidas, estacionalidad y
+tendencia &
+Recolector y control de calidad por sesión; dato obsoleto e imputación por arrastre;
+validación \emph{walk-forward} \textbf{expansiva} con purga y embargo; Holt-Winters sobre la
+actividad \\
+\addlinespace
+III. Predicción & Persistencia, SMA, suavizado exponencial, ARIMA/SARIMA, Prophet, VAR,
+modelos de ML, LSTM, Transformer, fundacional &
+Escalera de la Sección~\ref{sec::escalera}: \emph{naive-drift}, Holt, ARIMA(1,1,1), kNN-DTW y
+MOMENT en tres regímenes; el ML es el \emph{gradient boosting} del candidato; LSTM y
+Transformer en la Sección~\ref{sec:ampliacion_triaje}. \textbf{No ejecutados:} SMA, Prophet,
+VAR \\
+\addlinespace
+IV. Supervisado & Similitud (DTW), características (TSFresh), diccionarios (SFA/BOSS),
+convolución &
+kNN-DTW con separación temporal estricta; la rama convolucional, en el BookEncoder y la TCN.
+\textbf{No ejecutados:} TSFresh y BOSS \\
+\addlinespace
+V. No supervisado & Clustering, detección de anomalías, segmentación, aprendizaje de
+representaciones &
+Agrupamiento congelado del \emph{gate} de regímenes; el BookEncoder como representación
+aprendida. \textbf{No ejecutados:} anomalías y segmentación \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Por qué no se ejecutaron los cinco métodos restantes.} Las razones son de encaje,
+y las tres primeras comparten una: a esta escala la serie de precio está inmóvil en la
+inmensa mayoría de los pasos. La \textbf{media móvil simple} queda dominada por construcción
+por el persistente, que ya es el mejor de los baselines clásicos sobre una serie que no se
+mueve. \textbf{Prophet} está diseñado para series de negocio con estacionalidad de calendario
+y efectos de festivos; aquí el horizonte son segundos dentro de una sesión de una hora y no
+hay componente de calendario que modelar —el propio Holt-Winters, probado donde sí tiene
+sentido, solo aporta sobre la \emph{actividad} agregada y no sobre el precio—. La
+\textbf{autorregresión vectorial} respondería a la pregunta multivariante de si el contrato
+incorpora con retardo la información del subyacente; esa pregunta se ataca directamente y con
+más potencia mediante la correlación cruzada a quince desfases entre el perpetuo y el
+contrato, que es el tercero de los caminos del Capítulo~\ref{ch::conclusiones}, de modo que un
+VAR sería una segunda medición de lo ya medido.
+
+Las dos restantes chocan con la geometría de la tarea. \textbf{TSFresh} y los métodos de
+\textbf{diccionario} (SFA/BOSS) caracterizan series completas para clasificarlas, y aquí el
+punto de decisión es un instante concreto con quince segundos de contexto previo: no hay
+serie que caracterizar en el momento en que la política decide, que es la misma limitación
+—la tarea exige más fotogramas de los que el mercado mediano ofrece— que mide la Adenda~C.
+Por lo mismo, la \textbf{detección de anomalías} y la \textbf{segmentación} resuelven
+problemas que este trabajo no plantea: no se busca un suceso raro ni el punto de cambio de
+un régimen, sino el signo del movimiento en un horizonte fijo. La pieza del módulo que sí
+aplica —agrupar sesiones por régimen de volatilidad— está usada, y como \emph{gate}
+pre-registrado.
+
 \subsection{Peldaños de la asignatura: baselines clásicos, kNN-DTW y MOMENT}
 \label{sec::escalera}
 

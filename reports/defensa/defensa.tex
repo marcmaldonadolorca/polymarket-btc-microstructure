@@ -34,6 +34,15 @@
   \vspace{-0.35em}{\color{azul}\rule{0.12\textwidth}{1.2pt}}}
 
 % Pie: número de diapositiva discreto
+% Indice superior con la seccion actual resaltada (peticion de la tutora, 25-ago-2026):
+% "tambien ayuda un pequeno indice superior".
+\setbeamercolor{section in head/foot}{fg=gris}
+\setbeamercolor{section in head/foot shaded}{fg=gris!55}
+\setbeamerfont{section in head/foot}{size=\tiny}
+\setbeamertemplate{headline}{%
+  \vspace{0.1em}%
+  \hspace{1.2em}\insertsectionnavigationhorizontal{0.95\paperwidth}{}{}%
+}
 \setbeamertemplate{footline}{\hfill{\color{gris}\scriptsize\insertframenumber}\hspace{1.2em}\vspace{0.6em}}
 
 % Frase clave al pie de una diapositiva
@@ -74,6 +83,8 @@
 \end{frame}
 
 % ─────────────────────────────────────────────── 2. Problema
+\section{Problema}
+
 \begin{frame}{Qué se predice, exactamente}
   \begin{columns}[T]
     \begin{column}{0.52\textwidth}
@@ -107,6 +118,8 @@
 \end{frame}
 
 % ─────────────────────────────────────────────── 3. Datos
+\section{Método}
+
 \begin{frame}{El sistema de captura: la parte que decide qué se puede afirmar}
   \begin{columns}[T]
     \begin{column}{0.5\textwidth}
@@ -168,6 +181,8 @@
 \end{frame}
 
 % ─────────────────────────────────────────────── 5. El hallazgo central
+\section{Resultados}
+
 \begin{frame}{Primer hallazgo: acertar no es ganar}
   \begin{columns}[c]
     \begin{column}{0.46\textwidth}
@@ -195,7 +210,7 @@
 \end{frame}
 
 % ─────────────────────────────────────────────── 6. Escalera de modelos
-\begin{frame}{La escalera de modelos: el aprendizaje profundo sí se evaluó}
+\begin{frame}[shrink=8]{La escalera de modelos: el aprendizaje profundo sí se evaluó}
   \begin{columns}[T]
     \begin{column}{0.52\textwidth}
       \small
@@ -316,7 +331,9 @@
 \end{frame}
 
 % ─────────────────────────────────────────────── 10. Validación prospectiva maker
-\begin{frame}{Validación prospectiva pre-registrada: NO-GO}
+\section{Validación}
+
+\begin{frame}[shrink=8]{Validación prospectiva pre-registrada: NO-GO}
   \begin{columns}[T]
     \begin{column}{0.47\textwidth}
       \centering
@@ -374,7 +391,7 @@
 \end{frame}
 
 % ─────────────────────────────────────────────── 12. Entrenar contra el dinero
-\begin{frame}{¿Y si el problema era el objetivo, no la arquitectura?}
+\begin{frame}[shrink=8]{¿Y si el problema era el objetivo, no la arquitectura?}
   \begin{columns}[T]
     \begin{column}{0.5\textwidth}
       Censo de las funciones de pérdida de todo el trabajo:
@@ -408,6 +425,8 @@
 \end{frame}
 
 % ─────────────────────────────────────────────── 13. Limitaciones
+\section{Conclusiones}
+
 \begin{frame}{Los límites, declarados, son parte del resultado}
   \begin{columns}[T]
     \begin{column}{0.49\textwidth}

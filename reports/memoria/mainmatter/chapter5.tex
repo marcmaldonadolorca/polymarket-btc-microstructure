@@ -39,8 +39,15 @@ evidencia podrá alimentar las puertas de promoción:
   12 días prospectivos y una regla de exposición/fill validada.
 \end{itemize}
 
-En la fecha de corte hay cero días prospectivos de la política completa. Su estado correcto
-es \emph{hipótesis congelada pendiente de validación}, no candidata a bot.
+Cuando se congeló la regla no existía ningún día prospectivo de la política completa, y su
+estado era el de \emph{hipótesis pendiente de validación}. Los cortes del protocolo general
+del Capítulo~\ref{ch::resultados} llenaron después esa casilla, y conviene actualizar aquí
+el veredicto en lugar de dejar la promesa congelada: hay 50 y 55 días prospectivos —muy por
+encima de los 12 que exige la puerta más alta— y la capa con el filtro de volatilidad rinde
+$+0{,}009$ y $+0{,}039$~ticks en los dos cortes, lejos del umbral de 0,5 y con intervalos
+que contienen el cero. El estado correcto de la regla es, por tanto, \emph{hipótesis
+contrastada y no confirmada}: las puertas de promoción se fallan por rentabilidad, no por
+falta de datos, y no hay candidata a bot.
 
 \subsection{Diseño de una hipotética API de inferencia}
 

@@ -42,6 +42,32 @@ agregadas, los desgloses por régimen y la incertidumbre agrupada sin acceder al
 completo. El script que lo genera queda versionado para mantener trazabilidad, aunque su
 ejecución integral requiere el workspace privado de investigación.
 
+\subsection{El recolector, y por qué no se publica}
+
+Conviene decirlo con claridad porque es el artefacto más sustancial de ingeniería del trabajo
+y el único que estuvo en producción: el sistema desplegado no fue nunca la política, fue el
+\textbf{recolector}. Un servicio que corrió de forma continua durante meses sobre un
+ordenador de placa reducida, alineando cuatro fuentes —libro y operaciones del contrato,
+\emph{spot}, futuro perpetuo y oráculo— sobre una malla fija de dos segundos, con control de
+calidad por sesión y rechazo de las que no lo superan. Todo lo que este trabajo puede afirmar
+descansa en él, y las incidencias que acotaron sus ventanas —una reanudación tardía, una
+desconexión del disco de almacenamiento— están reportadas en el Capítulo~\ref{ch::etica}
+precisamente porque son propiedades del instrumento y no del análisis.
+
+Su código \textbf{no se publica}, y el motivo no es el tamaño. Está acoplado a la
+infraestructura privada donde vive —rutas, servicio, almacenamiento y la máquina concreta que
+lo aloja— y publicarlo exigiría un trabajo de saneamiento que no se ha hecho: separar la
+lógica de captura de la configuración del entorno y auditar que no arrastra nada del sistema
+que lo hospeda. Publicar sin ese paso sería peor que no publicar.
+
+Lo que sí se publica es lo que hace falta para reconstruirlo: el \textbf{esquema SQL} de la
+base de captura, que define exactamente qué se guarda y con qué granularidad, y el
+\emph{pipeline} de procesamiento posterior. Con eso, y con las dos APIs públicas de solo
+lectura que el recolector consume —el catálogo de contratos y el libro de órdenes—, un
+tercero puede escribir su propio recolector equivalente. No es lo mismo que entregar el
+binario, y esa diferencia se declara aquí en vez de dejarla implícita: la reproducción
+posible es la del \emph{método}, no la del \emph{corpus}.
+
 \subsection{Datos no publicados}
 
 El conjunto completo (del orden de 2,5 millones de filas \emph{cross-venue}, más la base de

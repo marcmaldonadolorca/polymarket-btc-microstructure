@@ -103,8 +103,9 @@ penaliza a quien cruza el \emph{spread} retribuye a quien provee liquidez— con
 política candidata que se sometió a validación prospectiva pre-registrada.
 
 El protocolo se selló criptográficamente antes de observar los datos, con las huellas de los
-cinco artefactos ejecutables, y se ejecutó una sola vez sobre una ventana de 35~días
-posteriores al sellado. El resultado es \textbf{NO-GO}: la política acumula $+3.408$\,\$
+cinco artefactos ejecutables, y se ejecutó una sola vez sobre una ventana de 35~días fijada
+en el propio sello —que es de la tarde del primer día de esa ventana— y no observada hasta
+el corte. El resultado es \textbf{NO-GO}: la política acumula $+3.408$\,\$
 simulados, pero su peor día desciende por debajo del umbral de riesgo declarado de antemano,
 y la regla se aplica sin interpretación.
 
@@ -117,7 +118,7 @@ efectivamente observada, el peor día esperado en una ventana de ese tamaño era
 $-232$\,\$ frente a un umbral de $-150$, de modo que la probabilidad de fallarla superaba
 el 60\,\% \emph{con independencia de la calidad de la política}. Dicho de otro modo: el
 sub-criterio que firmó el veredicto era el único de los tres que carecía de potencia para
-distinguir una política buena de una mala, mientras el que sí la tenía —equidad neta
+distinguir una política buena de una mala, mientras el que sí la tenía —equity neta
 positiva— se cumplía con holgura. El NO-GO es un resultado sobre el procedimiento, no una
 medición del valor económico de la estrategia, y presentarlo como lo segundo sería
 justamente el tipo de confusión que este trabajo intenta evitar.

@@ -280,8 +280,14 @@ las ciencias experimentales~\cite{nosek2018preregistration}. Su punto débil cl�
 la verificabilidad — nada impide redactar el «pre»-registro después. Este trabajo lo
 resuelve con un sello criptográfico de tiempo: el documento de pre-registro y la
 política congelada se atestan con OpenTimestamps~\cite{opentimestamps} sobre la cadena
-de Bitcoin, de modo que cualquier lector puede verificar que el compromiso es anterior
-a los datos de la ventana de evaluación, sin confiar en el autor ni en un tercero. La
+de Bitcoin, de modo que cualquier lector puede verificar la fecha del compromiso frente a
+las fechas de la ventana de evaluación, sin confiar en el autor ni en un tercero. Una
+precisión que conviene dejar escrita: el sello garantiza que el compromiso precede a la
+\emph{observación} de los datos, no a su existencia —al sellarse el protocolo general ya
+se habían capturado los primeros días de su ventana—. Para ese tramo inicial la garantía
+es la declaración del propio documento sellado, que fija el compromiso «antes de mirar
+cualquier dato», y la frontera entre la garantía criptográfica y la procedimental se
+declara aquí en lugar de dejarla implícita. La
 combinación —candidato congelado con hashes verificables, ventana de evaluación
 prospectiva intocada hasta un corte fijado de antemano, y reporte de todos los brazos
 comprometidos, favorables o no— es, hasta donde alcanza la revisión de este capítulo,

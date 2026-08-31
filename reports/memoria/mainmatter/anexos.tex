@@ -323,6 +323,44 @@ ventana. La comparación entre arquitecturas se estaba dirimiendo, en realidad, 
 modelos que no resuelven la tarea.
 
 
+\section{Ampliación del triaje de arquitecturas}
+
+La Sección~\ref{sec:ampliacion_triaje} resume el resultado; aquí va la tabla completa. Once
+variantes por cinco semillas, todas en un único entorno de cómputo —el control de
+reproducción descrito allí obliga a no mezclar plataformas—. Las corridas y su protocolo
+sellado están en `data/experiments/triaje\_ampliado\_v1/`.
+
+\begin{table}[htbp]
+\centering
+\caption[Ampliación del triaje con cinco semillas]{Ampliación del triaje: once variantes
+$\times$ cinco semillas en un único entorno. $\rho$ es la correlación de Spearman sobre el
+bloque terminal, con su desviación entre semillas. «Caída» es la pérdida de AUC de
+validación a test. Las tres últimas filas del primer bloque son las arquitecturas nuevas.}
+\label{tab:ampliacion_semillas}
+\footnotesize
+\setlength{\tabcolsep}{4.5pt}
+\begin{tabular}{lrrrrr}
+\toprule
+\textbf{Variante} & \textbf{Par.} & \textbf{AUC val} & \textbf{AUC test} & \textbf{Caída} & \textbf{$\rho$ test} \\
+\midrule
+\multicolumn{6}{l}{\emph{Con características tabulares}} \\
+\textbf{DLinear} \emph{(nuevo)} & \textbf{1.364} & $0{,}571$ & $0{,}552$ & $0{,}019$ & $\mathbf{0{,}135 \pm 0{,}004}$ \\
+LSTM \emph{(nuevo)}            & 23.618 & $0{,}563$ & $0{,}554$ & $0{,}009$ & $0{,}132 \pm 0{,}006$ \\
+PatchTST-lite \emph{(nuevo)}   & 10.243 & $0{,}567$ & $0{,}549$ & $0{,}018$ & $0{,}132 \pm 0{,}006$ \\
+Control tabular (GRU)          & 18.186 & $0{,}564$ & $0{,}555$ & $0{,}010$ & $0{,}132 \pm 0{,}002$ \\
+Fusión, concatenación          & 42.874 & $0{,}561$ & $0{,}551$ & $0{,}010$ & $0{,}128 \pm 0{,}007$ \\
+Fusión, dual                   & 34.190 & $0{,}564$ & $0{,}551$ & $0{,}013$ & $0{,}126 \pm 0{,}006$ \\
+\addlinespace
+\multicolumn{6}{l}{\emph{Solo libro de órdenes}} \\
+Atención, última foto          & 22.106 & $0{,}573$ & $0{,}523$ & $0{,}050$ & $0{,}050 \pm 0{,}013$ \\
+Atención, secuencia            & 53.890 & $0{,}569$ & $0{,}518$ & $0{,}050$ & $0{,}041 \pm 0{,}014$ \\
+BookEncoder + GRU              & 29.946 & $0{,}555$ & $0{,}529$ & $0{,}026$ & $0{,}032 \pm 0{,}009$ \\
+BookEncoder Conv1d             &  9.986 & $0{,}559$ & $0{,}526$ & $0{,}033$ & $0{,}026 \pm 0{,}010$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+
 \section{Figuras del diagnóstico \emph{post-hoc} de régimen}
 
 Sensibilidad al coste y desglose diario del subconjunto de baja volatilidad. Ambas

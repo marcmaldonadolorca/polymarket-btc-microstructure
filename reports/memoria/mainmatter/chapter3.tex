@@ -898,15 +898,146 @@ se verá, de su sobreajuste aquí.
 Todas estas arquitecturas aprenden representación —obtienen métricas de clasificación y de
 ordenación razonables, y algunas políticas \emph{proxy} resultan positivas dentro de
 muestra—, pero ninguna produce una política rentable y estable cuando se exige selección
-causal día a día y estabilidad en todo el bloque de test. Con un horizonte de entrenamiento
-de unas dos semanas (unos 5\,800 ejemplos) la varianza de estos modelos es demasiado alta:
-memorizan el periodo de entrenamiento y no generalizan al siguiente. La auto-atención es el
-caso más nítido de este patrón: con aproximadamente el doble de parámetros mejora el AUC de
-validación (0,568 frente a 0,560--0,563 de las variantes recurrente y convolucional) y, aun
-así, empeora la economía de test ($-1{,}99$ frente a $-1{,}08$ ticks netos al mismo umbral,
-con tres días negativos frente a dos). La capacidad añadida compra ordenación dentro de
-muestra, no política fuera de ella. Por eso el aprendizaje profundo se aparca a la espera de
-un volumen de datos sustancialmente mayor.
+causal día a día y estabilidad en todo el bloque de test. La
+Tabla~\ref{tab:triaje_profundo} recoge el triaje completo sobre el mismo tensor y el mismo
+protocolo, con las siete variantes entrenadas.
+
+\begin{table}[htbp]
+\centering
+\caption[Triaje diagnóstico de las arquitecturas profundas]{Triaje diagnóstico de las
+arquitecturas sobre el libro. Todas comparten tensor, protocolo y partición. $\rho$ es la
+correlación de Spearman sobre el bloque terminal. Las dos últimas columnas corresponden a
+la política seleccionada en validación de cada experimento, evaluada sobre los tres días
+del bloque terminal. \textbf{Es triaje exploratorio, no evidencia confirmatoria}: véase la
+advertencia del párrafo siguiente.}
+\label{tab:triaje_profundo}
+\footnotesize
+\setlength{\tabcolsep}{4.5pt}
+\begin{tabular}{lrrrrrr}
+\toprule
+\textbf{Variante} & \textbf{Par.} & \textbf{AUC} & \textbf{AUC} & \textbf{$\rho$} & \textbf{Neto} & \textbf{Días} \\
+ & & \textbf{val} & \textbf{test} & \textbf{test} & \textbf{test} & \textbf{$<0$} \\
+\midrule
+Atención, última foto & 22.106 & $0{,}569$ & $0{,}514$ & $+0{,}020$ & $-1{,}99$ & 3/3 \\
+Atención, secuencia       & 53.890 & $0{,}567$ & $0{,}531$ & $+0{,}065$ & --- & --- \\
+\addlinespace
+BookEncoder Conv1d         &  9.986 & $0{,}560$ & $0{,}528$ & $+0{,}024$ & $-1{,}08$ & 2/3 \\
+BookEncoder + GRU         & 29.946 & $0{,}561$ & $0{,}543$ & $+0{,}048$ & --- & --- \\
+\addlinespace
+Fusión, concatenación      & 42.874 & $0{,}568$ & $0{,}552$ & $+0{,}133$ & $+0{,}54$ & 0/3 \\
+Fusión, dual               & 34.190 & $0{,}562$ & $0{,}552$ & $+0{,}127$ & --- & --- \\
+\addlinespace
+\textbf{Control tabular}   & \textbf{18.186} & $0{,}568$ & $\mathbf{0{,}553}$ & $\mathbf{+0{,}134}$ & $+0{,}59$ & 1/3 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+La tabla dice dos cosas que una cifra suelta no diría. La primera es que \textbf{el AUC de
+validación no separa a estas arquitecturas} —las siete caen entre 0,560 y 0,569— mientras
+que el bloque terminal sí las ordena. La ordenación \emph{fina} dentro de las variantes que
+solo ven el libro no debe leerse de esta tabla: la ampliación de la
+Sección~\ref{sec:ampliacion_triaje} la mide con cinco semillas y muestra que se invierte.
+
+La segunda es la que decide la elección del candidato final. \textbf{El control tabular,
+con 18.186 parámetros, iguala o supera a todas las variantes que incorporan el libro},
+incluida la fusión de 42.874. La diferencia no está en el AUC, donde el margen es estrecho,
+sino en la correlación de rangos sobre el bloque terminal: $+0{,}134$ del control frente a
+$+0{,}020$ y $+0{,}065$ de las dos variantes de atención, entre dos y seis veces más. Añadir
+el libro de órdenes como representación profunda no aporta ordenación por encima de la que
+ya extraen las características tabulares. Ese es el motivo medido —y no una preferencia por
+la simplicidad— de que el candidato de la sección siguiente sea un modelo tabular.
+
+\paragraph{Qué puede y qué no puede concluirse de este triaje.} La tabla anterior es
+\textbf{exploratoria y así debe leerse}, por cuatro razones que conviene declarar antes de
+que se conviertan en una objeción. Primera: el bloque terminal de este triaje tiene
+\textbf{tres días}, y las políticas evaluadas seleccionan entre 50 y 321 acciones, de modo
+que la diferencia entre «tres días negativos» y «dos» es de un solo día y no soporta ninguna
+lectura fina. Segunda: esa partición se ha reutilizado entre experimentos de esta fase, así
+que no es evidencia fresca en el sentido en que sí lo son los cortes pre-registrados del
+Capítulo~\ref{ch::resultados}. Tercera: cada variante se entrenó con \textbf{una sola semilla} y una única
+configuración de hiperparámetros, sin búsqueda. Ese reparo dejó de ser una conjetura: la
+Sección~\ref{sec:ampliacion_triaje} lo mide, y confirma que la ordenación fina entre las
+variantes del libro no sobrevive a la varianza de inicialización aunque la separación entre
+familias sí. Cuarta: el contexto es de ocho fotogramas, dieciséis segundos, que para un
+mecanismo de atención o una convolución dilatada es un régimen muy corto.
+
+En consecuencia, la afirmación que este trabajo sostiene no es que el aprendizaje profundo
+no sirva en este problema, sino la más estrecha y la única que la evidencia respalda:
+\textbf{en este régimen de datos, con este contexto y este presupuesto de cómputo, ninguna
+de las cinco familias del triaje original se separó del ruido ni superó al control tabular}. La distinción
+importa porque la conclusión económica del trabajo no depende de ella: como se verá, la
+política muere por la estructura de costes y por la latencia, no por falta de capacidad
+predictiva, de modo que un modelo mejor elevaría el AUC pero no el resultado. Por eso el
+aprendizaje profundo se aparca a la espera de un volumen de datos sustancialmente mayor, y
+la Adenda~C del Capítulo~\ref{ch::resultados} mide por su cuenta cuánto haría falta.
+
+\subsubsection{Ampliación del triaje: semillas, LSTM y forecasting moderno}
+\label{sec:ampliacion_triaje}
+
+El triaje anterior tiene dos huecos que su propio párrafo de acotación declara: descansa en
+una sola semilla y omite la LSTM. Ambos se cerraron con una ampliación cuyo protocolo
+—etapas, métricas de cabecera y, sobre todo, \emph{qué se escribiría en la memoria para cada
+resultado posible}— se selló con OpenTimestamps \textbf{antes} de ejecutar nada, con la
+cláusula expresa de que el candidato congelado no se cambiaría ganase lo que ganase cualquier
+modelo nuevo. Se añaden tres arquitecturas: la \textbf{LSTM}, que sustituye la celda
+recurrente del control tabular y cierra el hueco declarado; \textbf{DLinear}, que descompone
+la serie en tendencia y residuo y proyecta cada componente con una capa
+lineal~\cite{zeng2023dlinear}; y \textbf{PatchTST-lite}, parches temporales con atención e
+independencia de canal~\cite{nie2023patchtst}. Las dos últimas son adaptaciones pequeñas al
+tensor y al volumen disponibles, no reproducciones fieles de sus artículos.
+
+\paragraph{Un control previo que cambió el alcance de la comparación.} Antes de nada se
+re-ejecutó el experimento de auto-atención con su \emph{semilla original} en el entorno
+actual. No reproduce: con idénticos datos, código, semilla e hiperparámetros, y cambiando
+solo la plataforma de cómputo, la correlación de rangos de la variante principal pasa de
+$0{,}020$ a $0{,}058$ y su AUC de test de $0{,}514$ a $0{,}522$. \textbf{El ruido de
+plataforma es, por tanto, del mismo orden que las diferencias que separan a estas
+arquitecturas entre sí}, lo que obliga a leer la Tabla~\ref{tab:triaje_profundo} como una
+foto de su entorno y no como una medición transportable. La ampliación que sigue se ejecutó
+íntegramente en un solo entorno y se interpreta solo dentro de él.
+
+La Tabla~\ref{tab:ampliacion_semillas} del Anexo~\ref{anexo:soporte} recoge las once
+variantes con su dispersión entre semillas; aquí se resume lo que decide.
+
+\paragraph{Lo que confirma.} La separación entre las dos familias es \textbf{total}: la peor
+de las treinta corridas que incorporan características tabulares ($\rho = 0{,}119$) queda por
+encima de la mejor de las veinte que solo ven el libro ($\rho = 0{,}066$). En comparación
+pareada por semilla, las cuatro variantes del libro pierden contra el control tabular en las
+\textbf{cinco de cinco} semillas, con diferencias de $-0{,}082$ a $-0{,}106$ frente a errores
+estándar de $0{,}004$ a $0{,}007$. La conclusión que sostenía el triaje original —que añadir
+el libro como representación profunda no aporta ordenación sobre las características
+tabulares— queda confirmada con un margen que la varianza de inicialización no explica.
+
+\paragraph{Lo que corrige.} La ordenación \emph{dentro} de la familia del libro se invierte.
+El triaje original leía la auto-atención como el caso más nítido de sobreajuste por
+capacidad; con cinco semillas, la atención queda \textbf{por encima} de la convolución en las
+cinco ($+0{,}024$ de diferencia media). Esa lectura se retira. Lo que sí sobrevive, y en el
+eje correcto, es el patrón de fondo: la columna «Caída» ordena a las arquitecturas casi
+exactamente como la tesis predice —las dos de atención pierden $0{,}050$ de AUC al pasar de
+validación a test, \textbf{cinco veces más que el control tabular}, que pierde $0{,}010$—. La
+capacidad compra ordenación dentro de muestra y la paga fuera de ella; simplemente, la
+comparación que lo demuestra no era la que el triaje original eligió.
+
+\paragraph{Lo que añade.} Las tres arquitecturas nuevas resultan \textbf{indistinguibles} del
+control tabular en comparación pareada: LSTM $+0{,}0001$, PatchTST-lite $+0{,}0000$ y DLinear
+$+0{,}0033$, todas por debajo de dos errores estándar. De ahí se siguen tres cosas. La
+elección de la GRU frente a la LSTM, que hasta aquí se justificaba solo a priori, era
+\textbf{indiferente}, y ahora está medida. La familia moderna de \emph{forecasting} tampoco
+aporta en este régimen. Y el resultado más informativo de toda la ampliación no es que algo
+gane, sino \textbf{con cuánto se iguala}: DLinear alcanza el rendimiento del control con
+\textbf{1.364 parámetros frente a 18.186}, trece veces menos, y con el segundo AUC de
+validación más alto de la tabla. Que un modelo esencialmente lineal empate con todo lo demás
+es la forma más fuerte del hallazgo de este capítulo: en este problema, y a este volumen de
+datos, \textbf{la capacidad no es el factor limitante}. Coincide con lo que Zeng
+\emph{et al.}~\cite{zeng2023dlinear} documentan para predicción de series temporales, y
+refuerza, por una vía distinta a las del Capítulo~\ref{ch::resultados}, la conclusión
+económica del trabajo: si
+la capacidad no limita, un modelo mejor no habría cambiado el resultado, porque lo que decide
+es el coste de ejecución y no la calidad de la predicción.
+
+Ninguna de estas corridas modifica el candidato congelado, que estaba sellado antes de que
+existieran, ni ninguna cifra del Capítulo~\ref{ch::resultados}. La cláusula estaba escrita en
+el protocolo antes de conocer los resultados.
 
 Durante la auditoría se detectó y corrigió un error de interpretación en el \emph{score} de
 selección adversa (su orientación correcta es $1 - P(\text{adverso})$), lo que ilustra que

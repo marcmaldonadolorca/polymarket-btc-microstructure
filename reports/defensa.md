@@ -699,13 +699,13 @@ Respuesta corta:
 > Porque dos no eran ejecutables y lo demuestro con números. Y digo también que mi primera versión sustituyó el GARCH por un sucedáneo vacuo: lo cacé verificando y lo retiré.
 
 
-### 48. Su tutora dijo que 60-70 páginas «va bien» y usted entrega 100. ¿Por qué?
+### 48. Su tutora dijo que 60-70 páginas «va bien» y usted entrega 104. ¿Por qué?
 
-Porque de esas 100, diecisiete son preliminares —índices, resumen, glosario— y quince son referencias y anexos, que su propia guía deja fuera del presupuesto («lo que sea necesario»). El cuerpo, que son los ocho capítulos, son 68 páginas: dentro del 60-70 que usted llamó «va bien». El exceso frente al presupuesto por capítulos de la plantilla está concentrado en un sitio: el capítulo de resultados ocupa dieciséis páginas frente a las cuatro orientativas. Antes de entregar moví allí todo lo que era análisis de soporte y no resultado: el diagnóstico del fallo de la cabeza de salud, la tabla completa de la adenda C, el registro de sombra y dos de las tres figuras del diagnóstico exploratorio de régimen; y retiré una figura que estaba declarada y nunca se citaba. Lo que queda en el capítulo son cuatro validaciones pre-registradas con su evidencia mínima: el corte maker, el corte del protocolo general, la adenda C y la adenda D. Recortarlas para acercarme a la cifra habría hecho el documento más corto y peor, y la guía dice «va bien», no «máximo».
+Porque de esas 104, diecinueve son preliminares —índices, resumen, glosario— y quince son referencias y anexos, que su propia guía deja fuera del presupuesto («lo que sea necesario»). El cuerpo, que son los ocho capítulos, son 70 páginas: dentro del 60-70 que usted llamó «va bien». El exceso frente al presupuesto por capítulos de la plantilla está concentrado en un sitio, el capítulo de resultados, y todo lo que era soporte y no resultado está movido a anexos: el diagnóstico de la cabeza de salud, la tabla completa de la adenda C, el registro de sombra y la tabla de la ampliación del triaje de arquitecturas. Antes de entregar moví allí todo lo que era análisis de soporte y no resultado: el diagnóstico del fallo de la cabeza de salud, la tabla completa de la adenda C, el registro de sombra y dos de las tres figuras del diagnóstico exploratorio de régimen; y retiré una figura que estaba declarada y nunca se citaba. Lo que queda en el capítulo son cuatro validaciones pre-registradas con su evidencia mínima: el corte maker, el corte del protocolo general, la adenda C y la adenda D. Recortarlas para acercarme a la cifra habría hecho el documento más corto y peor, y la guía dice «va bien», no «máximo».
 
 Respuesta corta:
 
-> El cuerpo son 68 páginas, dentro del 60-70 que usted dio por bueno; las otras 32 son preliminares, referencias y anexos. El exceso por capítulos está en resultados, y es porque hay cuatro validaciones pre-registradas. Todo el soporte ya está movido a anexos.
+> El cuerpo son 70 páginas, dentro del 60-70 que usted dio por bueno; las otras 34 son preliminares, referencias y anexos. Todo el soporte está movido a anexos. El exceso por capítulos está en resultados, y es porque hay cuatro validaciones pre-registradas. Todo el soporte ya está movido a anexos.
 
 
 ### 49. Dos tercios de sus fills dependen de un supuesto que usted mismo llama optimista. ¿Por qué habría de creerme ninguna cifra maker?

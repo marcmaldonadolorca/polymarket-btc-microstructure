@@ -86,9 +86,15 @@ objetivo económico, con el contrafactual exacto de cada acción posible y la pr
 de riesgo del pre-registro escrita como función de pérdida. El resultado completa la
 respuesta sobre el aprendizaje profundo por una vía independiente de la arquitectura y de
 la escala: la frontera riesgo--rendimiento aprendida queda dominada en sus dieciséis puntos
-por la de un parámetro escalar bien elegido. Tras agotar los tres ejes —arquitectura,
-datos y objetivo—, la conclusión ya no es que falte capacidad, sino que en este mercado y
-a esta resolución no hay estructura explotable que una red pueda capturar y un escalar no.
+por la de un parámetro escalar bien elegido. El eje de la arquitectura se amplió después con
+tres modelos más —una LSTM, que cierra la única ablación que faltaba, y las dos familias
+dominantes hoy en predicción de series temporales— y con cinco semillas por variante: las tres
+resultan indistinguibles del control tabular, y la mejor de ellas iguala su rendimiento con
+\textbf{trece veces menos parámetros}. Tras agotar los tres ejes —arquitectura, datos y
+objetivo—, la conclusión ya no es que falte capacidad, sino que en este mercado y a esta
+resolución no hay estructura explotable que una red pueda capturar y un escalar no; que el
+modelo más pequeño de todos los probados empate con los demás es la forma más directa de
+decirlo.
 
 \section{La validación prospectiva}
 

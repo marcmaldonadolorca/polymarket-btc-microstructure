@@ -61,3 +61,6 @@ reports/memoria/mainmatter/*.aux
 Thumbs.db
 .vscode/
 .idea/
+
+# material de preparacion de la defensa: NUNCA en el repo publico
+reports/defensa*

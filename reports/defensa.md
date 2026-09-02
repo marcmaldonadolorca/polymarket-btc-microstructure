@@ -802,3 +802,27 @@ Respuesta corta:
 
 > Los 2 s son la resolución del instrumento; el sistema real va a 430 ms. Muestrear más fino mejoraría la medición, no la ejecución, y la comisión exige que sobrevivan 3,5 de los 6,79 ticks a 400 ms — no demostrado en ningún sentido. Co-localizarse es entrar en la carrera HFT de eu-west-2 contra bots ya colocados. La vía inmune a latencia es el maker, y esa se ejecutó: NO-GO por riesgo, no por rentabilidad.
 
+
+### 51. ¿Por qué no cuantifica el flujo informado con las medidas estándar del campo —VPIN, la lambda de Kyle, el desequilibrio de flujo de órdenes?
+
+Separo lo que el instrumento permite de lo que no. **Lo que sí está dentro**: el desequilibrio de profundidad del libro es una de las características centrales del modelo, y su uso no es decorativo sino que se justifica midiendo. Su autocorrelación de primer orden es 0,99 —extremadamente persistente—, lo que valida su uso como característica lenta, y en el 33,8 % de las fotografías con el precio inmóvil **sí** cambia la profundidad disponible en el toque: el libro informa precisamente cuando el precio no se mueve. De hecho la conclusión del análisis exploratorio es esa, y está escrita: la señal lineal está en el estado del libro, no en el retorno retardado.
+
+**Lo que no puedo calcular, y por una razón estructural del registro**: VPIN exige clasificar el volumen de operaciones por lado y agruparlo en cubos de volumen; la lambda de Kyle exige flujo firmado contra cambio de precio a la misma frecuencia; y el desequilibrio de flujo de órdenes en el sentido de Cont, Kukanov y Stoikov exige altas y bajas en el mejor nivel, evento a evento. En mi malla esas tres cantidades —volúmenes, recuentos de operaciones y altas y bajas de órdenes— **no son series temporales**: son agregados de ventana, un único valor calculado para toda la sesión y repetido idéntico en cada fotografía. Lo declaro explícitamente en el capítulo 3, precisamente al distinguir qué columnas pueden usarse como característica y cuáles no, y la comprobación es inmediata: basta contar valores distintos dentro de cada sesión. Calcular VPIN sobre un agregado de sesión devolvería un número, no una medida.
+
+La consecuencia honesta es que la vía correcta no es reprocesar el corpus, sino capturar de nuevo dirigido por eventos —la misma captura sub-segundo que ya señalo como primer trabajo futuro—, que traería el flujo de operaciones firmado y con él VPIN y la lambda como medidas legítimas en lugar de como adorno bibliográfico.
+
+Respuesta corta:
+
+> La variante computable con mi instrumento —el desequilibrio de profundidad— sí está dentro y es central: ACF(1) de 0,99 y cambio de profundidad en el 33,8 % de las fotografías con precio inmóvil. VPIN, Kyle y el desequilibrio de flujo evento a evento exigen flujo de operaciones firmado, y mi malla lo agrega por sesión: no son reconstruibles retrospectivamente: exigen captura nueva.
+
+### 52. ¿En qué marco teórico de microestructura encuadra la selección adversa que reporta?
+
+En el de la información asimétrica: **Glosten y Milgrom (1985)** para el mecanismo —un proveedor de liquidez que no sabe si su contraparte está informada cotiza una horquilla que cubre esa pérdida esperada— y **Easley y O'Hara** para la formalización posterior de la probabilidad de negociación informada. No aporto nada a ese marco: lo uso para nombrar lo que mido.
+
+Y lo mido en los dos lados. En el lado **taker**, el acierto cae al 39,7 % a dos segundos, peor que una moneda: esa es la firma de estar cruzando sistemáticamente contra quien tiene mejor información, y es lo que impide leer la evaporación de los ticks instantáneos como dinero sin dueño. En el lado **maker**, el trabajo no se limita a nombrarla sino que localiza dónde vive —en el tramo terminal, contra la expiración que resuelve en contra—, y por eso la política incorpora un *score* de selección adversa, cuya orientación correcta es 1 − P(adverso); que tuviera que corregir esa orientación es una de las erratas que declaro, no algo que esconda.
+
+La diferencia con la literatura clásica merece decirse, porque un tribunal puede tirar de ahí: en Glosten-Milgrom el agente informado conoce el valor del activo. Aquí el «valor» es el resultado de un evento binario que resuelve un oráculo externo, así que la información privada no es sobre el fundamental, sino sobre la ruta del subyacente hasta la expiración. Es una asimetría sobre el camino, no sobre el destino.
+
+Respuesta corta:
+
+> Glosten-Milgrom para el mecanismo y Easley-O'Hara para la probabilidad de negociación informada. No aporto al marco, lo uso: el 39,7 % de acierto a 2 s es su firma en el lado taker, y en el maker la localizo en el tramo terminal, con un *score* de selección adversa cuya orientación tuve que corregir a 1 − P(adverso). Matiz propio del activo: la información privada es sobre la ruta hasta la expiración, no sobre el fundamental.

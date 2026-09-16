@@ -43,27 +43,28 @@ completo. El script que lo genera queda versionado para mantener trazabilidad, a
 ejecución integral requiere el workspace privado de investigación.
 
 \subsection{El recolector, y por qué no se publica}
+\label{sec::recolector_no_publica}
 
 Conviene decirlo con claridad porque es el artefacto más sustancial de ingeniería del trabajo
 y el único que estuvo en producción: el sistema desplegado no fue nunca la política, fue el
 \textbf{recolector}. Un servicio que corrió de forma continua durante meses sobre un
-ordenador de placa reducida, alineando cuatro fuentes —libro y operaciones del contrato,
-\emph{spot}, futuro perpetuo y oráculo— sobre una malla fija de dos segundos, con control de
+ordenador de placa reducida, alineando cuatro fuentes (libro y operaciones del contrato,
+\emph{spot}, futuro perpetuo y oráculo) sobre una malla fija de dos segundos, con control de
 calidad por sesión y rechazo de las que no lo superan. Todo lo que este trabajo puede afirmar
-descansa en él, y las incidencias que acotaron sus ventanas —una reanudación tardía, una
-desconexión del disco de almacenamiento— están reportadas en el Capítulo~\ref{ch::etica}
+descansa en él, y las incidencias que acotaron sus ventanas (una reanudación tardía, una
+desconexión del disco de almacenamiento) están reportadas en el Capítulo~\ref{ch::etica}
 precisamente porque son propiedades del instrumento y no del análisis.
 
 Su código \textbf{no se publica}, y el motivo no es el tamaño. Está acoplado a la
-infraestructura privada donde vive —rutas, servicio, almacenamiento y la máquina concreta que
-lo aloja— y publicarlo exigiría un trabajo de saneamiento que no se ha hecho: separar la
+infraestructura privada donde vive (rutas, servicio, almacenamiento y la máquina concreta que
+lo aloja) y publicarlo exigiría un trabajo de saneamiento que no se ha hecho: separar la
 lógica de captura de la configuración del entorno y auditar que no arrastra nada del sistema
 que lo hospeda. Publicar sin ese paso sería peor que no publicar.
 
 Lo que sí se publica es lo que hace falta para reconstruirlo: el \textbf{esquema SQL} de la
 base de captura, que define exactamente qué se guarda y con qué granularidad, y el
 \emph{pipeline} de procesamiento posterior. Con eso, y con las dos APIs públicas de solo
-lectura que el recolector consume —el catálogo de contratos y el libro de órdenes—, un
+lectura que el recolector consume (el catálogo de contratos y el libro de órdenes), un
 tercero puede escribir su propio recolector equivalente. No es lo mismo que entregar el
 binario, y esa diferencia se declara aquí en vez de dejarla implícita: la reproducción
 posible es la del \emph{método}, no la del \emph{corpus}.
@@ -71,8 +72,15 @@ posible es la del \emph{método}, no la del \emph{corpus}.
 \subsection{Datos no publicados}
 
 El conjunto completo (del orden de 2,5 millones de filas \emph{cross-venue}, más la base de
-captura) no se publica por tamaño. En su lugar se incluyen el esquema SQL, un ledger
-anonimizado suficiente para reproducir las cifras finales y el código del \emph{pipeline}.
-Esto permite una auditoría parcial, no la reproducción bit a bit del entrenamiento. Declarar
+captura) no se publica por tamaño. Tampoco existe un script de descarga que lo sustituya, y
+el motivo es de naturaleza de los datos: el corpus no procede de una descarga, sino de una
+captura en tiempo real. La API del libro de órdenes que consume el recolector devuelve la
+fotografía presente del libro, no su historia, de modo que la serie de libros solo puede
+obtenerse observándola en el momento; las referencias externas y el flujo de operaciones sí
+tienen histórico, pero sin el libro alineado no reconstruyen el corpus. Quien quiera un
+corpus equivalente tiene que capturar una ventana nueva con un recolector como el descrito
+en la Sección~\ref{sec::captura}, y esa ventana será otra. En su lugar se incluyen el esquema SQL, un ledger anonimizado suficiente
+para reproducir las cifras finales y el código del \emph{pipeline}. Esto permite una
+auditoría parcial, no la reproducción bit a bit del entrenamiento. Declarar
 esa frontera de forma explícita es parte de la trazabilidad y reduce la deuda técnica propia de
 estos sistemas~\cite{sculley2015debt}.

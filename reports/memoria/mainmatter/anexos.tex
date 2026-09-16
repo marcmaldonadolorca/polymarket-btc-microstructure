@@ -70,9 +70,9 @@ Dimensión oculta de la GRU & 56 \\
 Modelo base & MOMENT-1-small & TabPFN v2 \\
 Modo & \emph{linear probe} & sin entrenamiento \\
 Ventana de contexto & 512 pasos & 10.000 filas (tope) \\
-Optimizador & AdamW & — \\
-Épocas & 15 & — \\
-Ventanas de entrenamiento & 40.758 & — \\
+Optimizador & AdamW & --- \\
+Épocas & 15 & --- \\
+Ventanas de entrenamiento & 40.758 & --- \\
 Semilla & 20260714 & 20260713 \\
 \bottomrule
 \end{tabular}
@@ -98,16 +98,16 @@ La señal y la política se fijaron en el entrenamiento de mayo y no se han modi
 desde entonces: universo \emph{prestart} estricto ($-60$ a $-45$\,s respecto a la
 apertura, \emph{spread} $\le 2$ ticks, libro saludable, coste visible acotado), dos
 cabezas de \emph{gradient boosting} sobre el conjunto de características \emph{no\_clock},
-y regla de operación «valor esperado $>0{,}75$ y salud $\ge 0{,}5$». La integridad de
+y regla de operación ``valor esperado $>0{,}75$ y salud $\ge 0{,}5$''. La integridad de
 los artefactos se ancla con sus resúmenes SHA-256, incluidos literalmente en el
 pre-registro (modelos de valor esperado y de salud, manifiesto de características y
-\emph{gate} GARCH congelado).
+filtro de régimen GARCH congelado).
 
-\section*{Brazos de \emph{gate} y capas de reporte}
+\section*{Variantes de filtro de régimen y niveles de reporte}
 
-Se comprometieron por adelantado tres brazos de \emph{gate} —estático heredado,
-GARCH(1,1) ajustado solo con datos anteriores a junio, y clustering de regímenes
-(adenda A)— y tres capas de reporte que se publican todas: net@0,5 histórica, taker con
+Se comprometieron por adelantado tres variantes de filtro de régimen (la estática heredada,
+un GARCH(1,1) ajustado solo con datos anteriores a junio y el clustering de regímenes de la
+adenda A) y tres niveles de reporte que se publican todos: net@0,5 histórica, taker con
 comisión oficial (con expectativa \emph{declarada como negativa} antes de mirar los
 datos) y maker simulado. Declarar la expectativa negativa por adelantado es lo que
 convierte el resultado taker en una confirmación y no en una racionalización
@@ -116,8 +116,8 @@ convierte el resultado taker en una confirmación y no en una racionalización
 \section*{Cortes prospectivos}
 
 Los datos elegibles son la captura de la Pi posterior a la reanudación del recolector,
-procesados con el mismo \emph{pipeline} congelado. Se fijaron dos cortes —el primero a
-finales de agosto, el segundo justo antes de la entrega— sin ningún vistazo intermedio a
+procesados con el mismo \emph{pipeline} congelado. Se fijaron dos cortes (el primero a
+finales de agosto, el segundo justo antes de la entrega) sin ningún vistazo intermedio a
 las métricas de resultado.
 
 \section*{Verificación independiente del sello temporal}
@@ -129,7 +129,7 @@ OpenTimestamps~\cite{opentimestamps}. Para verificarlo sin confiar en el autor:
 \item Obtener el \emph{commit} del repositorio que introduce el pre-registro y su prueba
 \texttt{.ots} asociada (\texttt{docs/prereg\_v2\_commit.ots}).
 \item Ejecutar \texttt{ots verify docs/prereg\_v2\_commit.ots}: la herramienta consulta
-un nodo de Bitcoin y confirma el bloque —y por tanto la fecha— en que quedó atestado el
+un nodo de Bitcoin y confirma el bloque (y por tanto la fecha) en que quedó atestado el
 resumen del documento.
 \item Comprobar que esa fecha es anterior al primer dato de la ventana de evaluación
 prospectiva. Como la atestación de Bitcoin no puede retro-fecharse, la anterioridad del
@@ -137,7 +137,7 @@ compromiso queda demostrada sin necesidad de confiar en la palabra del autor ni 
 sello privado.
 \end{enumerate}
 
-Una fe de erratas posterior (la corrección del modelo de comisiones,
+Una corrección posterior (la del modelo de comisiones,
 Sección~\ref{sec::fe_erratas_fees}) se selló con el mismo procedimiento, de modo que la
 cadena de compromisos es completa y auditable.
 
@@ -176,8 +176,8 @@ acciones de régimen de baja volatilidad (156 mercados), la media asciende a $+1
 ticks. Se recuerda que esta separación se decidió tras inspeccionar el bloque, por lo que
 es una hipótesis, no una segunda validación.
 \item \textbf{Incertidumbre agrupada por mercado.} Un \emph{bootstrap} que remuestrea
-mercados enteros —para no tratar como independientes las hasta ocho señales solapadas de un
-mismo mercado— sitúa el intervalo de confianza del 90\,\% del corte de baja volatilidad en
+mercados enteros (para no tratar como independientes las hasta ocho señales solapadas de un
+mismo mercado) sitúa el intervalo de confianza del 90\,\% del corte de baja volatilidad en
 $[+0{,}193,\,+2{,}004]$ ticks: positivo pero ancho, coherente con el escaso soporte
 temporal.
 \end{enumerate}
@@ -199,15 +199,15 @@ La debilidad conocida de la pieza sellada es la cabeza de salud (\emph{healthy})
 capacidad de discriminación cae del entrenamiento a la validación de forma acusada
 (AUC $0{,}79 \to 0{,}56$). Conviene explicar \emph{por qué}, porque la causa determina si
 un reentrenamiento con más datos tiene techo. Se descompone la incertidumbre con un
-ensemble de semillas —la técnica que en redes profundas se conoce como \emph{deep
-ensemble}, aplicada aquí a la cabeza de \emph{gradient boosting}—: diez réplicas de la
+ensemble de semillas (la técnica que en redes profundas se conoce como \emph{deep
+ensemble}, aplicada aquí a la cabeza de \emph{gradient boosting}): diez réplicas de la
 misma cabeza entrenadas con semillas distintas,
 midiendo tanto su rendimiento por partición como su desacuerdo mutuo
-(Figura~\ref{fig::n3}).
+(véase la Figura~\ref{fig::n3}).
 
 El diagnóstico es inequívoco en tres puntos. Primero, la caída fuera de muestra es
-\emph{estable entre semillas} —la desviación del AUC entre réplicas es de apenas
-$\pm0{,}005$—, de modo que no es un artefacto de suerte en la inicialización: todas las
+\emph{estable entre semillas} (la desviación del AUC entre réplicas es de apenas
+$\pm0{,}005$), de modo que no es un artefacto de suerte en la inicialización: todas las
 réplicas coinciden en que la cabeza falla en junio. Segundo, el desacuerdo entre réplicas
 es \emph{prácticamente constante} entre entrenamiento y test ($\approx0{,}03$ en ambos):
 la incertidumbre epistémica no aumenta fuera de muestra, así que las réplicas no
@@ -234,8 +234,8 @@ pretender corregirlo.
 \includegraphics[width=\textwidth]{figures/fig_n3_ensemble_healthy.png}
 \caption{Diagnóstico del fallo fuera de muestra de la cabeza de salud. Izquierda: el AUC
 se desploma de entrenamiento a test con una dispersión mínima entre las diez réplicas
-(barras de error) y un desacuerdo entre réplicas plano (línea naranja) —el fallo es
-estable y no es epistémico. Derecha: un clasificador de dominio separa mayo de junio con
+(barras de error) y un desacuerdo entre réplicas plano (línea naranja) (el fallo es
+estable y no es epistémico). Derecha: un clasificador de dominio separa mayo de junio con
 AUC $0{,}90$, señal de un fuerte desplazamiento de covariables encabezado por la base del
 perpetuo.}
 \label{fig::n3}
@@ -258,10 +258,10 @@ El corpus se amplió a las tres temporalidades capturadas sobre \emph{los mismos
 restricción física obliga a un cambio: la rejilla es de dos segundos, de modo que un
 mercado de cinco minutos apenas alcanza los 150 fotogramas y el contexto de 512 de la
 curva publicada no cabe en él. Se fijó por tanto un contexto de \textbf{128 fotogramas en
-todos los brazos}, incluido el de una hora; reducirlo solo en el brazo ampliado habría
-confundido longitud de contexto con número de trayectorias. Los cuatro brazos —tabular y
-profundo, con y sin temporalidades cortas— se evalúan sobre \emph{los mismos} 916 casos
-held-out de mercados horarios, que es la comparación conservadora: el brazo ampliado no
+todas las variantes}, incluida la de una hora; reducirlo solo en la variante ampliada habría
+confundido longitud de contexto con número de trayectorias. Las cuatro variantes (tabular y
+profundo, con y sin temporalidades cortas) se evalúan sobre \emph{los mismos} 916 casos
+held-out de mercados horarios, que es la comparación conservadora: la variante ampliada no
 puede beneficiarse de un conjunto de prueba más benévolo. (Este conjunto pertenece al
 corpus reconstruido para la adenda y no coincide con los 906 casos congelados de la
 escalera; por eso sus cifras no son comparables celda a celda con las de aquella.)
@@ -269,14 +269,14 @@ escalera; por eso sus cifras no son comparables celda a celda con las de aquella
 \begin{table}[htbp]
 \centering
 \caption[Escalado sobre trayectorias independientes]{Curva de escalado sobre trayectorias
-independientes. Acierto sobre los mismos 916 casos held-out para los cuatro brazos, con
+independientes. Acierto sobre los mismos 916 casos held-out para las cuatro variantes, con
 intervalo de confianza binomial al 95\,\%. El punto inferior de cada bloque agota el
 \emph{pool} disponible y llega a $1{,}65$--$1{,}88$ veces el máximo que la curva publicada
 había explorado.}
 \label{tab::escalado_trayectorias}
 \begin{tabular}{lrrrl}
 \hline
-\textbf{Brazo} & \textbf{$n_{\text{train}}$} & \textbf{Trayect.} & \textbf{Acierto} & \textbf{IC\,95\,\%} \\
+\textbf{Variante} & \textbf{$n_{\text{train}}$} & \textbf{Trayect.} & \textbf{Acierto} & \textbf{IC\,95\,\%} \\
 \hline
 Tabular, solo 1h & 45.000 & 950 & $50{,}55$\,\% & $[47{,}26;\ 53{,}83]$ \\
 Profundo, solo 1h & 45.000 & 950 & $49{,}56$\,\% & $[46{,}28;\ 52{,}85]$ \\
@@ -291,22 +291,22 @@ Profundo, 1h+15m+5m & 84.438 & 2.834 & $48{,}91$\,\% & $[45{,}62;\ 52{,}20]$ \\
 \end{tabular}
 \end{table}
 
-Aplicada literalmente, la regla pre-registrada activa la rama principal: el brazo profundo
+Aplicada literalmente, la regla pre-registrada activa la rama principal: la variante profunda
 no supera al tabular por más de un punto porcentual en ningún punto del eje, de modo que
 la conclusión publicada no queda declarada artefacto del diseño muestral.
 
 Pero la lectura honesta del experimento es más severa que su propia regla, y conviene
 decirlo con claridad: \textbf{ninguno de los ocho puntos se distingue del azar}. Todos los
 intervalos de confianza contienen el 50\,\% y el contraste binomial frente a esa hipótesis
-no baja de $p = 0{,}25$ en ningún caso. La regla de decisión exigía separar los brazos por
+no baja de $p = 0{,}25$ en ningún caso. La regla de decisión exigía separar las variantes por
 un punto porcentual cuando el error estándar del acierto sobre 916 casos es de $1{,}65$
-puntos y el intervalo de una diferencia entre dos brazos alcanza los $4{,}6$: el umbral se
+puntos y el intervalo de una diferencia entre dos variantes alcanza los $4{,}6$: el umbral se
 declaró \emph{por debajo del suelo de ruido} del propio conjunto de evaluación. Ninguna de
 las dos ramas del pre-registro podía, por tanto, quedar establecida con estos datos.
 
 Es la segunda vez en este trabajo que un criterio de decisión se declara en unidades
-absolutas sin el análisis de potencia que le corresponde —la primera fue el umbral de peor
-día de la Sección~\ref{sec::validacion_prospectiva}— y la coincidencia no es casual: en
+absolutas sin el análisis de potencia que le corresponde (la primera fue el umbral de peor
+día de la Sección~\ref{sec::validacion_prospectiva}) y la coincidencia no es casual: en
 ambos casos el umbral se fijó por analogía con una magnitud observada antes, y no
 derivándolo de la dispersión del estadístico que iba a contrastar. Queda como advertencia
 metodológica para cualquier continuación, y explica por qué el pre-registro, siendo
@@ -314,8 +314,8 @@ condición necesaria para la honestidad de un experimento, no es condición sufi
 su poder.
 
 Lo que sí puede afirmarse sin ambigüedad es lo negativo, y no es poco: llevando el eje
-hasta agotar el \emph{pool} —$1{,}88$ veces más ventanas de las que la curva publicada
-llegó a explorar, y casi el triple de trayectorias independientes— \textbf{ninguna de las
+hasta agotar el \emph{pool} ($1{,}88$ veces más ventanas de las que la curva publicada
+llegó a explorar, y casi el triple de trayectorias independientes) \textbf{ninguna de las
 dos vías consigue despegarse del azar en la predicción del signo a H60}. El resultado es
 coherente con el diagnóstico independiente del Capítulo~\ref{ch::metodos}, donde se
 estableció que el precio medio es esencialmente una moneda al aire en la apertura de la
@@ -325,16 +325,16 @@ modelos que no resuelven la tarea.
 
 \section{Ampliación del triaje de arquitecturas}
 
-La Sección~\ref{sec:ampliacion_triaje} resume el resultado; aquí va la tabla completa. Once
-variantes por cinco semillas, todas en un único entorno de cómputo —el control de
-reproducción descrito allí obliga a no mezclar plataformas—. Las corridas y su protocolo
+La Sección~\ref{sec:ampliacion_triaje} resume el resultado; aquí va la tabla completa. Diez
+variantes por cinco semillas, todas en un único entorno de cómputo (el control de
+reproducción descrito allí obliga a no mezclar plataformas). Las corridas y su protocolo
 sellado están en `data/experiments/triaje\_ampliado\_v1/`.
 
 \begin{table}[htbp]
 \centering
-\caption[Ampliación del triaje con cinco semillas]{Ampliación del triaje: once variantes
+\caption[Ampliación del triaje con cinco semillas]{Ampliación del triaje: diez variantes
 $\times$ cinco semillas en un único entorno. $\rho$ es la correlación de Spearman sobre el
-bloque terminal, con su desviación entre semillas. «Caída» es la pérdida de AUC de
+bloque terminal, con su desviación entre semillas. ``Caída'' es la pérdida de AUC de
 validación a test. Las tres últimas filas del primer bloque son las arquitecturas nuevas.}
 \label{tab:ampliacion_semillas}
 \footnotesize

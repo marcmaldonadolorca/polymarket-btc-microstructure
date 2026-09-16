@@ -42,7 +42,7 @@ REGIMEN = [("Entrenamiento\n(may)", 18.0), ("Validación\n(may)", 22.0),
 
 def estilo():
     plt.rcParams.update({
-        "figure.dpi": 300, "savefig.dpi": 300, "font.size": 10,
+        "figure.dpi": 300, "savefig.dpi": 300, "font.size": 12,
         "axes.spines.top": False, "axes.spines.right": False,
         "axes.grid": True, "axes.axisbelow": True, "grid.alpha": 0.25,
         "axes.edgecolor": GRIS, "text.color": TINTA,
@@ -61,16 +61,13 @@ def fig_latencia():
         va = "bottom" if v > 0 else "top"
         off = 0.25 if v > 0 else -0.25
         ax.text(b.get_x() + b.get_width() / 2, v + off, f"{v:+.2f}",
-                ha="center", va=va, fontsize=9, color=TINTA)
+                ha="center", va=va, fontsize=12, color=TINTA, fontweight="bold")
         ax.text(b.get_x() + b.get_width() / 2, -7.4, f"n={n}\n{ac:.1f} %",
-                ha="center", va="bottom", fontsize=7.5, color=GRIS)
+                ha="center", va="bottom", fontsize=11, color=GRIS)
     ax.set_ylim(-8.2, 8.4)
     ax.set_ylabel("Neto medio (ticks)")
     ax.set_xlabel("Latencia de entrada")
     ax.set_title("La ventaja no sobrevive al primer escalón medible", pad=10)
-    ax.text(0.015, 0.955,
-            "acierto direccional del 92 % a latencia cero;\nel resultado economico ya es negativo a 2 s",
-            transform=ax.transAxes, fontsize=8, color=GRIS, va="top")
     fig.tight_layout()
     p = FIGS / "fig_latencia.png"
     fig.savefig(p, bbox_inches="tight")
@@ -86,7 +83,7 @@ def fig_regimen():
     barras = ax.bar(et, v, color=col, width=0.55)
     for b, x in zip(barras, v):
         ax.text(b.get_x() + b.get_width() / 2, x + 1.5, f"{x:.0f} %",
-                ha="center", fontsize=9.5, color=TINTA)
+                ha="center", fontsize=12, color=TINTA)
     ax.set_ylim(0, 70)
     ax.set_ylabel("Sesiones de alta volatilidad")
     ax.set_title("El bloque de test cayó en otro régimen de mercado", pad=10)

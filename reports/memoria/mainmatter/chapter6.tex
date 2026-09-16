@@ -36,8 +36,8 @@ de las dos cifras constituye una validación definitiva.
 \textbf{Ausencia del suceso de cola en particiones pequeñas.} La línea de la adenda~D
 (Sección~\ref{sec::adenda_d}) reveló una limitación estructural que afecta a cualquier
 intento de \emph{aprender} gestión del riesgo con pocos meses de datos: el suceso que la
-política debe evitar, el día de pérdida severa, es tan infrecuente —cuatro días de treinta
-y cinco en la configuración de la adenda, diez en el brazo base del corte— que las
+política debe evitar, el día de pérdida severa, es tan infrecuente (cuatro días de treinta
+y cinco en la configuración de la adenda, diez en la variante base del corte) que las
 particiones pequeñas lo pierden con alta probabilidad. El periodo de entrenamiento de
 mayo--junio no contiene ni un solo día por
 debajo de $-100$\,\$, y un conjunto de validación de una semana sale sin ningún día en
@@ -49,17 +49,17 @@ ventanas más largas o la simulación de escenarios de cola.
 \textbf{Continuidad de la captura.} El recolector no operó de forma ininterrumpida durante
 todo el periodo del proyecto: hay un hueco documentado entre el 14 de junio y la
 reanudación real, confirmada el 3 de julio de 2026 a las 08:42 UTC. El hueco no afecta a
-ninguna cifra reportada en este trabajo —tanto el corpus principal de entrenamiento
-(11-25 de mayo) como el bloque fuera de muestra confirmatorio (6-10 de junio) se
-capturaron antes de que se abriera—, pero delimita el origen real de la ventana de
+ninguna cifra reportada en este trabajo (tanto el corpus principal de entrenamiento, del
+11 al 25 de mayo, como el bloque fuera de muestra confirmatorio, del 6 al 10 de junio, se
+capturaron antes de que se abriera), pero delimita el origen real de la ventana de
 captura continua sobre la que se apoyará la validación prospectiva
 (Capítulo~\ref{ch::resultados}).
 
 \textbf{Resolución temporal del instrumento.} La captura opera en una malla de dos segundos,
 y esa granularidad limita una de las conclusiones centrales más de lo que su enunciado
 sugiere. La latencia de ejecución se midió extremo a extremo contra el mercado real
-—429{,}7\,ms en percentil 95 hasta el acuse del CLOB, con un \emph{fill} efectivamente casado
-en 426{,}7\,ms— y la decisión operativa registrada fue emplear un segundo como contrato de
+(429{,}7\,ms en percentil 95 hasta el acuse del CLOB, con un \emph{fill} efectivamente casado
+en 426{,}7\,ms) y la decisión operativa registrada fue emplear un segundo como contrato de
 modelado, reservando los dos segundos para el escenario de estrés. Sin embargo, un escalón de
 un segundo no tiene ninguna observación que lo soporte en una malla de dos, de modo que la
 tabla de latencias salta de cero a dos segundos sin ningún punto intermedio. El intervalo
@@ -110,8 +110,8 @@ una ejecución prospectiva de mayor fidelidad.
 
 \textbf{Respuesta competitiva del mercado.} Más allá de la fidelidad de la cola, el
 simulador maker hereda una limitación estructural de todo \emph{backtest} basado en
-reproducción histórica: asume que el resto del mercado —y en particular los creadores de
-mercado incumbentes— no reacciona a las órdenes propias. En un régimen de recompensas por
+reproducción histórica: asume que el resto del mercado (y en particular los creadores de
+mercado incumbentes) no reacciona a las órdenes propias. En un régimen de recompensas por
 liquidez, esa hipótesis es optimista, porque una orden \emph{maker} nueva compite por la
 cola y por el reparto de \emph{rebates} con participantes que ajustarían su comportamiento.
 Ningún \emph{replay} puede medir esa reacción; hacerlo exige un simulador reactivo, lo que
@@ -125,13 +125,13 @@ contratos de quince minutos. Como la vía maker de este trabajo se concentra por
 en los horizontes de una hora y de quince minutos, se auditó si ese patrón aparece en el
 corpus propio, comparando la reversión del precio de Bitcoin en los instantes de
 \emph{settlement} frente a instantes placebo emparejados por hora. El patrón direccional
-aparece con el signo que describe ese trabajo, pero es minúsculo —los contrastes más
+aparece con el signo que describe ese trabajo, pero es minúsculo (los contrastes más
 fuertes quedan entre $-0{,}2$ y $-0{,}8$ puntos básicos, con $|t|$ entre $2{,}1$ y
-$2{,}3$— y ninguno de los seis contrastes sobre el mercado al contado sobrevive la
+$2{,}3$) y ninguno de los seis contrastes sobre el mercado al contado sobrevive la
 corrección por comparaciones múltiples de Benjamini-Hochberg al 5\,\%; en los futuros
 perpetuos la dirección coincide con estadísticos aún menores. El componente de flujo del
-mecanismo no es medible con esta captura —sus volúmenes son agregados móviles de varios
-minutos, no cinta instante a instante— y el diseño solo detecta coincidencia temporal,
+mecanismo no es medible con esta captura (sus volúmenes son agregados móviles de varios
+minutos, no cinta instante a instante) y el diseño solo detecta coincidencia temporal,
 no atribución causal: un efecto genérico de las marcas redondas de tiempo produciría el
 mismo contraste. La auditoría se queda, por tanto, en una comprobación de robustez
 favorable a los horizontes empleados, no en una confirmación ni una refutación del

@@ -18,7 +18,7 @@ proviene precisamente de que cuatro vías independientes convergen en ella.
 
 La primera es la latencia. Medida como \emph{markout} desde el instante exacto de la señal,
 la política produce $+6{,}79$ ticks de media; en el primer escalón que la malla de captura
-permite resolver —dos segundos— el resultado ya es negativo. Conviene ser preciso sobre el
+permite resolver (dos segundos) el resultado ya es negativo. Conviene ser preciso sobre el
 alcance de este argumento, y el Capítulo~\ref{ch::metodos} lo es: la latencia de ejecución
 se midió contra el mercado real en unos $430$\,ms, incluida una orden efectivamente casada,
 mientras que el escalón de dos segundos es la resolución del instrumento y no una latencia
@@ -42,9 +42,9 @@ mercado digiere la información más rápido de lo que este montaje permite obse
 La cuarta es la única que llegó por validación prospectiva del lado \emph{taker}, y es la
 que cierra el argumento con la potencia que a las demás les faltaba. El corte del protocolo general se ejecutó dos veces, cada una sobre la ventana
 sellada de antemano: la primera hasta el 23 de agosto, sobre cincuenta días y 25.011
-unidades de acción; la segunda hasta el 28, sobre cincuenta y cinco días y 27.208. La capa
-histórica queda en $-0{,}004$ y en $+0{,}075$~ticks respectivamente, con un intervalo que
-contiene el cero en los dos casos y la deja por tanto indistinguible del azar. Las capas
+unidades de acción; la segunda hasta el 28, sobre cincuenta y cinco días y 27.208. El nivel
+histórico queda en $-0{,}004$ y en $+0{,}075$~ticks respectivamente, con un intervalo que
+contiene el cero en los dos casos y la deja por tanto indistinguible del azar. Los niveles
 que cobran la comisión oficial caen entre $-0{,}69$ y $-3{,}65$~ticks según el corte, con
 intervalos que lo excluyen holgadamente en ambos. Su valor no
 está solo en el signo. Al calcular el intervalo de la cifra de referencia contra la que
@@ -56,8 +56,8 @@ original le faltaba: potencia suficiente para afirmar la ausencia en lugar de su
 
 \section{Qué hizo y qué no hizo el aprendizaje profundo}
 
-La progresión de modelos profundos —arquitecturas recurrentes y convolucionales sobre el
-libro, auto-atención, y un modelo fundacional de series temporales— aprende
+La progresión de modelos profundos (arquitecturas recurrentes y convolucionales sobre el
+libro, auto-atención, y un modelo fundacional de series temporales) aprende
 representaciones útiles pero no produce una política estable. El modelo fundacional mejora
 de forma monótona con la adaptación y aun así no alcanza a la deriva ingenua ni a un ARIMA,
 y la curva de escalado de datos es plana.
@@ -66,8 +66,8 @@ Esa conclusión se sometió después a una prueba más exigente que la original,
 una limitación detectada en el propio diseño: la curva publicada hacía crecer el número de
 ventanas de entrenamiento sobre un conjunto fijo de trayectorias, de modo que medía densidad
 de muestreo y no diversidad. Ampliando el corpus a las tres temporalidades capturadas y
-llevando el eje hasta agotar los datos disponibles —casi el doble de ventanas de las
-exploradas originalmente y casi el triple de trayectorias— ninguna de las dos vías, tabular
+llevando el eje hasta agotar los datos disponibles (casi el doble de ventanas de las
+exploradas originalmente y casi el triple de trayectorias) ninguna de las dos vías, tabular
 o profunda, se despega del azar en la predicción del signo.
 
 De ese experimento surgió además un hallazgo que no se buscaba y que acota el problema mejor
@@ -87,24 +87,24 @@ de riesgo del pre-registro escrita como función de pérdida. El resultado compl
 respuesta sobre el aprendizaje profundo por una vía independiente de la arquitectura y de
 la escala: la frontera riesgo--rendimiento aprendida queda dominada en sus dieciséis puntos
 por la de un parámetro escalar bien elegido. El eje de la arquitectura se amplió después con
-tres modelos más —una LSTM, que cierra la única ablación que faltaba, y las dos familias
-dominantes hoy en predicción de series temporales— y con cinco semillas por variante: las tres
+tres modelos más (una LSTM, que cierra la única ablación que faltaba, y las dos familias
+dominantes hoy en predicción de series temporales) y con cinco semillas por variante: las tres
 resultan indistinguibles del control tabular, y la mejor de ellas iguala su rendimiento con
-\textbf{trece veces menos parámetros}. Tras agotar los tres ejes —arquitectura, datos y
-objetivo—, la conclusión ya no es que falte capacidad, sino que en este mercado y a esta
+\textbf{trece veces menos parámetros}. Tras agotar los tres ejes (arquitectura, datos y
+objetivo), la conclusión ya no es que falte capacidad, sino que en este mercado y a esta
 resolución no hay estructura explotable que una red pueda capturar y un escalar no; que el
 modelo más pequeño de todos los probados empate con los demás es la forma más directa de
 decirlo.
 
 \section{La validación prospectiva}
 
-El giro al lado pasivo del libro —motivado por que la misma estructura de comisiones que
-penaliza a quien cruza el \emph{spread} retribuye a quien provee liquidez— condujo a una
+El giro al lado pasivo del libro (motivado por que la misma estructura de comisiones que
+penaliza a quien cruza el \emph{spread} retribuye a quien provee liquidez) condujo a una
 política candidata que se sometió a validación prospectiva pre-registrada.
 
 El protocolo se selló criptográficamente antes de observar los datos, con las huellas de los
 cinco artefactos ejecutables, y se ejecutó una sola vez sobre una ventana de 35~días fijada
-en el propio sello —que es de la tarde del primer día de esa ventana— y no observada hasta
+en el propio sello (que es de la tarde del primer día de esa ventana) y no observada hasta
 el corte. El resultado es \textbf{NO-GO}: la política acumula $+3.408$\,\$
 simulados, pero su peor día desciende por debajo del umbral de riesgo declarado de antemano,
 y la regla se aplica sin interpretación.
@@ -118,8 +118,8 @@ efectivamente observada, el peor día esperado en una ventana de ese tamaño era
 $-232$\,\$ frente a un umbral de $-150$, de modo que la probabilidad de fallarla superaba
 el 60\,\% \emph{con independencia de la calidad de la política}. Dicho de otro modo: el
 sub-criterio que firmó el veredicto era el único de los tres que carecía de potencia para
-distinguir una política buena de una mala, mientras el que sí la tenía —equity neta
-positiva— se cumplía con holgura. El NO-GO es un resultado sobre el procedimiento, no una
+distinguir una política buena de una mala, mientras el que sí la tenía (equity neta
+positiva) se cumplía con holgura. El NO-GO es un resultado sobre el procedimiento, no una
 medición del valor económico de la estrategia, y presentarlo como lo segundo sería
 justamente el tipo de confusión que este trabajo intenta evitar.
 
@@ -144,7 +144,7 @@ Las aportaciones de este trabajo son metodológicas antes que predictivas.
   \item Una validación prospectiva pre-registrada y sellada, con resultado negativo
   reportado íntegro.
   \item Una trazabilidad que conserva los resultados negativos y las correcciones de error
-  con la misma dignidad que los positivos, incluida una fe de erratas del modelo de costes
+  con la misma dignidad que los positivos, incluida una corrección del modelo de costes
   documentada con marca de tiempo verificable.
 \end{enumerate}
 
@@ -172,8 +172,8 @@ conoce el resultado.
 
 El tercero es que un resultado nulo puede estar midiendo el instrumento y no el fenómeno.
 La primera frontera riesgo--rendimiento de la adenda~D devolvió dieciséis puntos idénticos
-hasta el último decimal; la reacción correcta no fue aceptar el «no aporta» —que era la
-conclusión cómoda y esperada— sino instrumentar el optimizador, que reveló \emph{logits}
+hasta el último decimal; la reacción correcta no fue aceptar el ``no aporta'' (que era la
+conclusión cómoda y esperada) sino instrumentar el optimizador, que reveló \emph{logits}
 saturados con gradiente del orden de $10^{-6}$: la política no elegía la constante, estaba
 congelada en ella. Solo tras corregirlo y comprobar que la política se movía, el mismo
 veredicto negativo pasó a ser evidencia. Un resultado demasiado exacto es una alarma, no
@@ -199,12 +199,12 @@ nunca suponerse.
 La continuación inmediata es la validación de las conclusiones de política sobre la ventana
 de captura posterior al corte, que permanece sin observar y crece cada día.
 
-Una segunda línea, más ambiciosa, ataca la limitación estructural del simulador maker —su
-incapacidad para medir la respuesta competitiva del mercado (Capítulo~\ref{ch::etica})—. La
+Una segunda línea, más ambiciosa, ataca la limitación estructural del simulador maker: su
+incapacidad para medir la respuesta competitiva del mercado (Capítulo~\ref{ch::etica}). La
 reproducción histórica trata el libro como un decorado inerte; capturar cómo reaccionarían
 los creadores de mercado incumbentes a las órdenes propias exige un simulador
 \emph{reactivo}. La línea de simuladores generativos de libros de órdenes de los últimos
-años ofrece el instrumental: modelos de «agente mundo» que aprenden de datos históricos una
+años ofrece el instrumental: modelos de ``agente mundo'' que aprenden de datos históricos una
 dinámica del libro capaz de reproducir cierto impacto de
 mercado~\cite{coletta2022worldagent}, modelos generativos autorregresivos del flujo de
 mensajes a nivel de \emph{token}~\cite{nagy2023generative} y, más recientemente, modelos de
@@ -223,8 +223,8 @@ trabajo no ha podido explorar. Esa línea exigiría además migrar el camino cal
 captura y de la ejecución de Python a un lenguaje compilado como C++ o Rust. La ventaja no
 es genérica sino específica de este cuello: sin recolector de basura ni bloqueo global del
 intérprete, las colas de mensajes se procesan con latencias del orden de microsegundos y,
-sobre todo, \emph{predecibles} —en el camino medido aquí, la varianza de la latencia
-importa tanto como su media—. No haría falta partir de cero: existen conectores y motores
+sobre todo, \emph{predecibles} (en el camino medido aquí, la varianza de la latencia
+importa tanto como su media). No haría falta partir de cero: existen conectores y motores
 de libro de órdenes maduros en ambos lenguajes (el ecosistema de \emph{trading}
 cuantitativo de código abierto en Rust es hoy notablemente activo), de modo que el trabajo
 propio se concentraría en el cliente de la API de Polymarket y en la lógica de decisión,

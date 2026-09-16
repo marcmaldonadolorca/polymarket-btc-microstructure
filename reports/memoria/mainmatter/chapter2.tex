@@ -4,10 +4,10 @@
 \label{ch::estado}
 
 Este capítulo sitúa el trabajo en la literatura. Se organiza en las áreas que confluyen
-en el problema —mercados de predicción y el estudio académico reciente de Polymarket,
+en el problema (mercados de predicción y el estudio académico reciente de Polymarket,
 aprendizaje profundo sobre libros de órdenes, modelos fundacionales y auto-supervisados
 de series temporales, microestructura y ejecución, validación temporal en finanzas, y
-cambio de distribución— y termina señalando el hueco concreto que este trabajo pretende
+cambio de distribución) y termina señalando el hueco concreto que este trabajo pretende
 cubrir.
 
 \section{Trabajos previos y estudios relevantes}
@@ -39,7 +39,7 @@ microestructura y justifica el enfoque de este trabajo.
 Hasta 2025, Polymarket apenas contaba con literatura académica propia; en la primera
 mitad de 2026 han aparecido cinco estudios que lo convierten en objeto de análisis
 directo, y que delimitan con precisión el hueco que ocupa este trabajo
-(Figura~\ref{fig::lit_timeline}).
+(véase la Figura~\ref{fig::lit_timeline}).
 
 \begin{figure}[htbp]
 \centering
@@ -67,12 +67,12 @@ Polygon y un marco contable a nivel de transacción, incluyendo la detección de
 \emph{wash trading}; su interés es forense y agregado, no operativo. Cheng, Yang y
 Zou~\cite{cheng2026arbitrage} buscan oportunidades de arbitraje en los mercados de
 baloncesto y encuentran que las anomalías de mercado único son rarísimas y de vida
-mediana de pocos segundos — una advertencia empírica directa contra las estrategias
+mediana de pocos segundos: una advertencia empírica directa contra las estrategias
 \emph{taker} de latencia que este trabajo confirma por otra vía. Ese hallazgo acota
 también la alternativa práctica más visible fuera de la literatura académica: los
 \emph{bots} de arbitraje de código abierto que circulan en repositorios públicos,
-que cruzan desajustes elementales —los dos lados de un mercado sumando menos de uno,
-o el mismo suceso cotizado distinto en dos mercados— sin modelo alguno. De ellos este
+que cruzan desajustes elementales (los dos lados de un mercado sumando menos de uno,
+o el mismo suceso cotizado distinto en dos mercados) sin modelo alguno. De ellos este
 trabajo aprovecha la lección de ingeniería (la conexión continua a la API y la
 contabilidad de costes por operación son la mitad del problema) y se diferencia en el
 objetivo: no ejecutar la anomalía obvia, que la evidencia muestra escasa y efímera,
@@ -91,8 +91,8 @@ La primera es el dato: los archivos citados capturan operaciones on-chain o el c
 público de eventos, mientras que el corpus propio sincroniza el libro L2 completo a
 malla fija de 2 segundos con referencias externas simultáneas (\emph{spot},
 perpetuos y oráculo) y con un contrato de latencia medido sobre el ciclo real de
-órdenes — es decir, contiene exactamente la información que hace falta para simular
-ejecución, no solo para describir actividad. La segunda es la pregunta: ninguno de
+órdenes (es decir, contiene exactamente la información que hace falta para simular
+ejecución, no solo para describir actividad). La segunda es la pregunta: ninguno de
 los cinco estudios evalúa económicamente una política de negociación congelada bajo
 coste, latencia y régimen de comisiones medidos, ni valida prospectivamente sus
 resultados; ese es el terreno de este trabajo.
@@ -102,8 +102,8 @@ resultados; ese es el terreno de este trabajo.
 La predicción del movimiento de precios a partir del libro de órdenes es un problema con
 una literatura ya madura. El trabajo de referencia es DeepLOB~\cite{zhang2019deeplob}, que
 representa el libro como una matriz de dos dimensiones (niveles de precio frente a tiempo) y
-aplica primero módulos convolucionales —que capturan la estructura espacial entre los
-niveles de compra y de venta— y, a continuación, capas recurrentes que modelan la
+aplica primero módulos convolucionales (que capturan la estructura espacial entre los
+niveles de compra y de venta) y, a continuación, capas recurrentes que modelan la
 dependencia temporal; se valida sobre FI-2010~\cite{ntakaris2018}, un conjunto de referencia
 público de libros de órdenes ampliamente utilizado como banco de pruebas. En la misma línea,
 Tsantekidis et al.~\cite{tsantekidis2017} comparan arquitecturas convolucionales y
@@ -115,12 +115,12 @@ mostrando que el enfoque no es exclusivo de los mercados tradicionales. La líne
 activa: TLOB~\cite{berti2025tlob} sustituye el par convolucional-recurrente por un
 transformador con doble atención (espacial sobre los niveles del libro y temporal sobre
 la secuencia) y documenta, además, que el rendimiento de todos estos modelos se degrada
-al acercarse a condiciones de mercado realistas — observación que anticipa el resultado
-central de este trabajo.
+al acercarse a condiciones de mercado realistas (observación que anticipa el resultado
+central de este trabajo).
 
-La Figura~\ref{fig::deeplob_esquema} ilustra la idea que da nombre a la «lectura visual»
-del libro: el estado del mercado en cada instante se apila como una columna —precios y
-volúmenes de los mejores niveles de compra y de venta— y la sucesión de instantes forma
+La Figura~\ref{fig::deeplob_esquema} ilustra la idea que da nombre a la ``lectura visual''
+del libro: el estado del mercado en cada instante se apila como una columna (precios y
+volúmenes de los mejores niveles de compra y de venta) y la sucesión de instantes forma
 una matriz que la convolución recorre igual que recorrería una imagen, buscando motivos
 locales (desequilibrios entre lados, escalones de profundidad) que la recurrencia integra
 después a lo largo del tiempo.
@@ -135,7 +135,7 @@ después a lo largo del tiempo.
 % matriz del libro
 \foreach \x in {0,...,7} {
   \foreach \y in {0,...,4} {
-    \pgfmathsetmacro{\g}{85 - mod(\x*13+\y*29,45)}
+    \pgfmathsetmacro{\g}{85 - mod (\x*13+\y*29,45)}
     \fill[black!\g!white] (\x*0.42, \y*0.42) rectangle ++(0.38, 0.38);
   }
 }
@@ -151,20 +151,20 @@ después a lo largo del tiempo.
 \draw[flecha] (conv) -- (rec);
 \draw[flecha] (rec) -- (out);
 \end{tikzpicture}
-\caption[La «lectura visual» del libro de órdenes]{Esquema de la familia DeepLOB: el libro
-se representa como una matriz niveles$\times$tiempo —cada celda, un precio o volumen— que
+\caption[La ``lectura visual'' del libro de órdenes]{Esquema de la familia DeepLOB: el libro
+se representa como una matriz niveles$\times$tiempo (cada celda, un precio o volumen) que
 los módulos convolucionales procesan como una imagen antes de que la parte recurrente (o
 de atención) integre la evolución temporal. El BookEncoder del Capítulo~\ref{ch::metodos}
 es la adaptación de esta idea al libro de Polymarket.}
 \label{fig::deeplob_esquema}
 \end{figure}
 
-De esta literatura este trabajo adopta una decisión de diseño —tratar el libro de órdenes
-como un objeto con estructura espacio-temporal, y no como una tabla plana— y, sobre ella,
+De esta literatura este trabajo adopta una decisión de diseño (tratar el libro de órdenes
+como un objeto con estructura espacio-temporal, y no como una tabla plana) y, sobre ella,
 introduce dos cambios. El primero es metodológico: evaluar cada modelo bajo un modelo de
 ejecución realista (coste y latencia), y no solo con métricas de clasificación como es
 habitual en estos trabajos. El segundo es de dominio: aplicar el enfoque a un mercado de
-predicción sobre Bitcoin —y no a un mercado de acciones—, lo que obliga a combinar el libro
+predicción sobre Bitcoin (y no a un mercado de acciones), lo que obliga a combinar el libro
 con referencias externas. Esa doble diferencia es, precisamente, donde este trabajo pone el
 acento.
 
@@ -181,23 +181,23 @@ modesto. En la misma familia, Chronos~\cite{ansari2024chronos} discretiza los va
 de la serie y los trata literalmente como \emph{tokens} de un modelo de lenguaje;
 TimesFM~\cite{das2024timesfm} es el fundacional de predicción de Google entrenado
 sobre cientos de miles de millones de puntos reales, y la línea
-Moirai~\cite{liu2025moirai2} —ya en su segunda versión, con predicción cuantílica—
+Moirai~\cite{liu2025moirai2} (ya en su segunda versión, con predicción cuantílica)
 representa el estado del arte de los fundacionales universales de predicción. Fuera de
 las series, TabPFN~\cite{hollmann2025tabpfn} lleva la misma idea al dato tabular:
 una red pre-entrenada sobre el prior de millones de conjuntos sintéticos que
 clasifica conjuntos pequeños por inferencia en contexto, sin entrenar. Su inclusión
-en la escalera de este trabajo permite formular la pregunta simétrica —¿qué aporta
-un fundacional \emph{del tipo de dato que ganó} (tabular), y no solo del tipo de
-dato aparente (serie temporal)?— cuyos resultados se presentan en la
+en la escalera de este trabajo permite formular la pregunta simétrica (¿qué aporta
+un fundacional \emph{del tipo de dato que ganó}, el tabular, y no solo del tipo de
+dato aparente, la serie temporal?), cuyos resultados se presentan en la
 Sección~\ref{sec::tabpfn}.
 
 El pre-entrenamiento auto-supervisado es el mecanismo que sostiene a estos modelos y
 una línea propia de literatura. Las estrategias dominantes son la reconstrucción de
-tramos enmascarados —SimMTM~\cite{dong2023simmtm} la formula como suma ponderada de
-series vecinas fuera de la variedad de la serie original—, el contraste jerárquico
-entre vistas aumentadas —TS2Vec~\cite{yue2022ts2vec}, generalizado por
+tramos enmascarados (SimMTM~\cite{dong2023simmtm} la formula como suma ponderada de
+series vecinas fuera de la variedad de la serie original), el contraste jerárquico
+entre vistas aumentadas (TS2Vec~\cite{yue2022ts2vec}, generalizado por
 SoftCLT~\cite{lee2024softclt} con asignaciones blandas que respetan la cercanía
-temporal— y los objetivos híbridos: TimeSiam~\cite{dong2024timesiam} empareja
+temporal) y los objetivos híbridos: TimeSiam~\cite{dong2024timesiam} empareja
 subseries pasadas y presentes con codificadores siameses, y
 TimeDART~\cite{wang2025timedart} combina difusión y auto-regresión para capturar a la
 vez la dinámica global y los patrones locales. Para este trabajo, esta literatura
@@ -205,15 +205,15 @@ cumple dos papeles: motiva el peldaño auto-supervisado de la escalera (un codif
 convolucional-temporal pre-entrenado por reconstrucción sobre el propio corpus) y
 aporta la advertencia, repetida en sus propias evaluaciones, de que la ventaja del
 pre-entrenamiento depende críticamente del volumen y de la afinidad de dominio de los
-datos — condición que un mercado joven, con semanas de historia, no cumple de partida.
+datos (condición que un mercado joven, con semanas de historia, no cumple de partida).
 La Figura~\ref{fig::model_map} resume las familias evaluadas y su relación con el
 especialista tabular que este trabajo acaba eligiendo.
 
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=\textwidth]{figures/fig_model_map.png}
-\caption{Familias de modelos consideradas —fundacionales de series, auto-supervisados y el
-fundacional tabular— y su papel como peldaños de la escalera comparativa frente al
+\caption{Familias de modelos consideradas (fundacionales de series, auto-supervisados y el
+fundacional tabular) y su papel como peldaños de la escalera comparativa frente al
 especialista tabular, que es el vehículo finalmente elegido de la señal. Las estrellas
 marcan los modelos efectivamente evaluados en este trabajo (MOMENT y TabPFN).}
 \label{fig::model_map}
@@ -229,8 +229,8 @@ señal. Este trabajo cuantifica ese fenómeno en el contexto concreto de Polymar
 la latencia real del ciclo de orden y se demuestra que una señal direccional fuerte se
 vuelve no rentable bajo una latencia de entrada modesta. El cambio que se introduce respecto
 a esta literatura es, de nuevo, metodológico: en lugar de asumir una latencia o un coste
-fijos, ambos se determinan a partir de los datos —la latencia, de forma empírica sobre el
-ciclo de orden real; el coste, de forma relativa al estado del libro en cada instante—, de
+fijos, ambos se determinan a partir de los datos (la latencia, de forma empírica sobre el
+ciclo de orden real; el coste, de forma relativa al estado del libro en cada instante), de
 modo que la evaluación económica refleje las condiciones efectivas de ejecución.
 
 \subsection{Aprendizaje automático en finanzas y validación temporal}
@@ -256,8 +256,8 @@ CORAL~\cite{sun2016coral}. En el Capítulo~\ref{ch::resultados} se mostrará un 
 contraintuitivo: con un horizonte de datos reducido, estas técnicas no superan a una
 estrategia mucho más simple, consistente en restringir la operativa al régimen en el que
 el modelo fue entrenado. Además de CORAL, en este trabajo se evalúan otras estrategias de
-adaptación habituales —filtros conformales, \emph{ensembles} y reentrenamiento incremental
-con ventana móvil—, cuyos resultados se detallan en el Capítulo~\ref{ch::resultados}. Por
+adaptación habituales (filtros conformales, \emph{ensembles} y reentrenamiento incremental
+con ventana móvil), cuyos resultados se detallan en el Capítulo~\ref{ch::resultados}. Por
 último, en cuanto a arquitecturas profundas para series temporales multivariantes, trabajos
 como el \emph{Temporal Fusion Transformer}~\cite{lim2021tft} marcan una línea de evolución
 natural para cuando se disponga de muchos más datos.
@@ -267,8 +267,8 @@ natural para cuando se disponga de muchos más datos.
 Las referencias de validación temporal citadas más arriba comparten un diagnóstico: el
 riesgo dominante en la investigación financiera empírica no es el error del modelo,
 sino el del investigador que prueba muchas variantes y reporta la mejor. Harvey, Liu y
-Zhu~\cite{harvey2016cross} cuantifican el problema en la literatura de factores —la
-mayoría de los resultados publicados no sobreviviría umbrales de contraste múltiple— y
+Zhu~\cite{harvey2016cross} cuantifican el problema en la literatura de factores (la
+mayoría de los resultados publicados no sobreviviría umbrales de contraste múltiple) y
 Bailey y López de Prado~\cite{bailey2014deflated} ofrecen la corrección
 correspondiente para estrategias de negociación, la ratio de Sharpe deflactada, que
 penaliza explícitamente el número de ensayos. Ambas líneas atacan el sesgo
@@ -277,20 +277,20 @@ penaliza explícitamente el número de ensayos. Ambas líneas atacan el sesgo
 La respuesta \emph{a priori} es el pre-registro: comprometer hipótesis, protocolo y
 criterios de éxito antes de observar los datos de evaluación, práctica hoy estándar en
 las ciencias experimentales~\cite{nosek2018preregistration}. Su punto débil clásico es
-la verificabilidad — nada impide redactar el «pre»-registro después. Este trabajo lo
+la verificabilidad: nada impide redactar el ``pre''-registro después. Este trabajo lo
 resuelve con un sello criptográfico de tiempo: el documento de pre-registro y la
 política congelada se atestan con OpenTimestamps~\cite{opentimestamps} sobre la cadena
 de Bitcoin, de modo que cualquier lector puede verificar la fecha del compromiso frente a
 las fechas de la ventana de evaluación, sin confiar en el autor ni en un tercero. Una
 precisión que conviene dejar escrita: el sello garantiza que el compromiso precede a la
-\emph{observación} de los datos, no a su existencia —al sellarse el protocolo general ya
-se habían capturado los primeros días de su ventana—. Para ese tramo inicial la garantía
-es la declaración del propio documento sellado, que fija el compromiso «antes de mirar
-cualquier dato», y la frontera entre la garantía criptográfica y la procedimental se
+\emph{observación} de los datos, no a su existencia (al sellarse el protocolo general ya
+se habían capturado los primeros días de su ventana). Para ese tramo inicial la garantía
+es la declaración del propio documento sellado, que fija el compromiso ``antes de mirar
+cualquier dato'', y la frontera entre la garantía criptográfica y la procedimental se
 declara aquí en lugar de dejarla implícita. La
-combinación —candidato congelado con hashes verificables, ventana de evaluación
-prospectiva intocada hasta un corte fijado de antemano, y reporte de todos los brazos
-comprometidos, favorables o no— es, hasta donde alcanza la revisión de este capítulo,
+combinación (candidato congelado con hashes verificables, ventana de evaluación
+prospectiva intocada hasta un corte fijado de antemano, y reporte de todas las variantes
+comprometidas, favorables o no) es, hasta donde alcanza la revisión de este capítulo,
 inédita en la literatura de mercados de predicción, y constituye la aportación
 metodológica central del trabajo (el protocolo se detalla en el
 Capítulo~\ref{ch::metodos}).
@@ -318,7 +318,7 @@ Fundacionales de series (MOMENT, Chronos, TimesFM) &
 \emph{Zero-shot} y ajuste barato; contexto largo &
 No baten a baselines simples en régimen casi inmóvil; contexto de 512 no cabe en mercados
 cortos &
-MOMENT como brazo profundo de la escalera \\
+MOMENT como peldaño profundo de la escalera \\
 \addlinespace
 Fundacional tabular (TabPFN) &
 Ordenación \emph{zero-shot} competitiva con un tercio de los datos &
@@ -333,7 +333,7 @@ Encoder TCN auto-supervisado como peldaño \\
 Tabulares con regularización (HGB) &
 Varianza baja con pocos casos; robustos a escala y ruido &
 Sesgo alto; no capturan estructura secuencial fina &
-Especialista de dos cabezas —el modelo final \\
+Especialista de dos cabezas (el modelo final) \\
 \bottomrule
 \end{tabular}
 \end{table}

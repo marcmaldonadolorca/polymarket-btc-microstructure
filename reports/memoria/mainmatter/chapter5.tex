@@ -16,7 +16,7 @@ El resultado limpio se apoya en cinco días, solo tres son positivos y el neto p
 ligeramente negativo bajo el coste completo. El subconjunto de baja volatilidad es más
 prometedor, pero se identificó usando esos mismos cinco días. Desplegar en estas condiciones
 confundiría una hipótesis razonable con una validación. Por coherencia con la tesis del
-trabajo ---la honestidad del protocolo prevalece sobre cualquier número concreto--- el
+trabajo (la honestidad del protocolo prevalece sobre cualquier número concreto) el
 proyecto se detiene antes de operar.
 
 \subsection{Del registro retrospectivo a la sombra prospectiva}
@@ -42,8 +42,8 @@ evidencia podrá alimentar las puertas de promoción:
 Cuando se congeló la regla no existía ningún día prospectivo de la política completa, y su
 estado era el de \emph{hipótesis pendiente de validación}. Los cortes del protocolo general
 del Capítulo~\ref{ch::resultados} llenaron después esa casilla, y conviene actualizar aquí
-el veredicto en lugar de dejar la promesa congelada: hay 50 y 55 días prospectivos —muy por
-encima de los 12 que exige la puerta más alta— y la capa con el filtro de volatilidad rinde
+el veredicto en lugar de dejar la promesa congelada: hay 50 y 55 días prospectivos (muy por
+encima de los 12 que exige la puerta más alta) y el nivel con el filtro de volatilidad rinde
 $+0{,}009$ y $+0{,}039$~ticks en los dos cortes, lejos del umbral de 0,5 y con intervalos
 que contienen el cero. El estado correcto de la regla es, por tanto, \emph{hipótesis
 contrastada y no confirmada}: las puertas de promoción se fallan por rentabilidad, no por
@@ -79,7 +79,7 @@ Quien cruza el mercado (\emph{taker}) paga una comisión $C\cdot r\cdot p\,(1-p)
 aporta liquidez (\emph{maker}) está exento y, además, recibe una parte del fondo de
 comisiones en forma de \emph{rebate}, aproximadamente el 20\,\% del fondo repartido con el
 mismo peso $p\,(1-p)$. Ese peso (Figura~\ref{fig::pq}) concentra tanto la comisión como el
-reparto en torno a $p=0{,}5$ —la zona de precios donde opera este trabajo— y se anula en
+reparto en torno a $p=0{,}5$ (la zona de precios donde opera este trabajo) y se anula en
 los extremos, cerca de la resolución. El vehículo económico se invierte respecto al taker:
 donde uno paga el \emph{spread} y la comisión, el otro los cobra.
 
@@ -95,13 +95,13 @@ precisamente en la zona de precios intermedios donde opera el trabajo.}
 El tamaño del premio se midió sobre la copia histórica (solo lectura) antes de construir
 nada. El universo de mercados horarios de Bitcoin mueve del orden de
 \$310.000 de nocional al día (\$434.000 contando todas las temporalidades), con una
-concentración baja —el 10\,\% de mercados más grandes reúne solo el 23\,\% del volumen— y
-una distribución horaria plana: no hay «mercado estrella» ni «hora mágica» por los que
+concentración baja (el 10\,\% de mercados más grandes reúne solo el 23\,\% del volumen) y
+una distribución horaria plana: no hay ``mercado estrella'' ni ``hora mágica'' por los que
 competir, de modo que la ventaja está en la presencia continua, que la infraestructura
 24/7 del proyecto ya proporciona. El fondo de \emph{rebates} resultante se estima entre
 \$1.100 y \$3.000 al día, entre diez y veinte veces por encima del umbral por debajo del
 cual la vía se habría descartado por insignificante. La puerta económica del lado maker,
-por tanto, se pasa con holgura —a diferencia de la taker.
+por tanto, se pasa con holgura (a diferencia de la taker).
 
 \subsection{El simulador de colas y \emph{fills}}
 \label{sec::simulador_maker}
@@ -125,17 +125,17 @@ fresca. La economía por sesión se contabiliza como caja más inventario valora
 resolución más \emph{rebates}; el \textbf{riesgo terminal binario} está incluido: el
 inventario que queda al expirar liquida a 0 o a 1 según el desenlace del mercado.
 
-El resultado más informativo del simulador no es el número —una banda de entre \$25 y
+El resultado más informativo del simulador no es el número (una banda de entre \$25 y
 \$200 diarios de beneficio bruto simulado según régimen y configuración, cuyo signo
-sobrevive a los ajustes estrictos— sino la \emph{descomposición} del riesgo. La selección
+sobrevive a los ajustes estrictos) sino la \emph{descomposición} del riesgo. La selección
 adversa medida por el \emph{markout} a corto plazo es \textbf{favorable} (alrededor de
 $+1$ tick): estos libros revierten a pocos segundos, y esa misma predictibilidad de corto
 plazo que el taker no podía pagar por culpa de la comisión es la que cobra el maker
 pasivo. El coste no está ahí, sino en el \textbf{inventario retenido hasta la
-expiración}, que resuelve en contra —la selección adversa vive en el tramo terminal, no en
-el \emph{markout} corto—. La consecuencia de diseño es directa y conecta con la
+expiración}, que resuelve en contra (la selección adversa vive en el tramo terminal, no en
+el \emph{markout} corto). La consecuencia de diseño es directa y conecta con la
 Sección~\ref{sec::tramo_terminal}: la palanca dominante es el control de inventario
-—aplanar la posición antes del tramo en que el precio se decide—, no la captura de
+(aplanar la posición antes del tramo en que el precio se decide), no la captura de
 \emph{spread} en sí. Introducir una zona plana en los últimos minutos, cotizando solo el
 lado que reduce inventario, es lo que separa un simulador que pierde en el terminal de uno
 que conserva el signo.
@@ -156,7 +156,7 @@ canónica de \emph{market making} óptimo: el modelo de Avellaneda y
 Stoikov~\cite{avellaneda2008}, cuyo \emph{precio de reserva} sesga las cotizaciones en
 proporción al inventario y al tiempo restante hasta la resolución, y sus extensiones al
 control de riesgo de inventario~\cite{gueant2013}. Una exploración preliminar sobre el
-mismo corpus —fuera del pre-registro— indica que este sesgo, adaptado a la varianza de
+mismo corpus (fuera del pre-registro) indica que este sesgo, adaptado a la varianza de
 \emph{settlement} binario $p\,(1-p)$, reduce la pérdida terminal que penaliza a la
 estrategia pasiva. Esa adaptación, construida aquí de forma heurística, coincide además
 con la teoría publicada casi en paralelo: la derivación por control estocástico de la
@@ -167,7 +167,7 @@ respalda de forma independiente la forma funcional empleada. Su magnitud, sin em
 \emph{fill}: bajo el supuesto más generoso, en el que una orden alcanzada por un barrido
 se ejecuta íntegra, la pérdida terminal llega a neutralizarse y la mejora neta es del
 orden del tres por ciento; bajo el supuesto conservador que fija el propio pre-registro
-—ejecución de la mitad del tamaño en los barridos— la pérdida terminal solo se atenúa y
+(ejecución de la mitad del tamaño en los barridos) la pérdida terminal solo se atenúa y
 la mejora neta desaparece. Esta sensibilidad no es exclusiva de la cotización óptima:
 afecta al orden de mérito de cualquier política que cotice alejada del mejor precio,
 porque el grueso de sus ejecuciones procede precisamente de barridos. Junto con la
@@ -185,15 +185,15 @@ El riesgo central de un creador de mercado en estos contratos no está en el
 un contrato binario liquida a 0 o a 1, de modo que una posición sin cerrar a la
 expiración se enfrenta a una varianza estructural de settlement. Para dimensionar ese
 riesgo hace falta saber \emph{cuándo} el precio deja de ser una moneda al aire sobre el
-desenlace. Se mide de forma directa —sin entrenar ningún modelo, como baseline previo a
-cualquier modelo secuencial— tratando el precio medio como estimador de la probabilidad
+desenlace. Se mide de forma directa (sin entrenar ningún modelo, como baseline previo a
+cualquier modelo secuencial) tratando el precio medio como estimador de la probabilidad
 de settlement y evaluando su calibración a lo largo de la vida del mercado con
 \emph{proper scoring} (puntuación de Brier) por tiempo a expiración. La etiqueta es el
 settlement real, aproximado por el precio medio del último frame observado cuando este
 cae a menos de cinco minutos del cierre y ha convergido a 0 o 1; las series cuyo último
 frame queda lejos del cierre se censuran. El universo etiquetado (310 series, con
-balance exacto entre desenlaces) es un subconjunto sesgado del corpus —el observado
-cerca del cierre—, lo que se declara como limitación.
+balance exacto entre desenlaces) es un subconjunto sesgado del corpus (el observado
+cerca del cierre), lo que se declara como limitación.
 
 El resultado (Figura~\ref{fig::n1}, panel izquierdo) es una caída suave y monótona de la
 puntuación de Brier: en la apertura del mercado (50--60 minutos a expiración) vale
@@ -205,15 +205,15 @@ la mayor parte de la vida del contrato el precio medio de Polymarket es honesto 
 resolutivo, y toda la información se concentra en el tramo final.
 
 El panel derecho matiza el diagnóstico con curvas de fiabilidad en dos cortes. Lejos del
-cierre, el precio está \emph{bien calibrado} —un precio de $0{,}25$ resuelve a favor en
-un 31\,\% de los casos y uno de $0{,}75$ en un 69\,\%, cerca de la diagonal— pero con casi
-toda su masa concentrada en torno a $0{,}5$: el mercado dice correctamente «no lo sé». Al
+cierre, el precio está \emph{bien calibrado} (un precio de $0{,}25$ resuelve a favor en
+un 31\,\% de los casos y uno de $0{,}75$ en un 69\,\%, cerca de la diagonal) pero con casi
+toda su masa concentrada en torno a $0{,}5$: el mercado dice correctamente ``no lo sé''. Al
 acercarse el cierre, la distribución se polariza hacia 0 y 1 conforme llega la
 información, manteniendo la calibración en los extremos. La consecuencia para el diseño
 maker es inmediata: el precio sirve como probabilidad (no hay que corregir su sesgo), pero
 la ventana en la que el inventario deja de ser una apuesta y pasa a estar decidido es
 estrecha y tardía, lo que convierte el aplanado de inventario \emph{antes} de ese tramo en
-la palanca de riesgo dominante del simulador —coherente con la concentración de actividad
+la palanca de riesgo dominante del simulador, coherente con la concentración de actividad
 en el minuto 50 detectada en el análisis exploratorio (Sección~\ref{sec::eda_series}).
 
 \begin{figure}[htbp]
@@ -237,6 +237,6 @@ expiración; usando \emph{solo} el flujo, sin el precio, la puntuación es peor 
 tiempo a expiración grande cae al azar. La microestructura no aporta información sobre el
 settlement que el precio no capture ya: a este horizonte, el precio es prácticamente un
 estadístico suficiente. En consecuencia no se entrena un modelo secuencial dedicado
-—sobre apenas un centenar de desenlaces independientes solo añadiría riesgo de
-sobreajuste—, y la curva de Brier por tiempo a expiración se emplea directamente como
+(sobre apenas un centenar de desenlaces independientes solo añadiría riesgo de
+sobreajuste), y la curva de Brier por tiempo a expiración se emplea directamente como
 cronograma de aplanado de inventario en el simulador.

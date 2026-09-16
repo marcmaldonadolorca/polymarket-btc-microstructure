@@ -6,8 +6,8 @@
 Este capítulo separa dos niveles de evidencia que no deben confundirse. Primero se presenta
 la evaluación confirmatoria del especialista base, congelado antes de observar el bloque del
 6 al 10 de junio. Después se documenta el diagnóstico de volatilidad realizado sobre ese mismo
-bloque. El segundo resultado es útil para formular una política futura, pero no constituye
-una nueva validación fuera de muestra.
+bloque con el fin de formular una política futura, pero no constituye una nueva validación
+fuera de muestra.
 
 \section{Resultados obtenidos}
 
@@ -63,7 +63,7 @@ defendible es, por tanto, \emph{señal parcial fuera de muestra}, no rentabilida
 
 La inspección del bloque reveló que la fracción de sesiones de alta volatilidad aumentó hasta
 aproximadamente el 58\,\%, frente al 18--22\,\% de los periodos históricos
-(Figura~\ref{fig:regimen}). Para estudiar ese desplazamiento se dividió la selección con el
+(véase la Figura~\ref{fig:regimen}). Para estudiar ese desplazamiento se dividió la selección con el
 umbral 0,6657, percentil 80 de la volatilidad de entrenamiento. El umbral numérico no se
 ajustó al bloque nuevo, pero la decisión de usarlo como filtro sí se tomó tras observarlo; por
 ello, todo lo que sigue en esta subsección es diagnóstico y exploratorio.
@@ -83,7 +83,9 @@ rechazaría. Las primeras son positivas y las segundas, negativas al coste de re
 \begin{table}[h]
 \centering
 \caption{Diagnóstico \emph{post-hoc} por régimen en el bloque del 6--10 de junio (ticks por
-unidad de acción).}
+unidad de acción). Las columnas @0,25, @0,5 y @1,0 son el neto al factor de coste $c$
+correspondiente de la ecuación~\eqref{eq:coste}: la fracción del coste visible de entrada que
+se descuenta (optimista, referencia y estrés).}
 \label{tab:regimen}
 \begin{tabular}{lrrrr}
 \toprule
@@ -101,7 +103,7 @@ Total sin filtro   & 754 & $+0{,}537$ & $+0{,}349$ & $-0{,}026$ \\
 Si se aplica retrospectivamente el filtro de baja volatilidad, el subconjunto de 318 acciones
 mantiene signo positivo en los tres niveles de coste (Figura~\ref{fig:coste}) y en los
 cinco días (Figura~\ref{fig:netodiario}), ambas en el Anexo~\ref{anexo:soporte}. Su suma cronológica presenta un drawdown diagnóstico de
-88,1 ticks (Figura~\ref{fig:drawdown}). Estas magnitudes describen el subconjunto observado;
+88,1 ticks (véase la Figura~\ref{fig:drawdown}). Estas magnitudes describen el subconjunto observado;
 no son PnL de una cartera ejecutada.
 
 \begin{figure}[h]
@@ -119,13 +121,13 @@ agrupado por mercado amplía el IC90 a $[+0{,}193,+2{,}004]$ y reduce la probabi
 a 97,6~\%. Ambos cálculos son descriptivos: la selección \emph{post-hoc} impide darles una
 lectura confirmatoria.
 
-\subsection{Resultados con la comisión oficial de 2026 (capa taker-real)}
+\subsection{Resultados con la comisión oficial de 2026 (nivel de coste taker-real)}
 \label{sec::taker_real}
 
 La corrección del modelo de costes (Sección~\ref{sec::fe_erratas_fees}) obliga a
 re-evaluar la política congelada con la comisión oficial de 2026. La operación se hizo sin
 reentrenar nada: los mismos artefactos sellados, la misma selección de acciones, y como
-control de integridad se reprodujeron primero las cifras publicadas (la política
+control de integridad se reprodujeron primero las cifras reportadas inicialmente (la política
 \texttt{ev>0{,}75, healthy\(\ge\)0{,}5} da $n=754$ y $+0{,}349$ ticks netos al coste de
 referencia; el corte de baja volatilidad, $n=318$ y $+1{,}069$). Después se aplicó la
 comisión real. La Tabla~\ref{tab::taker_real} resume el resultado.
@@ -133,15 +135,15 @@ comisión real. La Tabla~\ref{tab::taker_real} resume el resultado.
 \begin{table}[htbp]
 \centering
 \caption{Política congelada re-evaluada con la comisión oficial de 2026. Ticks netos
-medios por acción; «solo entrada» es la cota optimista que omite la comisión de salida,
-«ida y vuelta» carga ambas. Las comisiones medias medidas son de 1,75 ticks a la entrada
+medios por acción; ``solo entrada'' es la cota optimista que omite la comisión de salida,
+``ida y vuelta'' carga ambas. Las comisiones medias medidas son de 1,75 ticks a la entrada
 y 1,71 a la salida.}
 \label{tab::taker_real}
 \begin{tabular}{lccc}
 \toprule
- & & \multicolumn{2}{c}{Fee oficial 2026} \\
+ & Función de costes & \multicolumn{2}{c}{Función de costes oficial 2026} \\
 \cmidrule(lr){3-4}
-Corte & Publicado (fee errónea) & solo entrada & ida y vuelta \\
+Corte & anterior & solo entrada & ida y vuelta \\
 \midrule
 Todas las acciones ($n=754$) & $+0{,}349$ & $-1{,}059$ & $-3{,}304$ \\
 Baja volatilidad ($n=318$) & $+1{,}069$ & $-0{,}342$ & $-2{,}604$ \\
@@ -153,11 +155,11 @@ El resultado es inequívoco: \emph{ningún corte taker es positivo} bajo el rég
 comisiones vigente, ni siquiera en la cota optimista que solo carga la comisión de
 entrada. La comisión media de entrada (1,75 ticks) supera por sí sola el resultado bruto
 de la señal. Este número negativo no es un fracaso del trabajo, sino su lección central
-confirmada estructuralmente: una precisión direccional cercana al 90\,\% —demostrada en
-los capítulos anteriores— no se traduce en beneficio cuando el coste de ejecución la
-domina. «Acertar no es ganar» deja de ser una advertencia metodológica y pasa a ser una
+confirmada estructuralmente: una precisión direccional cercana al 90\,\%, que se muestra
+en los capítulos anteriores, no se traduce en beneficio cuando el coste de ejecución la
+domina. ``Acertar no es ganar'' deja de ser una advertencia metodológica y pasa a ser una
 consecuencia medida del régimen de comisiones. La política congelada se reporta, por
-tanto, tal cual: negativa en la capa taker, lo que motiva el giro al lado maker del
+tanto, tal cual: negativa en el nivel taker, lo que motiva el giro al lado maker del
 Capítulo~\ref{ch::despliegue} y no una búsqueda de umbrales que la rescaten.
 
 \subsection{Validación prospectiva pre-registrada}
@@ -174,9 +176,9 @@ cuando la política quedó congelada. Esta sección recoge esa evaluación.
 
 El procedimiento se diseñó para que el autor no pudiera ajustarlo después de ver los
 resultados, y para que un tercero pueda comprobarlo sin tener que fiarse de su palabra.
-Antes de que existiera un solo día completo de la ventana —el sello es de la tarde del
-primer día— y sin haber observado ningún dato de ella, se fijaron por escrito y se sellaron:
-el universo de mercados, los filtros, la configuración exacta del simulador, los brazos
+Antes de que existiera un solo día completo de la ventana (el sello es de la tarde del
+primer día) y sin haber observado ningún dato de ella, se fijaron por escrito y se sellaron:
+el universo de mercados, los filtros, la configuración exacta del simulador, las variantes
 que se ejecutarían, las métricas que se reportarían y las reglas de decisión, junto con
 las huellas criptográficas de los cinco artefactos ejecutables. El documento se registró
 además en la cadena de bloques de Bitcoin mediante OpenTimestamps~\cite{opentimestamps},
@@ -186,12 +188,12 @@ verificación del sello.
 
 La cadena tiene una divergencia deliberada que conviene declarar aquí y no en una nota al
 pie: la huella del motor de simulación que consta en el pre-registro no es la del motor
-que se ejecutó. El 13 de julio de 2026 se detectó y corrigió una errata que impedía
-ejecutar el brazo base, y la corrección se selló a su vez con su propia marca de tiempo.
+que se ejecutó. El 13 de julio de 2026 se detectó y corrigió un error que impedía
+ejecutar la variante base, y la corrección se selló a su vez con su propia marca de tiempo.
 Revertir al artefacto originalmente sellado no habría hecho el experimento más honesto:
-lo habría hecho imposible, porque el brazo de referencia no llegaba a completar una
-corrida. Se conserva por tanto la cadena completa —sello original, errata, sello de la
-errata— y se reporta la divergencia como parte del resultado.
+lo habría hecho imposible, porque la variante de referencia no llegaba a completar una
+corrida. Se conserva por tanto la cadena completa (sello original, corrección, sello de la
+corrección) y se reporta la divergencia como parte del resultado.
 
 \subsubsection{Ventana de evaluación}
 
@@ -206,30 +208,30 @@ Esa circunstancia, que operativamente fue un contratiempo, refuerza metodológic
 resultado. La objeción más natural a cualquier evaluación prospectiva es que el analista
 elija cuándo parar, y que esa elección dependa de lo que va viendo. Aquí el punto de corte
 lo fijó un fallo de hardware tres días antes de que se ejecutara la primera evaluación, y
-la cobertura se verificó sobre el registro de sesiones del recolector —unas 225 sesiones
-diarias, sin un solo día incompleto dentro de la ventana— antes de calcular ninguna
+la cobertura se verificó sobre el registro de sesiones del recolector (unas 225 sesiones
+diarias, sin un solo día incompleto dentro de la ventana) antes de calcular ninguna
 métrica de resultado. El mínimo declarado en el pre-registro era de 25~días evaluados; la
 ventana disponible lo supera en un 40\,\%.
 
-\subsubsection{Brazos y capas}
+\subsubsection{Variantes evaluadas y métricas}
 
-Se ejecutan los \textbf{tres brazos declarados}, y los tres se reportan con independencia
-de su signo. El brazo \emph{base} es la configuración congelada operando sin señal. El
-brazo \emph{suppress\_ask} suprime durante 240~segundos la cotización de venta del token
-favorecido por la señal H60. El brazo \emph{tight\_risk} activa, en los mercados
+Se ejecutan las \textbf{tres variantes declaradas}, y las tres se reportan con independencia
+de su signo. La variante \emph{base} es la configuración congelada operando sin señal. La
+variante \emph{suppress\_ask} suprime durante 240~segundos la cotización de venta del token
+favorecido por la señal H60. La variante \emph{tight\_risk} activa, en los mercados
 señalados, un régimen de riesgo estricto que reduce a la mitad el límite de inventario y
 el sesgo de inventario y duplica el número de fotogramas en plano. La partición por el
-gate de regímenes congelado descrito en la Sección~\ref{sec::brazos_gate} se reporta como
+filtro de regímenes congelado descrito en la Sección~\ref{sec::variantes_gate} se reporta como
 análisis secundario, con su hipótesis registrada de antemano.
 
-Las métricas son las del pre-registro, sin añadidos: equity neta —caja más inventario
-valorado a resolución más \emph{rebates}—, su descomposición en las tres partidas,
+Las métricas son las del pre-registro, sin añadidos: equity neta (caja más inventario
+valorado a resolución más \emph{rebates}), su descomposición en las tres partidas,
 \emph{markout} a corto plazo, peor día y porcentaje de mercados con resultado positivo.
 
 \subsubsection{Reglas de decisión, declaradas antes de mirar}
 
 La Tabla~\ref{tab::puertas_b3} recoge las tres condiciones que el pre-registro declara
-para promover la política a operación en sombra, y la regla de sustitución entre brazos.
+para promover la política a operación en sombra, y la regla de sustitución entre variantes.
 Se rellenan y se obedecen sin interpretación. Conviene subrayar que un resultado negativo
 no es un fracaso del trabajo ni obliga a reescribir nada: el pre-registro declara
 explícitamente que el experimento es informativo en cualquier dirección y que todo corte
@@ -239,7 +241,7 @@ honesta, no el signo del número que produzca.
 \begin{table}[htbp]
 \centering
 \caption[Puertas de decisión pre-declaradas]{Puertas de decisión pre-declaradas para el
-corte prospectivo nº~1, sobre el brazo base. Las tres condiciones deben cumplirse
+corte prospectivo nº~1, sobre la variante base. Las tres condiciones deben cumplirse
 simultáneamente.}
 \label{tab::puertas_b3}
 \begin{tabular}{lrc}
@@ -257,13 +259,13 @@ Días evaluados $\geq 25$ & 35 & Sí \\
 
 \begin{table}[htbp]
 \centering
-\caption[Resultado del corte prospectivo por brazo]{Resultado del corte prospectivo
-nº~1 por brazo, con la descomposición declarada en el pre-registro. Valores en dólares
+\caption[Resultado del corte prospectivo por variante]{Resultado del corte prospectivo
+nº~1 por variante, con la descomposición declarada en el pre-registro. Valores en dólares
 simulados sobre los 35~días de la ventana y 1.684 pares mercado-token.}
-\label{tab::corte_brazos}
+\label{tab::corte_variantes}
 \begin{tabular}{lrrrrr}
 \hline
-\textbf{Brazo} & \textbf{Equity neta} & \textbf{Caja} & \textbf{Terminal} &
+\textbf{Variante} & \textbf{Equity neta} & \textbf{Caja} & \textbf{Terminal} &
 \textbf{\emph{Rebates}} & \textbf{Peor día} \\
 \hline
 Base & $+3.408{,}11$ & $+9.425{,}06$ & $-6.712{,}95$ & $+696{,}00$ & $-235{,}66$ \\
@@ -277,9 +279,9 @@ Base & $+3.408{,}11$ & $+9.425{,}06$ & $-6.712{,}95$ & $+696{,}00$ & $-235{,}66$
 \centering
 \includegraphics[width=0.92\textwidth]{figures/fig_corte_prospectivo.png}
 \caption[Corte prospectivo pre-registrado nº 1]{Corte prospectivo pre-registrado nº~1.
-Arriba, equity neta acumulada por brazo sobre los 35~días de la ventana. Abajo, equity
-diaria del brazo base con el umbral pre-declarado de $-150$\,\$: el corte no falla por
-rentabilidad —la curva acumulada termina en $+3.408$\,\$— sino por la profundidad de un
+Arriba, equity neta acumulada por variante sobre los 35~días de la ventana. Abajo, equity
+diaria de la variante base con el umbral pre-declarado de $-150$\,\$: el corte no falla por
+rentabilidad (la curva acumulada termina en $+3.408$\,\$) sino por la profundidad de un
 único día, el 5 de agosto.}
 \label{fig:corte_prospectivo}
 \end{figure}
@@ -287,8 +289,8 @@ rentabilidad —la curva acumulada termina en $+3.408$\,\$— sino por la profun
 \subsubsection{Lectura del corte}
 
 \textbf{La política congelada gana dinero y aun así no pasa la puerta.} La
-Tabla~\ref{tab::corte_brazos} desglosa los tres brazos y la Figura~\ref{fig:corte_prospectivo}
-muestra su evolución diaria. El brazo base acumula $+3.408{,}11$\,\$ simulados en 35~días —una media de $97{,}4$\,\$ diarios— con
+Tabla~\ref{tab::corte_variantes} desglosa las tres variantes y la Figura~\ref{fig:corte_prospectivo}
+muestra su evolución diaria. La variante base acumula $+3.408{,}11$\,\$ simulados en 35~días (una media de $97{,}4$\,\$ diarios) con
 10~días negativos y un $50{,}4$\,\% de pares mercado-token en positivo. Pero su peor día
 es $-235{,}66$\,\$, y la regla pre-declarada exigía no bajar de $-150$\,\$. Falla una de
 las tres condiciones y, por tanto, el veredicto es \textbf{NO-GO}: la política no se
@@ -309,27 +311,27 @@ en solo cuatro días, el primero de ellos parcial. El retorno medio, por tanto, 
 concluyente: se mantiene dentro de la banda ya conocida.
 
 Lo que sí cambia es la dispersión, y conviene decirlo con precisión porque la lectura
-inmediata —«la cola izquierda se ha duplicado»— no resiste el contraste. El peor día
+inmediata (``la cola izquierda se ha duplicado'') no resiste el contraste. El peor día
 pasa de $-118{,}46$ a $-235{,}66$\,\$, pero \textbf{ocupa la misma posición relativa dentro de
 su propia ventana}: su distancia a la media, medida en desviaciones típicas diarias, es
 de $-2{,}15$ en desarrollo y $-2{,}13$ en la ventana prospectiva. No es un día más
 extremo: es el mínimo de una distribución más ancha.
 
 Lo que se ensancha es medible y tiene dos componentes. La desviación típica de la equity
-\emph{por par mercado-token} crece de $19{,}11$ a $21{,}45$\,\$ —un $12$\,\%, con un
-contraste de Brown-Forsythe que da $p = 1{,}7\cdot 10^{-9}$—, y el número de pares
+\emph{por par mercado-token} crece de $19{,}11$ a $21{,}45$\,\$ (un $12$\,\%, con un
+contraste de Brown-Forsythe que da $p = 1{,}7\cdot 10^{-9}$), y el número de pares
 simultáneos por día sube de $42{,}4$ a $48{,}1$. Ambos efectos se componen: la desviación
 típica \emph{diaria} pasa de $106{,}88$ a $156{,}25$\,\$, un factor $1{,}46$ cuyo
 contraste $F$ queda en $p = 0{,}060$, marginal por el escaso número de días. El retorno
 medio, en cambio, no se mueve de forma detectable ($111{,}53$ frente a $97{,}37$\,\$
 diarios, $p = 0{,}681$). El valor terminal del inventario aporta el $70{,}8$\,\% de la
-varianza de la equity medido como cuota de covarianza —esto es,
-$\operatorname{cov}(\text{terminal},\text{equity})/\operatorname{var}(\text{equity})$—,
+varianza de la equity medido como cuota de covarianza, esto es,
+$\operatorname{cov}(\text{terminal},\text{equity})/\operatorname{var}(\text{equity})$,
 que es la descomposición aditiva pertinente cuando las partidas suman exactamente la
 magnitud descompuesta; conviene precisarlo porque el coeficiente de determinación de una
 regresión simple entre ambas series es bastante menor ($R^{2} = 0{,}28$), y confundir
 ambas cifras exageraría el poder predictivo del terminal. La partida dominante de la
-varianza es, en todo caso, precisamente aquella sobre la que actúan los brazos de señal.
+varianza es, en todo caso, precisamente aquella sobre la que actúan las variantes de señal.
 
 Esto obliga a una observación crítica sobre el propio diseño de la puerta, que se hace
 aquí como limitación y no como atenuante: \textbf{el umbral se declaró como una cantidad
@@ -347,7 +349,7 @@ La objeción admite además una formulación cuantitativa que conviene hacer exp
 porque responde a la pregunta de si el umbral era siquiera alcanzable. Dada la dispersión
 diaria efectivamente observada, ¿cuál era el peor día \emph{esperado} en una ventana de
 35~días? Simulando 50.000 ventanas con la media y la desviación medidas, el mínimo
-esperado es de $-231{,}8$\,\$ —frente a los $-235{,}66$ que se observaron— y la
+esperado es de $-231{,}8$\,\$ (frente a los $-235{,}66$ que se observaron) y la
 probabilidad de cruzar el umbral de $-150$\,\$ alcanza el $87$\,\%. Un remuestreo
 \emph{bootstrap} de los propios días observados, que no supone normalidad, da $-199{,}9$\,\$
 y un $64$\,\%; conviene señalar que esta segunda cifra es una cota inferior por
@@ -364,19 +366,19 @@ izquierda).
 \caption[La puerta B3 vista desde la dispersión]{Izquierda: distribución simulada del peor
 día en una ventana de 35 días bajo la dispersión medida. El día observado ($-235{,}66$\,\$)
 cae junto a la moda de lo esperado, y el umbral pre-declarado queda holgadamente dentro de
-la región que la distribución cruza. Derecha: techo de oráculo del riesgo terminal —qué
-ocurriría si se retirase el percentil peor de pares—. Retirar solo el 5\,\% bastaría para
+la región que la distribución cruza. Derecha: techo de oráculo del riesgo terminal (qué
+ocurriría si se retirase el percentil peor de pares). Retirar solo el 5\,\% bastaría para
 que la puerta se superase, lo que acota el valor máximo de un modelo de riesgo terminal.}
 \label{fig:puerta_b3_potencia}
 \end{figure}
 
 Esa misma descomposición permite acotar, por el otro extremo, cuánto valdría acertar el
 riesgo terminal, que es la línea que el resultado sugiere. Si se retirase con información
-perfecta el 5\,\% peor de los pares —85 de 1.684— la equity ascendería a $+6.789$\,\$ y el
+perfecta el 5\,\% peor de los pares (85 de 1.684) la equity ascendería a $+6.789$\,\$ y el
 peor día quedaría en $-125{,}4$\,\$: la puerta se superaría. Retirando el decil, la equity
 llega a $+9.221$\,\$ y el peor día a $-70{,}2$. No es una política, porque exige conocer el
 futuro, sino la cota superior de lo que un modelo de riesgo terminal podría aportar, y
-justifica que sea esa —y no la predicción direccional— la dirección de trabajo que este
+justifica que sea esa (y no la predicción direccional) la dirección de trabajo que este
 resultado deja abierta.
 
 Nada de esto altera el veredicto. La regla estaba escrita, es la que se aplica y el
@@ -388,33 +390,33 @@ distribución más estrecha.
 
 \textbf{Ninguna variante de señal sustituye a la base.} La regla de sustitución exigía
 mejorar simultáneamente la equity neta y el valor terminal. Las dos variantes mejoran el
-terminal —\emph{suppress\_ask} lo lleva de $-6.712{,}95$ a $-6.430{,}98$ y
-\emph{tight\_risk} hasta $-6.103{,}28$— pero ninguna mejora la neta. Se documentan y se
+terminal (\emph{suppress\_ask} lo lleva de $-6.712{,}95$ a $-6.430{,}98$ y
+\emph{tight\_risk} hasta $-6.103{,}28$) pero ninguna mejora la neta. Se documentan y se
 descartan, como estaba escrito.
 
 El detalle importa más que el agregado, porque las variantes solo actúan sobre los
 208~pares que la señal toca. Restringiendo la comparación a ese subconjunto, el efecto
 es inequívoco: \emph{tight\_risk} reduce el inventario terminal de $-1.565{,}57$ a
-$-955{,}91$ —un $39$\,\% menos— mientras la equity neta cae de $+841{,}44$ a
+$-955{,}91$ (un $39$\,\% menos) mientras la equity neta cae de $+841{,}44$ a
 $+358{,}44$, es decir, un $57$\,\%. La señal H60 hace exactamente lo que el diagnóstico
-del Capítulo~\ref{ch::resultados} anticipaba: incide sobre el inventario terminal, que
+del Capítulo~\ref{ch::despliegue} anticipaba: incide sobre el inventario terminal, que
 era la palanca identificada. Lo que el corte añade es el precio de accionarla, y ese
 precio no estaba medido: controlar el riesgo terminal cuesta más de la mitad del
 beneficio en caja. La hipótesis era correcta y la palanca funciona; simplemente no
 compensa.
 
 \textbf{El \emph{markout} confirma que la ejecución maker captura spread, pero poco.}
-Los tres brazos quedan en torno a $+0{,}011$~ticks a 30 y 60~segundos. El signo es el
+Las tres variantes quedan en torno a $+0{,}011$~ticks a 30 y 60~segundos. El signo es el
 esperado para un proveedor de liquidez, la magnitud es marginal.
 
 \textbf{Análisis secundario por régimen: la hipótesis registrada se cumple.} Aplicando
-el gate congelado de la adenda~A —entrenado únicamente con datos de mayo y junio, y por
-tanto sin haber visto un solo frame de la ventana— las 1.673 series se reparten en dos
+el filtro de régimen congelado de la adenda~A (entrenado únicamente con datos de mayo y junio, y por
+tanto sin haber visto un solo frame de la ventana) las 1.673 series se reparten en dos
 regímenes, siendo el agitado el de mayor volatilidad realizada ($11{,}5$ frente a
-$6{,}2$). Sobre el brazo base y descartando los terminales ambiguos ($n=1.316$), el
+$6{,}2$). Sobre la variante base y descartando los terminales ambiguos ($n=1.316$), el
 régimen agitado rinde $+4{,}06$\,\$ de equity media por serie frente a $+3{,}12$\,\$ del
 tranquilo, y concentra además un inventario terminal menos negativo. La hipótesis
-declarada de antemano —que el régimen agitado favorece el neto maker— queda confirmada
+declarada de antemano (que el régimen agitado favorece el neto maker) queda confirmada
 prospectivamente, lo que respalda la observación de desarrollo recogida en el
 Capítulo~\ref{ch::metodos}.
 
@@ -424,15 +426,15 @@ maker: la sitúa. La economía del lado maker es positiva y medible donde la del
 Capítulo~\ref{ch::despliegue}; pero su perfil de riesgo diario, con la configuración
 congelada y sin respuesta competitiva del mercado, excede el umbral que este trabajo se
 fijó antes de mirar. La consecuencia práctica no es abandonar la línea sino que
-cualquier continuación debe atacar la cola izquierda —no el retorno medio— y volver a
+cualquier continuación debe atacar la cola izquierda (no el retorno medio) y volver a
 someterse a una puerta declarada de antemano.
 
-\subsubsection{Capas de reporte del protocolo general}
+\subsubsection{Niveles de reporte del protocolo general}
 
-El pre-registro general contempla, además de la adenda del simulador, dos capas de
-reporte sobre la política congelada del lado \emph{taker}: la histórica a 0,5 y la de
-comisión oficial. Su corte prospectivo tiene fecha propia y posterior —el 24 de agosto de
-2026— y se reporta aquí en un segundo bloque. Que las dos fechas sean distintas no es un
+El pre-registro general contempla, además de la adenda del simulador, dos niveles de
+reporte sobre la política congelada del lado \emph{taker}: el histórico a 0,5 y el de
+comisión oficial. Su corte prospectivo tiene fecha propia y posterior (el 24 de agosto de
+2026) y se reporta aquí en un segundo bloque. Que las dos fechas sean distintas no es un
 descuido sino la consecuencia de que son dos experimentos encadenados: el del simulador
 maker no podía pre-registrarse hasta que el simulador existió, y por eso tiene su propia
 ventana, más corta y posterior. Ninguna de las dos fechas se ha movido respecto a lo
@@ -454,7 +456,7 @@ mercado comparten horizonte y el remuestreo por filas las trataría como indepen
 \label{tab::corte_v2}
 \begin{tabular}{llrrr}
 \toprule
-\textbf{Capa} & \textbf{Gate} & \textbf{Media (ticks)} & \textbf{IC 95\,\%} & \textbf{Días $>0$} \\
+\textbf{Nivel} & \textbf{Filtro} & \textbf{Media (ticks)} & \textbf{IC 95\,\%} & \textbf{Días $>0$} \\
 \midrule
 Histórica @0,5      & ninguno & $-0{,}004$ & $[-0{,}223;\ +0{,}212]$ & 23/50 \\
 Histórica @0,5      & estático & $+0{,}009$ & $[-0{,}233;\ +0{,}257]$ & 25/50 \\
@@ -467,18 +469,18 @@ Histórica, fee real & ninguno & $-0{,}770$ & $[-0{,}989;\ -0{,}554]$ & 10/50 \\
 \end{table}
 
 La Tabla~\ref{tab::corte_v2} recoge el resultado, cuya lectura tiene dos partes que
-conviene no confundir. En la capa histórica —la que
-existe únicamente para ser comparable con lo ya publicado— el resultado es
+conviene no confundir. En el nivel histórico (el que
+existe únicamente para ser comparable con lo reportado inicialmente) el resultado es
 \textbf{indistinguible de cero}: $-0{,}004$~ticks con un intervalo que contiene
 holgadamente el cero y 23 días positivos de 50. El filtro de volatilidad no lo cambia. En
-las capas que cobran la comisión oficial, en cambio, el signo es inequívoco y el intervalo
+los niveles que cobran la comisión oficial, en cambio, el signo es inequívoco y el intervalo
 excluye el cero por amplio margen en las tres, hasta los $-3{,}65$~ticks de la operación
 completa, que no tiene un solo día positivo en toda la ventana.
 
 Una precisión que altera el marco de la comparación y que solo apareció al calcular los
-intervalos de la referencia. La cifra que este corte venía a contrastar —los
+intervalos de la referencia. La cifra que este corte venía a contrastar (los
 $+0{,}349$~ticks del bloque de junio, reproducidos aquí dígito a dígito como control del
-instrumento— \textbf{nunca fue estadísticamente significativa}: su intervalo al 95\,\% es
+instrumento) \textbf{nunca fue estadísticamente significativa}: su intervalo al 95\,\% es
 $[-0{,}194;\ +0{,}892]$ por filas y $[-0{,}655;\ +1{,}337]$ agrupando por mercado. Hablar de deterioro, por tanto, sería impreciso: lo que muestra el corte es que
 con treinta y tres veces más datos la señal sigue sin distinguirse del azar, y que la
 comisión vigente la vuelve decisivamente negativa. Es el mismo desenlace al que llegan las otras vías del
@@ -486,8 +488,8 @@ trabajo, alcanzado ahora con la potencia que a la validación original le faltab
 
 \paragraph{Una contradicción interna del pre-registro, y cómo se resolvió.} El protocolo
 declara que el filtro de tradabilidad debe aplicarse con la definición histórica de la
-columna de coste, esto es, con la fórmula de comisión anterior y «para no des-congelar el
-filtro», mientras las capas de reporte usan la comisión real. Ocurre que el propio acto de sellado
+columna de coste, esto es, con la fórmula de comisión anterior y ``para no des-congelar el
+filtro'', mientras los niveles de reporte usan la comisión real. Ocurre que el propio acto de sellado
 incorporó al control de versiones el módulo que calcula esa columna \emph{ya con la
 fórmula corregida}, de modo que el texto sellado y el código sellado se contradicen.
 Reconstruido el conjunto con el código actual, el filtro dejaba 42 unidades de 2.837.137,
@@ -499,25 +501,25 @@ tomó \emph{después} de observar que la vía literal no producía datos: es un 
 libertad ejercido con conocimiento de un resultado intermedio, y por eso se declara aquí
 como desviación documentada y no como continuidad silenciosa.
 
-\paragraph{Dos brazos que no se ejecutaron.} De los tres \emph{gates} pre-registrados solo
-el estático pudo evaluarse. El brazo GARCH resultó \textbf{inejecutable en el punto de
+\paragraph{Dos variantes que no se ejecutaron.} De los tres filtros de régimen pre-registrados solo
+el estático pudo evaluarse. La variante GARCH resultó \textbf{inejecutable en el punto de
 decisión}: su especificación exige sesenta barras de un minuto por sesión, y el tramo
 previo a la apertura, que es el único disponible cuando la política decide, tiene una
 mediana de cuatro barras y un máximo de seis. Ninguna sesión alcanza el mínimo. No es que
-el \emph{gate} no funcione: es que la historia intra-sesión que necesita no existe. El
-brazo de regímenes sí pudo aplicarse, pero el agrupamiento congelado se entrenó sobre la
+el filtro de régimen no funcione: es que la historia intra-sesión que necesita no existe. La
+variante de regímenes sí pudo aplicarse, pero el agrupamiento congelado se entrenó sobre la
 malla del lado \emph{maker} y solo cubre el 4,9\,\% de las unidades de este corte, así que
-se reporta como no concluyente en lugar de extrapolarlo. Ambos casos se documentan porque
-un brazo comprometido que no se reporta es información perdida, y la tentación de
-sustituirlo por un sucedáneo —que en una primera versión de este análisis llegó a
-materializarse— produce cifras que parecen resultados sin serlo.
+se reporta como no concluyente en lugar de extrapolarla. Ambos casos se documentan porque
+una variante comprometida que no se reporta es información perdida, y la tentación de
+sustituirla por un sucedáneo (que en una primera versión de este análisis llegó a
+materializarse) produce cifras que parecen resultados sin serlo.
 
 \subsubsection{Segundo corte, justo antes de la entrega}
 
-El protocolo general contempla un segundo corte «justo antes de la entrega de
-septiembre», sobre la misma ventana acumulativa y el mismo \emph{pipeline} congelado. Se
+El protocolo general contempla un segundo corte ``justo antes de la entrega de
+septiembre'', sobre la misma ventana acumulativa y el mismo \emph{pipeline} congelado. Se
 ejecutó el 29 de agosto de 2026 con la regla derivada que fija el cierre en el último día
-UTC completo anterior a la ejecución —el 28 de agosto—, valor escrito en los guiones antes
+UTC completo anterior a la ejecución (el 28 de agosto), valor escrito en los guiones antes
 de lanzarlos. La ventana elegible pasa así del 2 de julio al 28 de agosto: 58~días, con
 captura efectiva en 55. Las tres ausencias son las mismas de antes y por la misma causa
 documentada. La política congelada selecciona ahora 27.208 unidades de acción.
@@ -525,12 +527,12 @@ documentada. La política congelada selecciona ahora 27.208 unidades de acción.
 \begin{table}[htbp]
 \centering
 \caption[Segundo corte prospectivo del pre-registro general]{Segundo corte prospectivo del
-pre-registro general (55~días, 27.208 unidades de acción). Mismas capas, misma política
+pre-registro general (55~días, 27.208 unidades de acción). Mismos niveles, misma política
 congelada y mismo \emph{bootstrap} agrupado por mercado que la Tabla~\ref{tab::corte_v2}.}
 \label{tab::corte_v2_n2}
 \begin{tabular}{llrrr}
 \toprule
-\textbf{Capa} & \textbf{Gate} & \textbf{Media (ticks)} & \textbf{IC 95\,\%} & \textbf{Días $>0$} \\
+\textbf{Nivel} & \textbf{Filtro} & \textbf{Media (ticks)} & \textbf{IC 95\,\%} & \textbf{Días $>0$} \\
 \midrule
 Histórica @0,5      & ninguno  & $+0{,}075$ & $[-0{,}132;\ +0{,}286]$ & 28/55 \\
 Histórica @0,5      & estático & $+0{,}039$ & $[-0{,}202;\ +0{,}278]$ & 29/55 \\
@@ -546,11 +548,11 @@ El control que hace comparable este corte con el anterior es la reutilización. 
 extracción fue incremental: solo se extrajeron los cinco días nuevos y los cincuenta
 anteriores se reaprovecharon. Recalculada la serie diaria completa dentro del conjunto
 ampliado, esos cincuenta días devuelven las mismas 25.011 unidades y valores idénticos a
-los del primer corte en las cuatro capas y en el recuento diario —doscientas cincuenta
-celdas sin una sola diferencia—, incluida la media de $-0{,}004$~ticks.
+los del primer corte en los cuatro niveles y en el recuento diario (doscientas cincuenta
+celdas sin una sola diferencia), incluida la media de $-0{,}004$~ticks.
 
 La conclusión que recoge la Tabla~\ref{tab::corte_v2_n2} no cambia, pero el aspecto de su
-primera fila sí, y hay que explicar por qué. En la capa histórica la media pasa de
+primera fila sí, y hay que explicar por qué. En el nivel histórico la media pasa de
 $-0{,}004$ a $+0{,}075$~ticks y los días positivos de 23 de 50 a 28 de 55. Todo ese
 movimiento cabe en los cinco días nuevos: aportan el 8,1\,\% de las unidades, los cinco
 salen positivos y esas 2.197 unidades promedian $+0{,}97$~ticks. Con cinco días no hay
@@ -562,12 +564,12 @@ el \emph{deflated Sharpe} de la serie diaria queda en $0{,}14$, muy por debajo d
 habilidad. Que cinco días de cincuenta y cinco muevan la media casi ocho centésimas de
 tick ilustra por qué aquí manda el intervalo y no el punto.
 
-En las capas que cobran la comisión oficial el signo vuelve a ser inequívoco. El intervalo
+En los niveles que cobran la comisión oficial el signo vuelve a ser inequívoco. El intervalo
 excluye el cero en las tres, hasta los $-3{,}57$~ticks de la operación completa, que no
-tiene un solo día positivo en los cincuenta y cinco. Los dos brazos que no se ejecutaron
-en el primer corte siguen sin ejecutarse por las mismas razones —el GARCH por falta de
-barras en el punto de decisión, el de regímenes por cobertura insuficiente, ahora del
-4,5\,\%— y se reportan como tales.
+tiene un solo día positivo en los cincuenta y cinco. Las dos variantes que no se ejecutaron
+en el primer corte siguen sin ejecutarse por las mismas razones (la GARCH por falta de
+barras en el punto de decisión, la de regímenes por cobertura insuficiente, ahora del
+4,5\,\%) y se reportan como tales.
 
 \paragraph{Qué queda observado y qué sigue sin mirarse.} Este corte observa el lado
 \emph{taker} hasta el 28 de agosto. La ventana del lado \emph{maker} posterior a la de la
@@ -577,19 +579,21 @@ términos en que se selló.
 
 % M1 CERRADO 2026-08-18 con el corte ejecutado: tablas rellenas, lectura escrita,
 % regla de sustitución resuelta (ninguna variante sustituye) y análisis secundario
-% por régimen contrastado. Queda solo la figura (c) de equity diaria por brazo.
+% por régimen contrastado. Queda solo la figura (c) de equity diaria por variante.
 
 \section{Comparativa con otros enfoques y baseline}
 
 Esta sección sitúa el resultado limpio del especialista frente a las alternativas evaluadas:
-las arquitecturas profundas sobre el libro de órdenes y los intentos de adaptación al cambio
-de régimen. La comparación justifica por qué la mejor señal disponible procede de un modelo
-tabular sencillo y no de una red profunda.
+las arquitecturas profundas sobre el libro de órdenes, los modelos de referencia de series
+temporales (baselines clásicos, kNN-DTW y el fundacional MOMENT), un fundacional tabular y
+los intentos de adaptación al cambio de régimen. La comparación justifica por qué la mejor
+señal disponible procede de un modelo tabular sencillo y no de una red profunda ni de un
+modelo fundacional.
 
 \subsection{Especialista tabular frente a aprendizaje profundo}
 
-Las redes recurrentes y convolucionales sobre el libro aprenden representación ---algunas
-políticas \emph{proxy} resultan positivas dentro de muestra---, pero esa ventaja no sobrevive
+Las redes recurrentes y convolucionales sobre el libro aprenden representación (algunas
+políticas \emph{proxy} resultan positivas dentro de muestra), pero esa ventaja no sobrevive
 cuando se exige selección causal día a día y estabilidad en todo el bloque de test. Con unas
 dos semanas de datos, la capacidad necesaria para generalizar temporalmente excede lo que
 las redes pueden estimar de forma fiable.
@@ -600,12 +604,120 @@ el espacio de hipótesis. Esa combinación conserva un promedio positivo al cost
 en el bloque intacto, aunque todavía no supera el coste de estrés. El resultado no descarta el
 aprendizaje profundo; lo sitúa como una vía a reevaluar cuando el volumen de datos crezca.
 
+\subsection{Modelos de referencia de series temporales: baselines clásicos, kNN-DTW y MOMENT}
+\label{sec::escalera}
+
+Para situar al especialista frente a los métodos clásicos y fundacionales de series
+temporales, se evalúa una escalera de modelos de referencia sobre un mismo problema
+controlado: predecir la dirección del precio medio a horizonte H60
+(60 pasos de 2\,s) en la foto de apertura$-45$\,s de cada mercado, con el mismo nivel de
+coste (comisión taker oficial). El conjunto de evaluación son 906 casos congelados;
+cada modelo produce una señal de signo y se reporta su acierto direccional y su
+resultado bruto en ticks. Conviene subrayar que estos baselines usan un universo más
+amplio que el especialista final (no aplican su filtro estricto de tradabilidad), de
+modo que la comparación con la cifra sellada del especialista es de contexto, no
+cabeza a cabeza.
+
+\paragraph{Qué declaran estos métodos en sus \emph{benchmarks} y qué se obtiene aquí.}
+La comparación con las cifras que sus autores reportan en los artículos originales es parte
+de la pregunta. DeepLOB declara un F1
+del 83,4\,\% prediciendo la dirección a horizonte corto en FI-2010, un conjunto de
+acciones nórdicas de alta liquidez~\cite{zhang2019deeplob}; MOMENT declara resultados
+\emph{zero-shot} competitivos con modelos ajustados en sus colecciones de series de largo
+horizonte~\cite{goswami2024moment}. Nada de eso se reproduce en este corpus, y la
+diferencia no es un fallo de implementación sino de régimen: FI-2010 etiqueta movimientos
+sobre un subyacente que se mueve casi siempre, mientras que aquí el precio queda inmóvil
+en la mayoría de los pasos de dos segundos (Sección~\ref{sec::grano_temporal}), la señal
+útil vive a horizontes donde la comisión oficial de 2026 consume el margen, y la
+geometría contexto–horizonte excluye a la mayor parte de los mercados cortos. Este
+contraste (métodos que rinden donde fueron diseñados y no aquí) es precisamente lo que
+la comparación debe hacer visible, y anticipa la conclusión económica de la
+Sección~\ref{sec::taker_real}.
+
+Los baselines clásicos se ajustan por serie sobre el tramo pre-señal, sin información
+futura. El \textbf{naive-drift} (signo de la deriva reciente) y el \textbf{ARIMA(1,1,1)}
+son los más informativos; el \textbf{suavizado exponencial de Holt} queda por detrás, y
+el \textbf{kNN con distancia DTW} (biblioteca de mayo, consultas de junio, con
+separación temporal estricta) no supera a la deriva simple. Como demostración de
+forecasting estacional donde tiene sentido, un modelo de Holt-Winters sobre la actividad
+agregada mejora un 2,7\,\% el error del persistente; a horizonte de segundos sobre el
+precio, en cambio, el componente estacional no aporta.
+
+El modelo fundacional de referencia es \textbf{MOMENT-1-small}, evaluado en tres regímenes de
+adaptación crecientes: \emph{zero-shot} (reconstrucción con la cola enmascarada, sin
+entrenar), \emph{linear-probing} (solo la cabeza de predicción, backbone congelado) y
+\emph{fine-tuning completo} (todo el modelo, entrenado en GPU). El entrenamiento usa
+ventanas del propio corpus muestreadas fuera de los casos de evaluación (con un margen
+de exclusión que garantiza que entrenamiento y evaluación no comparten ni un frame) y
+restringidas al mismo régimen de actividad que el corte de evaluación (Sección
+\ref{sec::eda_series}). La Tabla~\ref{tab::escalera} recoge el resultado.
+
+\begin{table}[htbp]
+\centering
+\caption[Escalera de modelos de referencia]{Escalera de modelos de referencia sobre el
+conjunto de 906 casos congelados (H60, comisión taker oficial). La columna $n$ es el
+soporte real de cada modelo: los baselines clásicos solo emiten señal donde su criterio
+interno lo permite, de modo que sus aciertos \emph{no} son comparables cabeza a cabeza
+entre sí ni con MOMENT (que responde en los 906); el ejemplo extremo es ARIMA, cuyo
+56,5\,\% descansa en el 18\,\% de los casos. El neto taker es negativo en todos los
+casos por el régimen de comisiones de 2026.}
+\label{tab::escalera}
+\begin{tabular}{lrcc}
+\toprule
+Modelo & $n$ & Acierto direccional & Bruto (ticks) \\
+\midrule
+ARIMA(1,1,1) & 161 & 56,5\,\% & $+0{,}621$ \\
+naive-drift & 467 & 53,1\,\% & $+1{,}186$ \\
+Holt (suavizado exponencial) & 902 & 48,4\,\% & $+0{,}516$ \\
+\textbf{MOMENT fine-tuning completo} & 906 & \textbf{47,3\,\%} & $+0{,}082$ \\
+MOMENT linear-probing & 906 & 46,6\,\% & $-0{,}175$ \\
+MOMENT zero-shot & 906 & 45,5\,\% & $-0{,}585$ \\
+kNN-DTW & 232 & 45,3\,\% & $-0{,}209$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+De esta escalera se extraen dos lecturas. La primera es que la adaptación del
+fundacional \emph{ayuda de forma monótona}: cada régimen mejora al anterior, tanto en
+acierto como en resultado bruto (zero-shot $\to$ linear-probing $\to$ fine-tuning
+completo), lo que confirma que el modelo capta algo de la estructura local al
+especializarse; los tres regímenes responden sobre los mismos 906 casos, así que esta
+comparación sí es cabeza a cabeza. La segunda, más importante, es que \emph{ni siquiera
+el fine-tuning completo supera a los baselines clásicos}: Holt, que responde en 902 de
+los 906 casos (soporte casi idéntico), lo supera ligeramente con una fracción del coste
+computacional, y naive-drift y ARIMA se sitúan por encima aunque sobre soportes menores
+(467 y 161 casos donde su criterio interno emite señal), de modo que su ventaja debe
+leerse con la cautela que la columna $n$ impone. El fundacional de series temporales, la
+herramienta más sofisticada de la escalera, no es en ningún caso la más precisa.
+
+Cabe preguntarse si el fundacional mejoraría con más datos. La
+Figura~\ref{fig::escalado} responde con una curva de escalado: se re-entrena el
+linear-probing sobre subconjuntos crecientes de ventanas (de 2.700 a 40.500) y se evalúa
+cada uno sobre los mismos casos congelados. La curva es esencialmente plana (el acierto
+oscila entre el 43,9 y el 46,8\,\% sin tendencia clara al alza) y se mantiene por debajo del
+baseline clásico en todo el rango. La conclusión es que el cuello de botella no es la
+cantidad de datos de entrenamiento ni la capacidad del modelo, sino el régimen de datos:
+sobre una malla de 2 segundos, el precio medio de estos mercados apenas contiene estructura
+direccional explotable a este horizonte por encima de la deriva, con independencia de la sofisticación
+del modelo. Es la misma lección que atraviesa el trabajo (predecir es difícil, y donde
+se puede, no basta) reforzada ahora desde el lado del modelado.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.78\textwidth]{figures/fig_moment_scaling.png}
+\caption{Curva de escalado del fine-tuning de MOMENT (linear-probing) frente al número
+de ventanas de entrenamiento, evaluada sobre los 906 casos congelados. Más datos no
+cierran la brecha con la deriva simple: el techo lo marca el régimen de datos, no el
+tamaño de la muestra.}
+\label{fig::escalado}
+\end{figure}
+
 \subsection{Un fundacional tabular: TabPFN \emph{zero-shot}}
 \label{sec::tabpfn}
 
 El Capítulo~\ref{ch::estado} anunciaba la evaluación de TabPFN~\cite{hollmann2025tabpfn},
-el modelo fundacional para dato tabular que predice sin entrenar —el conjunto de
-entrenamiento se le pasa como contexto—. Se evaluó sobre el universo del especialista sin
+el modelo fundacional para dato tabular que predice sin entrenar (el conjunto de
+entrenamiento se le pasa como contexto). Se evaluó sobre el universo del especialista sin
 el filtro de coste, con las dos particiones habituales (validación inicial y test
 terminal), limitado a 10.000 de las 28.095 filas de entrenamiento por su ventana de
 contexto: aproximadamente un tercio de los datos que ve el \emph{gradient boosting}.
@@ -616,11 +728,11 @@ $0{,}120$ frente a $0{,}092$ del \emph{gradient boosting} fresco y $0{,}098$/$0{
 del especialista congelado, y es el único cuyo $R^2$ es positivo en ambas particiones. En
 la cabeza de salud, en cambio, no domina: su AUC ($0{,}550$) queda por debajo del
 \emph{gradient boosting} en validación ($0{,}585$), y en el test terminal la ordenación se
-invierte —$0{,}549$ frente a $0{,}535$— sin que ninguno de los dos se despegue del azar. Y la
+invierte ($0{,}549$ frente a $0{,}535$) sin que ninguno de los dos se despegue del azar. Y la
 traducción económica repite la lección del resto del capítulo: ninguna de esas
 diferencias de ordenación convierte la política en rentable bajo la comisión oficial. El
-interés del resultado es metodológico —un fundacional tabular alcanza \emph{zero-shot},
-con un tercio de los datos, la calidad de ordenación de un modelo ajustado— y delimita
+interés del resultado es metodológico (un fundacional tabular alcanza \emph{zero-shot},
+con un tercio de los datos, la calidad de ordenación de un modelo ajustado) y delimita
 dónde rinde esta familia: en ordenar candidatos, no en decidir operaciones.
 
 \subsection{Experimentos de adaptación al régimen}
@@ -639,9 +751,9 @@ de nuevos datos bajo una política ya congelada.
 
 La debilidad conocida de la pieza sellada es la cabeza de salud, cuya discriminación cae
 de $0{,}79$ a $0{,}56$ entre entrenamiento y validación. Un ensemble de diez réplicas con
-semillas distintas permite atribuir esa caída: es estable entre réplicas —de modo que no
-es suerte de inicialización—, el desacuerdo entre ellas no aumenta fuera de muestra —de
-modo que no es incertidumbre epistémica— y un clasificador de dominio separa mayo de junio
+semillas distintas permite atribuir esa caída: es estable entre réplicas (de modo que no
+es suerte de inicialización), el desacuerdo entre ellas no aumenta fuera de muestra (de
+modo que no es incertidumbre epistémica) y un clasificador de dominio separa mayo de junio
 con AUC $0{,}90$, lo que sí identifica un desplazamiento acusado de covariables. La
 consecuencia práctica acota cualquier iteración futura: reentrenar con más datos del mismo
 periodo tiene techo, porque el obstáculo no es el tamaño de la muestra sino la cobertura
@@ -650,7 +762,7 @@ del régimen. El diagnóstico completo, con sus figuras, está en el Anexo~\ref{
 \subsection{Curva de escalado de datos: tabular frente a aprendizaje profundo}
 \label{sec::escalado_tab_deep}
 
-La conclusión anterior —el tabular sencillo bate a la red profunda con pocos datos— invita
+La conclusión anterior (el tabular sencillo bate a la red profunda con pocos datos) invita
 a una objeción natural: ¿no ganaría la vía profunda con más datos, dada su mayor capacidad?
 Se responde empíricamente con una curva de escalado que enfrenta a ambas vías sobre la
 \emph{misma} tarea y evaluación. Se predice la dirección del tramo H60 en los 906 casos
@@ -658,24 +770,24 @@ congelados a partir de ventanas de contexto régimen-ajustadas y sin fuga; la v�
 es el fine-tuning de MOMENT (Sección~\ref{sec::escalera}) y la tabular un \emph{gradient
 boosting} sobre características clásicas derivadas de la misma ventana (retornos a varios
 rezagos, momentum, volatilidad realizada y distancia a $0{,}5$). Ambas se entrenan sobre
-subconjuntos crecientes del mismo corpus —de 3.000 a algo más de 41.000 ventanas— y se
-evalúan sobre los mismos casos (Figura~\ref{fig::escalado_tab_deep}).
+subconjuntos crecientes del mismo corpus (de 3.000 a algo más de 41.000 ventanas) y se
+evalúan sobre los mismos casos (véase la Figura~\ref{fig::escalado_tab_deep}).
 
 El resultado es inequívoco: la vía tabular domina a la profunda \emph{en todo el rango de
 datos}. Con el corpus mínimo, la tabular acierta un 48,2\,\% frente al 46,0\,\% de
 MOMENT; con el corpus completo, la tabular sube hasta el 50,3\,\% mientras que la
 profunda se estanca en torno al 46,8\,\%. Es decir, la vía tabular no solo parte de un
 nivel más alto, sino que además escala al menos tan bien: la brecha no se cierra al añadir
-datos, se ensancha. La objeción queda respondida en negativo —al menos en este régimen de
-tamaño de corpus— y refuerza la elección del modelo tabular como vehículo de la señal. La
+datos, se ensancha. La objeción queda respondida en negativo (al menos en este régimen de
+tamaño de corpus) y refuerza la elección del modelo tabular como vehículo de la señal. La
 lección para el proyecto es coherente con el resto del trabajo: la complejidad del modelo
 no es el cuello de botella, de modo que no compra rendimiento; con dos semanas de datos, la
 capacidad de una red profunda es una desventaja, no una ventaja.
 
 Conviene delimitar con exactitud qué eje recorre esta curva, porque de ello depende el
 alcance de la conclusión. El presupuesto de datos se varió aumentando el número de
-\emph{ventanas} de entrenamiento sobre un corpus fijo de 509 mercados —1.018 pares
-mercado-token— pertenecientes todos a la temporalidad horaria. Como las ventanas se
+\emph{ventanas} de entrenamiento sobre un corpus fijo de 509 mercados (1.018 pares
+mercado-token) pertenecientes todos a la temporalidad horaria. Como las ventanas se
 solapan casi por completo (en un 98\,\%: paso de 10 sobre ventanas de 512 fotogramas), lo
 que crece a lo largo del eje es la densidad de muestreo, no
 el número de trayectorias independientes, que permanece constante. Y la temporalidad
@@ -699,9 +811,9 @@ $1{,}88$ veces las ventanas que la curva original llegó a explorar. El resultad
 la conclusión previa por el eje correcto: en el punto máximo del eje ninguna de las dos
 vías se despega del azar, con intervalos que contienen el 50\,\% y sin ningún contraste por
 debajo de $p = 0{,}25$. La regla de decisión pedía un punto porcentual de separación y la
-brecha observada fue de $0{,}87$, por debajo del umbral —y, como se documenta en el
+brecha observada fue de $0{,}87$, por debajo del umbral (y, como se documenta en el
 Capítulo~\ref{ch::conclusiones}, también por debajo del ruido del propio conjunto de
-evaluación—. La tabla completa y el protocolo de sellado están en el
+evaluación). La tabla completa y el protocolo de sellado están en el
 Anexo~\ref{anexo:soporte}.
 
 \subsubsection{Un hallazgo no buscado: la tarea excluye los mercados cortos}
@@ -724,7 +836,7 @@ el régimen de los datos, sino \textbf{la geometría de la tarea}, que descarta 
 los mercados capturados antes de que empiece el entrenamiento. La elección de operar solo
 con mercados horarios, que en la curva original podía parecer una simplificación, resulta
 ser una consecuencia forzada del horizonte elegido. Una línea futura que quiera aprovechar
-los mercados de horizonte corto —que son los más numerosos con diferencia— no necesita más
+los mercados de horizonte corto (que son los más numerosos con diferencia) no necesita más
 datos: necesita redefinir el horizonte de predicción.
 
 \begin{figure}[htbp]
@@ -744,34 +856,34 @@ profundo alcance al tabular.}
 La última línea experimental del trabajo (metodología en la
 Sección~\ref{sec::politica_parada}) ataca el eje que ningún experimento anterior había
 tocado: en lugar de predecir mejor y decidir después, entrenar la decisión directamente
-contra el dinero. Su carácter es \textbf{exploratorio} —los treinta y cinco días del corte
-ya habían sido observados por los barridos de política—, de modo que nada de esta sección
+contra el dinero. Su carácter es \textbf{exploratorio} (los treinta y cinco días del corte
+ya habían sido observados por los barridos de política), de modo que nada de esta sección
 constituye validación prospectiva.
 
 \paragraph{La política colapsa a la constante, por razones correctas.} Entrenada sobre
-mayo--junio y evaluada sobre la ventana del corte, la política de parada elige «no
-retirarse nunca» en las 1.323 sesiones de test, con las dos arquitecturas, y ni siquiera
+mayo--junio y evaluada sobre la ventana del corte, la política de parada elige ``no
+retirarse nunca'' en las 1.323 sesiones de test, con las dos arquitecturas, y ni siquiera
 supera a la mejor acción constante en el propio conjunto de ajuste. El análisis de la
 causa resultó más informativo que el resultado: en el periodo de entrenamiento la acción
-de no retirarse \emph{domina estrictamente} —mejor total (+3.523,9\,\$) y además la mejor
-cola (peor día $-20{,}9$\,\$) de las ocho acciones—, de modo que no existe compromiso que
+de no retirarse \emph{domina estrictamente}: tiene el mejor total (+3.523,9\,\$) y además
+la mejor cola (peor día $-20{,}9$\,\$) de las ocho acciones, de modo que no existe compromiso que
 aprender y la constante es la respuesta óptima. El suceso que la política debía aprender a
-evitar —el día de pérdida severa— sencillamente no está en sus datos: mayo--junio contiene
+evitar (el día de pérdida severa) sencillamente no está en sus datos: mayo--junio contiene
 un único día en pérdida (de veinticuatro) y ninguno por debajo de $-100$\,\$, mientras que
 la ventana del corte contiene cuatro y dos, respectivamente, bajo la configuración de
 esta adenda. Conviene precisar la comparación: esas cifras proceden del contrafactual sin
-aplanado de la adenda, no del brazo base del corte reportado más arriba, que sobre la
+aplanado de la adenda, no de la variante base del corte reportado más arriba, que sobre la
 misma ventana registra diez días negativos y seis por debajo de ese umbral. Son dos
-simulaciones distintas del mismo periodo —difieren en tamaño de orden y en el conjunto de
-pares— y lo que interesa aquí es la comparación interna entre entrenamiento y prueba
+simulaciones distintas del mismo periodo (difieren en tamaño de orden y en el conjunto de
+pares) y lo que interesa aquí es la comparación interna entre entrenamiento y prueba
 dentro de una misma configuración, no el nivel absoluto.
 
 \paragraph{La frontera aprendida queda dominada por el parámetro.} Sobre una partición
 donde el compromiso media--cola sí existe, la política entrenada con aversión creciente al
 riesgo ($\lambda$ de 0 a 32) recorre las ocho acciones y traza una frontera
 riesgo--rendimiento real. Comparada punto a punto contra la frontera de las ocho acciones
-constantes —para cada nivel de protección de cola, la mejor acción fija que protege al
-menos igual—, ninguno de los dieciséis puntos evaluados bate a la
+constantes (para cada nivel de protección de cola, la mejor acción fija que protege al
+menos igual), ninguno de los dieciséis puntos evaluados bate a la
 frontera fija. En ocho de ellos la política ni siquiera se diferencia: con aversión al
 riesgo baja colapsa a la acción constante y empata con ella por construcción. En los ocho
 restantes, donde sí elige, pierde: $9{,}6$\,\$ diarios menos que el escalar equivalente en
@@ -783,9 +895,9 @@ el codificador secuencial y el tabular en la predicción del riesgo terminal.
 experimento producía dieciséis puntos idénticos hasta el último decimal; la
 instrumentación reveló \emph{logits} saturados en torno a $-12$, donde el gradiente del
 sigmoide ($\approx 6\cdot10^{-6}$) congela la política con independencia de lo que pida la
-pérdida —se corrigió acotando los \emph{logits} y manteniendo exploración con un premio de
-entropía decreciente—. La segunda corrección fue conceptual: la regla de un \emph{token}
+pérdida (se corrigió acotando los \emph{logits} y manteniendo exploración con un premio de
+entropía decreciente). La segunda corrección fue conceptual: la regla de un \emph{token}
 por mercado, correcta para contar muestras independientes en un contraste de AUC, falsea
-la evaluación económica —en la operativa se cotizan los dos \emph{tokens} y el umbral de
-riesgo del pre-registro se calibró sobre el libro completo—, y al deshacerla desapareció
+la evaluación económica (en la operativa se cotizan los dos \emph{tokens} y el umbral de
+riesgo del pre-registro se calibró sobre el libro completo), y al deshacerla desapareció
 un aparente cumplimiento de la puerta de riesgo que era un artefacto de la partición.

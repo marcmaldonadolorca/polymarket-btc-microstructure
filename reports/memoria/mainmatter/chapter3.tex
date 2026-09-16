@@ -4,16 +4,17 @@
 \label{ch::metodos}
 
 Este capítulo describe el material (los datos) y los métodos (líneas base, protocolo de
-validación y modelos) del trabajo. Se ha organizado en tres bloques: la descripción del
-conjunto de datos, los resultados de las líneas base —que contienen la lección central del
-trabajo— y la metodología de modelado y entrenamiento.
+validación y modelos) del trabajo. Se ha organizado en cuatro bloques: la descripción del
+conjunto de datos, el análisis exploratorio de series temporales, los resultados de los
+modelos base (que contienen la lección central del trabajo) y la metodología de modelado y
+entrenamiento.
 
 \section{Descripción del dataset}
 
 Esta sección describe el origen de los datos, su organización temporal y los controles de
 calidad que determinan qué entra en el conjunto de trabajo. Se introducen primero los
-conceptos necesarios —fuentes de datos, malla temporal y contrato de latencia, y datos
-obsoletos— y después se resume la composición del corpus y su análisis exploratorio.
+conceptos necesarios (fuentes de datos, malla temporal y contrato de latencia, y datos
+obsoletos) y después se resume la composición del corpus y su análisis exploratorio.
 
 \subsection{Sistema de captura multifuente}
 \label{sec::captura}
@@ -23,19 +24,21 @@ vivo del mercado en producción, y todas las operaciones y niveles de libro regi
 corresponden a órdenes reales de participantes reales.
 
 Los datos de mercado se registran mediante una herramienta de captura propia, desarrollada
-específicamente para este trabajo. Por su carácter sensible, esta herramienta no se publica y
-aquí se describe únicamente a nivel funcional; lo que sí se publica
+específicamente para este trabajo. Esta herramienta no se publica porque está acoplada a la
+infraestructura privada en la que se ejecuta (el motivo se detalla en la
+Sección~\ref{sec::recolector_no_publica}); aquí se describe únicamente a nivel funcional, y lo
+que sí se publica
 (Capítulo~\ref{ch::reproducibilidad}) es el esquema de la consulta de datos, una muestra
 representativa y todo el código de análisis y modelado. A nivel funcional, por cada sesión de
 mercado la herramienta anota cuatro tipos de información: (i) el libro de órdenes del contrato
 de Polymarket y su flujo de operaciones; (ii) los metadatos del mercado (tamaño de tick,
-ventana temporal, comisiones); (iii) referencias externas del mercado de Bitcoin —el mercado
-al contado (\emph{spot}) y los futuros perpetuos (\emph{perpetual futures})—; y (iv) un
+ventana temporal, comisiones); (iii) referencias externas del mercado de Bitcoin (el mercado
+al contado, \emph{spot}, y los futuros perpetuos, \emph{perpetual futures}); y (iv) un
 oráculo de precios que aporta el precio de referencia. La fuente de verdad es una base de
 datos relacional sobre la que se construyen las características; de ella se publican el
 esquema y una muestra representativa, pero no los datos completos. Todas las fuentes se
 alinean en el tiempo sobre una malla regular de dos segundos, como se detalla a continuación
-(Figura~\ref{fig:captura}).
+(véase la Figura~\ref{fig:captura}).
 
 \paragraph{Qué permite hacer la API pública y qué se usa de ella.} Polymarket expone dos
 servicios públicos de solo lectura que bastan para toda la recolección. El primero es la API
@@ -44,8 +47,8 @@ metadatos: identificadores de mercado y de \emph{token}, pregunta, ventana tempo
 sesión, tamaño de \emph{tick} y régimen de comisiones. De ella la herramienta obtiene, en
 cada ciclo, qué contratos de Bitcoin están vivos y cuándo vencen. El segundo es la API del
 libro de órdenes (\texttt{clob.polymarket.com}), que para cada \emph{token} devuelve la
-fotografía completa del libro —todos los niveles de compra y de venta con sus precios y
-volúmenes— y el flujo de operaciones ejecutadas (precio, volumen y lado agresor). La
+fotografía completa del libro (todos los niveles de compra y de venta con sus precios y
+volúmenes) y el flujo de operaciones ejecutadas (precio, volumen y lado agresor). La
 herramienta consulta ambas de forma periódica y sella cada respuesta con dos marcas de
 tiempo, la del servidor y la local de recepción, que es lo que después permite medir la
 latencia (Sección~\ref{sec::latencia_grid}) y detectar datos obsoletos. Ninguna de las dos
@@ -106,8 +109,11 @@ punto razonable (Tabla~\ref{tab::grano}).
 
 \begin{table}[h]
 \centering
-\caption{Grano temporal del punto medio: proporción de intervalos sin ningún cambio de
-precio y observaciones disponibles por mercado, según la ventana de observación.}
+\caption[Grano temporal del punto medio según la ventana de observación]{Grano temporal del
+punto medio: proporción de intervalos sin ningún cambio de precio y observaciones
+disponibles por mercado, según la ventana de observación. La columna
+$|\Delta|$ p90 es el percentil 90 del valor absoluto del cambio del punto medio entre dos
+observaciones consecutivas de esa ventana, en céntimos de probabilidad.}
 \label{tab::grano}
 \begin{tabular}{rrrr}
 \toprule
@@ -126,8 +132,8 @@ precio y observaciones disponibles por mercado, según la ventana de observació
 La causa es estructural y no accidental: el \emph{tick} de estos contratos vale un céntimo
 de probabilidad y la horquilla media mide \textbf{3,8 \emph{ticks}}, de modo que el punto
 medio solo se desplaza cuando uno de los dos lados del libro salta de verdad. Conviene
-además descartar la explicación alternativa —que la inmovilidad la produjera el sistema de
-captura y no el mercado—, y cuatro comprobaciones independientes la descartan: en el
+además descartar la explicación alternativa (que la inmovilidad la produjera el sistema de
+captura y no el mercado), y cuatro comprobaciones independientes la descartan: en el
 33,8\,\% de las fotografías con el precio inmóvil \emph{sí} cambia la profundidad
 disponible en el toque, luego el capturador observa el libro y registra sus cambios; la
 proporción de intervalos inmóviles es homogénea entre mercados (del 84,3\,\% al 95,0\,\%
@@ -137,15 +143,15 @@ nuestro precio sí cambia que en los que permanece quieto, es decir, la relació
 subyacente existe y apunta en el sentido correcto.
 
 Para dimensionar el fenómeno con justicia conviene añadir que \emph{tampoco} el mercado al
-contado de Bitcoin —uno de los más líquidos que existen— registra un cambio mediano de su
+contado de Bitcoin (uno de los más líquidos que existen) registra un cambio mediano de su
 punto medio en intervalos de dos segundos dentro de esta misma captura. El grano no es,
 por tanto, una patología de la plataforma estudiada, sino un recordatorio de que dos
 segundos es un intervalo muy fino para observar precios medios en cualquier mercado.
 
 Esta caracterización tiene una consecuencia metodológica de primer orden, y explica
 decisiones que se toman más adelante en este trabajo. Toda la familia de modelos de tiempo
-continuo —difusiones con saltos, cotización óptima al estilo Avellaneda-Stoikov y sus
-derivados— presupone un precio que evoluciona sin interrupción; aplicada a una serie
+continuo (difusiones con saltos, cotización óptima al estilo Avellaneda-Stoikov y sus
+derivados) presupone un precio que evoluciona sin interrupción; aplicada a una serie
 inmóvil nueve de cada diez instantes, su estimación degenera. Cuando la observación tiene
 un grano tan grueso, el análisis en clave de tiempo continuo debe realizarse en la banda de
 \textbf{60 a 120 segundos}, donde alrededor de la mitad de los intervalos ya presentan
@@ -159,10 +165,10 @@ mide el \emph{tick} y por encima se agota la muestra, porque estos contratos viv
 La calidad de los datos es tan crítica como el modelo: una referencia externa retrasada o
 incompleta puede inducir una señal que en realidad no existe. Por ello, antes de incorporarse
 al conjunto de trabajo, cada sesión de mercado pasa una batería de controles de calidad y se
-descarta por completo si no los supera (Figura~\ref{fig:qa}). Conviene definir primero un
+descarta por completo si no los supera (véase la Figura~\ref{fig:qa}). Conviene definir primero un
 concepto recurrente: un dato \emph{obsoleto} (en inglés \emph{stale}) es un valor que no se ha
-actualizado cuando debería haberlo hecho —por ejemplo, una cotización externa que permanece
-``congelada'' varios instantes de la malla porque su fuente dejó de emitir—. Un dato obsoleto
+actualizado cuando debería haberlo hecho (por ejemplo, una cotización externa que permanece
+``congelada'' varios instantes de la malla porque su fuente dejó de emitir). Un dato obsoleto
 parece información válida, pero no lo es, y es una de las principales fuentes de señales
 espurias.
 
@@ -182,20 +188,20 @@ de forma fiable.
 Existe además una distinción en la propia estructura del registro que condiciona qué puede
 usarse como característica y que conviene dejar explícita, porque no es evidente al
 inspeccionar los datos. No todas las columnas capturadas son series temporales: unas se
-observan en \emph{cada} instante de la malla —el punto medio, las mejores posturas de compra
-y venta, la profundidad disponible en cada lado, la horquilla y el último precio operado—
+observan en \emph{cada} instante de la malla (el punto medio, las mejores posturas de compra
+y venta, la profundidad disponible en cada lado, la horquilla y el último precio operado)
 mientras que otras son \emph{agregados de ventana}, es decir, un único valor calculado para
 toda la sesión y repetido idéntico en cada una de sus fotografías; es el caso de los
 volúmenes y recuentos de operaciones y de las altas y bajas de órdenes. La comprobación es
-inmediata —basta contar valores distintos dentro de cada sesión— y el resultado es
+inmediata (basta contar valores distintos dentro de cada sesión) y el resultado es
 inequívoco: las columnas del segundo grupo presentan un valor único en la totalidad de las
 sesiones examinadas.
 
 La distinción importa porque una columna agregada es indistinguible de una serie al
 inspeccionar el conjunto: tiene un valor en cada fila, del tipo correcto y sin ausencias.
-Usarla como si midiera actividad instantánea introduce dos errores a la vez —sobreestima
+Usarla como si midiera actividad instantánea introduce dos errores a la vez (sobreestima
 enormemente el número de observaciones independientes y solapa el predictor con el intervalo
-que pretende anticipar—, sin que ninguna comprobación de software lo delate. Por ese motivo
+que pretende anticipar), sin que ninguna comprobación de software lo delate. Por ese motivo
 las características construidas en este trabajo se restringen al primer grupo.
 
 \begin{figure}[h]
@@ -253,6 +259,7 @@ después de congelar el candidato, lo que convierte su validación en una prueba
 \end{figure}
 
 \subsection{Análisis exploratorio del corpus}
+\label{sec::eda_corpus}
 
 El análisis exploratorio previo deja cuatro observaciones que condicionan todo el diseño
 posterior:
@@ -261,9 +268,9 @@ posterior:
   \item \textbf{Desequilibrio de clases.} La etiqueta direccional está dominada por la
   clase \textsc{flat} (quietud): a horizonte H60, y midiendo sobre los 2,2 millones de
   pasos del corpus horario, el 52,9\,\% de las observaciones se mueve menos de un tick y
-  el 64,0\,\%, menos de dos —el rango que cubre los umbrales $\theta$ que absorben
-  \emph{spread} y comisión—. Esto vuelve engañosa la precisión bruta —un modelo que
-  prediga siempre \textsc{flat} acierta ya más de la mitad de las veces— y obliga a usar
+  el 64,0\,\%, menos de dos (el rango que cubre los umbrales $\theta$ que absorben
+  \emph{spread} y comisión). Esto vuelve engañosa la precisión bruta (un modelo que
+  prediga siempre \textsc{flat} acierta ya más de la mitad de las veces) y obliga a usar
   precisión equilibrada (\emph{balanced accuracy}) y F1 macro.
   \item \textbf{Calidad de los datos.} En los tramos de alta volatilidad, los retardos de
   actualización de las referencias externas abarcan varios ciclos de la malla; tras el
@@ -272,8 +279,8 @@ posterior:
   \item \textbf{Patrón \emph{prestart}.} La ventana inmediatamente anterior a la apertura
   del mercado concentra una densidad atípica de cancelaciones, modificaciones y cruces, lo
   que sugiere reposicionamiento de los participantes y una señal de microestructura
-  diferenciada. Esta observación motiva el \emph{modelo especialista} ---un modelo entrenado
-exclusivamente para esa ventana, en lugar de uno generalista--- que se describe más adelante
+  diferenciada. Esta observación motiva el \emph{modelo especialista} (un modelo entrenado
+exclusivamente para esa ventana, en lugar de uno generalista) que se describe más adelante
 en este capítulo.
   \item \textbf{Acoplamiento con Bitcoin.} La correlación entre el precio del contrato y las
   referencias de Bitcoin es clara en ventanas de minutos pero se diluye en ventanas de
@@ -296,36 +303,36 @@ Antes de modelar, el corpus se somete a un análisis exploratorio formal de seri
 temporales. Cada análisis de esta sección responde una pregunta concreta de diseño y
 termina en una decisión; el material es una muestra de 285--300 series
 mercado--contrato del corpus completo (2,3 millones de filas de la malla horaria de
-Polymarket —no confundir con los 2,5 millones de filas multifuente, que incluyen las
-referencias externas—, 1.018 series).
+Polymarket (no confundir con los 2,5 millones de filas multifuente, que incluyen las
+referencias externas), 1.018 series).
 
-\paragraph{Estacionariedad (ADF/KPSS).} Sobre los niveles del precio medio, el
-contraste ADF solo rechaza la raíz unitaria en el 6,3\% de las series, y el KPSS
-rechaza la estacionariedad en el 99,3\%; sobre las primeras diferencias, el ADF
-rechaza en el 100\% y el KPSS solo en el 12,6\%. Ambos contrastes coinciden: el
-precio medio es integrado de orden uno y los retornos son estacionarios. La decisión
-derivada es modelar siempre sobre diferencias o retornos, nunca sobre niveles
-(Figura~\ref{fig::eda_estacionariedad}).
+\paragraph{Estacionariedad (ADF/KPSS).} Como se muestra en la
+Figura~\ref{fig::eda_estacionariedad}, al analizar los niveles del precio medio el contraste
+ADF solo rechaza la raíz unitaria en el 6,3\% de las series. Además, el KPSS rechaza la
+estacionariedad en el 99,3\%. Sobre las primeras diferencias ocurre lo contrario: el ADF
+rechaza en el 100\% y el KPSS solo en el 12,6\%. Ambos contrastes coinciden: el precio
+medio es integrado de orden uno y los retornos son estacionarios. La decisión derivada es
+modelar siempre sobre diferencias o retornos, nunca sobre niveles.
 
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=0.85\textwidth]{figures/fig_eda_estacionariedad.png}
 \caption{Contrastes de estacionariedad ADF y KPSS sobre niveles y primeras
-diferencias del precio medio (muestra de 285 series). El patrón conjunto —raíz
-unitaria en niveles, estacionariedad en diferencias— es consistente en todo el corpus.}
+diferencias del precio medio (muestra de 285 series). El patrón conjunto (raíz
+unitaria en niveles, estacionariedad en diferencias) es consistente en todo el corpus.}
 \label{fig::eda_estacionariedad}
 \end{figure}
 
-\paragraph{Autocorrelación (ACF/PACF).} Los retornos a 2 segundos presentan una
-autocorrelación de primer orden media de $0{,}07$, con cero retardos significativos
+\paragraph{Autocorrelación (ACF/PACF).} Como se muestra en la Figura~\ref{fig::eda_acf},
+los retornos a 2 segundos presentan una autocorrelación de primer orden media de $0{,}07$,
+con cero retardos significativos
 de los diez primeros en la serie mediana: apenas hay estructura lineal explotable en
 el retorno puro. En cambio, los retornos absolutos muestran los diez primeros
 retardos significativos (agrupamiento de volatilidad) y el desequilibrio de
 profundidad del libro es extremadamente persistente (autocorrelación de primer orden
 $0{,}99$). La decisión derivada es doble: las características del modelo deben buscar
-la señal en el estado del libro y en la volatilidad —no en el retorno retardado— y la
-persistencia del desequilibrio valida su uso como característica lenta
-(Figura~\ref{fig::eda_acf}).
+la señal en el estado del libro y en la volatilidad (no en el retorno retardado) y la
+persistencia del desequilibrio valida su uso como característica lenta.
 
 \begin{figure}[htbp]
 \centering
@@ -336,11 +343,11 @@ retorno retardado.}
 \label{fig::eda_acf}
 \end{figure}
 
-\paragraph{Descomposición STL de la actividad.} La serie agregada de actividad
-(eventos por cubo temporal) se descompone en tendencia, estacionalidad diaria y
-residuo; la componente estacional explica el 19,4\% de la varianza. Existe un ciclo
-diario real pero moderado: la actividad no es reducible a su patrón horario
-(Figura~\ref{fig::eda_stl}).
+\paragraph{Descomposición STL de la actividad.} Como se muestra en la
+Figura~\ref{fig::eda_stl}, la serie agregada de actividad (eventos por cubo temporal) se
+descompone en tendencia, estacionalidad diaria y residuo; la componente estacional explica
+el 19,4\% de la varianza. Existe un ciclo diario real pero moderado: la actividad no es
+reducible a su patrón horario.
 
 \begin{figure}[htbp]
 \centering
@@ -350,14 +357,14 @@ diaria explica el 19,4\% de la varianza.}
 \label{fig::eda_stl}
 \end{figure}
 
-\paragraph{Espectro de Fourier y ciclo intrahora.} El espectro de la actividad
-muestra picos nítidos en los periodos de 24 horas y de 1 hora (230 y 225 veces la
+\paragraph{Espectro de Fourier y ciclo intrahora.} Como se muestra en la
+Figura~\ref{fig::eda_fourier}, el espectro de la actividad presenta picos nítidos en los periodos de 24 horas y de 1 hora (230 y 225 veces la
 potencia mediana, respectivamente): el ciclo de vida horario de los mercados
 estudiados imprime su firma en la actividad global. Dentro de la hora, el perfil
-medio no es plano —la razón entre el minuto más y menos activo es $2{,}3$— y el
+medio no es plano (la razón entre el minuto más y menos activo es $2{,}3$) y el
 minuto más activo es el \textbf{minuto 50}, coherente con la concentración de
 actividad en el tramo final de la vida del contrato que motiva el análisis del riesgo
-terminal del Capítulo~\ref{ch::despliegue} (Figura~\ref{fig::eda_fourier}).
+terminal del Capítulo~\ref{ch::despliegue}.
 
 \begin{figure}[htbp]
 \centering
@@ -367,13 +374,13 @@ el minuto 50 es el más activo del ciclo horario.}
 \label{fig::eda_fourier}
 \end{figure}
 
-\paragraph{Calidad por sesión e imputación.} La cobertura mediana de la malla de
-2 segundos es del 100\% y el 99,8\% de las series supera el 99\% de cobertura. Con
-esta densidad, la política de imputación puede ser conservadora: arrastre del último
-valor observado marcando el dato como \texttt{stale}, sin interpolar —interpolar
-inventaría microestructura precisamente donde el modelo la busca—, y exclusión de la
-sesión cuando la cobertura cae por debajo del umbral de calidad
-(Figura~\ref{fig::eda_calidad}).
+\paragraph{Calidad por sesión e imputación.} Como se muestra en la
+Figura~\ref{fig::eda_calidad}, la cobertura mediana de la malla de 2 segundos es del 100\%
+y el 99,8\% de las series supera el 99\% de cobertura. Con esta densidad, la política de
+imputación puede ser conservadora: arrastre del último valor observado marcando el dato
+como \texttt{stale}, sin interpolar (interpolar inventaría microestructura precisamente
+donde el modelo la busca), y exclusión de la sesión cuando la cobertura cae por debajo del
+umbral de calidad.
 
 \begin{figure}[htbp]
 \centering
@@ -392,38 +399,103 @@ y de alcance: aquel archivo describe la plataforma completa a nivel de evento, y
 corpus añade las referencias externas sincronizadas y el contrato de latencia que
 permiten pasar de la descripción a la evaluación económica.
 
-\section{Resultados en modelos baseline}
+\section{Resultados en modelos base}
+\label{sec::baseline}
 
-Antes de introducir cualquier modelo complejo conviene establecer una línea base sencilla y
-medir su comportamiento bajo condiciones realistas. Esta sección muestra que una línea base
-tabular alcanza una precisión direccional muy alta y, sin embargo, deja de ser rentable al
-introducir la latencia; este resultado es la observación que reorienta todo el trabajo.
+Antes de introducir cualquier modelo complejo conviene establecer modelos base sencillos y
+medir su comportamiento bajo condiciones realistas. Esta sección muestra el análisis de los
+resultados de los modelos base, que sirven de referencia para las comparaciones posteriores:
+el mejor de ellos alcanza una precisión direccional muy alta en las operaciones que
+selecciona y, sin embargo, deja de ser rentable al introducir la latencia de entrada. Ese resultado es la observación que reorienta todo el
+trabajo.
 
-\subsection{Línea base tabular y el impacto de la latencia}
+\subsection{Modelos base tabulares y el impacto de la latencia}
+\label{sec::linea_base}
 
-La línea base son modelos sobrios y bien entendidos —una regresión logística balanceada y un
-\emph{gradient boosting} pequeño, también balanceado— sobre el conjunto de características
-descrito antes, con la etiqueta direccional a un horizonte corto (16 segundos). Se entrena por
-\emph{token-frame} y se evalúa por \emph{market-frame}, para no contar dos veces el mismo
-instante del mercado. Esta línea base alcanza una precisión direccional cercana al 90\,\% y
-supera la validación temporal por bloques. Evaluada solo con métricas de clasificación, parece
-un modelo excelente. El problema aparece al introducir la entrada retrasada y el coste. La
-Tabla~\ref{tab:latencia} y la Figura~\ref{fig:latencia} muestran el rendimiento en el test
-terminal —el bloque no utilizado para seleccionar la política— en función de la latencia de
-entrada, en un escenario conservador con filtro de \emph{spread}.
+\paragraph{Modelos base.} Se han seleccionado dos modelos base \emph{tabulares}, es decir,
+modelos que reciben en cada instante un vector de características ya calculadas (no la
+secuencia ni el libro completo): una regresión logística balanceada y un \emph{gradient
+boosting} ligero, también balanceado (la implementación
+\texttt{HistGradientBoostingClassifier} de scikit-learn, con 90 iteraciones, 15 hojas
+por árbol y regularización $\ell_2$). Ambos se entrenan sobre un conjunto de características
+de las mismas familias que las de la Sección~\ref{sec::features} (estado del libro,
+referencias externas, volatilidad y contexto de ventana), en su versión previa al
+especialista, que todavía incluía las variables de reloj de la ventana; la variante del
+\emph{gradient boosting} seleccionada en validación prescinde del \emph{microprice}. La
+etiqueta es la direccional a un horizonte corto de 16 segundos.
+
+En ambos casos se entrena por \emph{token-frame} y se evalúa por \emph{market-frame}, para
+no contar dos veces el mismo instante del mercado, con la validación temporal por bloques de
+la Sección~\ref{sec::validacion}.
+
+\paragraph{Métrica de clasificación y primera comparación.} La Tabla~\ref{tab:modelos_base}
+compara los dos modelos en el bloque de test del experimento de referencia (el último tramo
+temporal del corpus, reservado), a latencia nula y con la regla de decisión seleccionada en
+validación. El \emph{gradient boosting} es el
+mejor de los dos en las tres métricas y la regresión logística el peor: con una precisión
+equilibrada similar (0,577 frente a 0,571), el primero acierta la subida en el 75,9\,\% de
+las operaciones que selecciona, frente al 55,2\,\% de la segunda, y triplica su neto visible
+medio. Por eso el resto de la sección usa el \emph{gradient boosting}. En un escenario
+conservador (filtro de horquilla, margen de medio tick y umbral de decisión alto, el de la
+Tabla~\ref{tab:latencia}) su precisión direccional se acerca al 90\,\% y supera la
+validación temporal por bloques.
 
 \begin{table}[h]
 \centering
-\caption{Rendimiento en el test terminal bajo distintas latencias (ticks netos).}
+\caption[Los dos modelos base en el bloque de test]{Los dos modelos base en el bloque de
+test (horizonte de 16 segundos, latencia nula, una acción por \emph{market-frame}). Acierto
+UP: porcentaje de acciones cuyo precio medio subió al menos un tick a los 16 segundos. Neto
+visible medio: \emph{markout} a 16 segundos menos el coste visible de entrada, promediado
+por acción, en ticks.}
+\label{tab:modelos_base}
+\small
+\begin{tabular}{lrrrr}
+\toprule
+\textbf{Modelo} & \textbf{Precisión} & \textbf{Acciones} & \textbf{Acierto UP} & \textbf{Neto visible} \\
+ & \textbf{equilibrada} & \textbf{(núm.)} & \textbf{(\%)} & \textbf{medio (ticks)} \\
+\midrule
+Regresión logística balanceada & 0,571 & 1.336 & 55,2 & $+1{,}14$ \\
+\emph{Gradient boosting} ligero & 0,577 & 1.371 & 75,9 & $+3{,}51$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Evaluación económica de los modelos base.} Evaluado solo por su acierto
+direccional en las operaciones que selecciona, el mejor modelo base parece excelente. Por
+los motivos metodológicos que se
+exponen a continuación, esa métrica no basta, y se añade una evaluación del beneficio obtenido bajo condiciones de ejecución realistas. Para
+ello se define una \emph{política}: entrar solo cuando la diferencia entre la probabilidad
+de subida y la de bajada que estima el modelo alcanza o supera $0{,}65$, con una acción por
+\emph{market-frame} y en un escenario conservador (horquilla de entrada de un tick como
+máximo, margen adicional de medio tick, 16 segundos de espera entre acciones del mismo
+mercado y límites de 50 acciones por día y 3 por sesión). Esa política se evalúa en el
+\textbf{test terminal}, que es el último bloque temporal del corpus, reservado y no
+utilizado para seleccionar ni la política ni sus umbrales. Sobre él se aplica una prueba de
+estrés de latencia: la fila de entrada se desplaza 0, 2, 4 u 8 segundos después del instante
+de la señal y el resultado se mide desde ahí. La Tabla~\ref{tab:latencia} y la
+Figura~\ref{fig:latencia} recogen el resultado.
+
+\begin{table}[h]
+\centering
+\caption[Rendimiento de la política del modelo base bajo distintas latencias de
+entrada]{Rendimiento de la política del mejor modelo base (el \emph{gradient boosting}) en
+el test terminal bajo distintas latencias de entrada. Latencia: retraso entre el instante de la señal y la fila de entrada
+(0~s es la señal instantánea; 2~s es el primer escalón que la malla de captura puede
+representar, como se precisa en el apartado siguiente). Acierto UP: porcentaje de acciones
+cuyo precio medio subió al menos un tick a los 16 segundos de la entrada. Neto medio: \emph{markout} a 16 segundos menos el
+coste visible de entrada y el margen de medio tick, promediado por acción, en ticks; Neto
+total: suma de ese neto sobre todas las acciones. Ambos pueden ser negativos. Ninguna cifra
+incluye la comisión oficial de 2026 (Sección~\ref{sec::fe_erratas_fees}).}
 \label{tab:latencia}
 \begin{tabular}{rrrrr}
 \toprule
 \textbf{Latencia} & \textbf{Acciones} & \textbf{Acierto UP} & \textbf{Neto medio} & \textbf{Neto total} \\
+\textbf{(s)} & \textbf{(núm.)} & \textbf{(\%)} & \textbf{(ticks)} & \textbf{(ticks)} \\
 \midrule
-0\,s & 64 & 92,2\,\% & $+6{,}79$ & $+434{,}44$ \\
-2\,s & 63 & 39,7\,\% & $-1{,}48$ & $-93{,}48$ \\
-4\,s & 66 & 45,5\,\% & $-0{,}74$ & $-48{,}83$ \\
-8\,s & 66 & 43,9\,\% & $-0{,}30$ & $-19{,}53$ \\
+0 & 64 & 92,2 & $+6{,}79$ & $+434{,}44$ \\
+2 & 63 & 39,7 & $-1{,}48$ & $-93{,}48$ \\
+4 & 66 & 45,5 & $-0{,}74$ & $-48{,}83$ \\
+8 & 66 & 43,9 & $-0{,}30$ & $-19{,}53$ \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -437,22 +509,27 @@ política ejecutable con dos segundos de latencia.}
 \label{fig:latencia}
 \end{figure}
 
-La lectura de la tabla es contundente. A latencia nula la política sería extraordinaria
-($+6{,}79$ ticks de media, con un 92\,\% de acierto en las operaciones de subida), porque mide
-el \emph{markout} desde el instante exacto de la señal. En el primer escalón que el
-instrumento puede resolver —dos segundos— el acierto cae al 39,7\,\% y el neto pasa a
-$-1{,}48$ ticks: la oportunidad ya se ha consumido cuando la orden podría ejecutarse. Es
-revelador que a 4 y 8 segundos el neto \emph{mejore} ligeramente (hacia $-0{,}74$ y
-$-0{,}30$): no es que operar más tarde sea mejor, sino que a esas latencias el modelo ya ni
-siquiera detecta la señal efímera que lo hacía perder, de modo que sus decisiones se vuelven
-casi aleatorias y el daño se diluye. En otras palabras, toda la ventaja vivía en una ventana
-de pocos segundos.
+La Tabla~\ref{tab:latencia} muestra el rendimiento de la política en función de la latencia
+de entrada. Cuando la latencia es nula, la política funciona de manera extraordinaria, con
+$+6{,}79$ ticks netos de media y un 92\,\% de acierto en las operaciones de subida, porque
+mide el \emph{markout} desde el instante exacto de la señal. Con una latencia de 2 segundos,
+el primer escalón que el instrumento puede resolver, el acierto cae al 39,7\,\% y el neto
+medio pasa a $-1{,}48$ ticks: la oportunidad ya se ha consumido cuando la orden podría
+ejecutarse. Con 4 y 8 segundos el neto mejora ligeramente (hacia $-0{,}74$ y $-0{,}30$), y no
+porque operar más tarde sea mejor, sino porque a esas latencias el modelo ya ni siquiera
+detecta la señal efímera que lo hacía perder, de modo que sus decisiones se vuelven casi
+aleatorias y el daño se diluye.
+
+\paragraph{Reflexión.} El mejor resultado (latencia nula) y el peor (dos segundos) delimitan
+la lectura: toda la ventaja vivía en una ventana de pocos segundos, y la métrica de
+clasificación, por sí sola, no la habría detectado. La sección siguiente precisa qué
+significa exactamente ese escalón de dos segundos.
 
 \subsubsection{Qué es exactamente el escalón de dos segundos}
 \label{sec::latencia_grid}
 
-Conviene precisar el significado de esa columna, porque de ello depende el alcance de la
-conclusión y porque la cifra se presta a una lectura más fuerte de la que los datos
+Conviene precisar el significado de la columna de latencia de la
+Tabla~\ref{tab:latencia}, porque de ello depende el alcance de la conclusión y porque la cifra se presta a una lectura más fuerte de la que los datos
 sostienen. \textbf{Los dos segundos no son la latencia medida del sistema, sino la
 resolución de la rejilla de captura}, y ambas cosas difieren en casi un orden de magnitud.
 
@@ -468,7 +545,7 @@ Lo que impide usar esa cifra es el propio muestreo: la captura se realiza en una
 dos segundos, de modo que un escalón de un segundo no tiene ninguna fila que lo soporte.
 El valor que aparece en la tabla es, por tanto, el mínimo que el instrumento puede
 representar, y sobreestima la latencia real por un factor cercano a cinco. Entre cero y dos
-segundos —justamente el rango donde vive la latencia efectivamente medida— \textbf{no existe
+segundos (justamente el rango donde vive la latencia efectivamente medida) \textbf{no existe
 ninguna observación}, y la forma que la señal tenga ahí no puede deducirse de estos datos.
 
 A ello se añade que el bloque terminal sobre el que se mide es pequeño: con 63~acciones, el
@@ -506,10 +583,14 @@ mercado digiere la información externa más rápido de lo que este montaje perm
 Este es, con esa matización, el resultado que vertebra el trabajo: \textbf{acertar la
 dirección no equivale a obtener beneficio}. El problema deja de ser de clasificación y pasa a
 ser de ejecución; a partir de aquí, todo modelo se evalúa por su política económica bajo
-coste y latencia, no por su acierto. Conviene subrayar que esta conclusión no depende en
-exclusiva del argumento de latencia: la fe de erratas de comisiones de la
-Sección~\ref{sec::fe_erratas_fees} la sostiene por una vía independiente, al mostrar que con
-la tarifa oficial la comisión de entrada agota por sí sola el resultado bruto.
+coste y latencia, no por su acierto. Los modelos base ya se han evaluado con ese criterio
+(su neto visible en la Tabla~\ref{tab:modelos_base} y, para el mejor de ellos, la prueba de
+estrés de latencia de la Tabla~\ref{tab:latencia}), y sus cifras netas no incluyen todavía
+la comisión oficial de 2026, que las haría aún más negativas. Conviene subrayar, además, que esta
+conclusión no depende en exclusiva del argumento de latencia: la corrección del modelo de
+costes de la Sección~\ref{sec::fe_erratas_fees} la sostiene por una vía independiente, al
+mostrar que con la tarifa oficial la comisión de entrada agota por sí sola el resultado
+bruto.
 
 \section{Metodología y entrenamiento}
 
@@ -536,7 +617,7 @@ etapas que las secciones siguientes desarrollan, de la captura al corte prospect
 \node[etapa, right=of cap] (qa) {Control de calidad por sesión\\\scriptsize §\ref{sec::qa}};
 \node[etapa, right=of qa] (eda) {EDA y series\\\scriptsize §\ref{sec::eda_series}};
 \node[etapa, right=of eda] (feat) {Objetivo y características\\\scriptsize esta sección};
-\node[etapa, below=9mm of feat] (esc) {Escalera de modelos\\\scriptsize §\ref{sec::escalera}};
+\node[etapa, below=9mm of feat] (esc) {Escalera de modelos\\\scriptsize §\ref{sec::escalera_modelos}};
 \node[sello, left=of esc] (cong) {Congelación del especialista\\\scriptsize §\ref{sec:congelacion}};
 \node[etapa, left=of cong] (oos) {Fuera de muestra 6--10 jun\\\scriptsize Cap.~\ref{ch::resultados}};
 \node[sello, left=of oos] (prosp) {Giro \emph{maker} y corte prospectivo sellado\\\scriptsize Cap.~\ref{ch::resultados}};
@@ -556,13 +637,13 @@ ventana prospectiva.}
 \end{figure}
 
 \paragraph{Preprocesado.} Antes de cualquier modelo, el corpus pasa por cuatro
-transformaciones, ya introducidas en las secciones anteriores y resumidas aquí para
-responder de forma compacta a la pregunta: (i)~filtrado de calidad por sesión según los
+transformaciones, ya introducidas en las secciones anteriores y resumidas aquí en un solo
+lugar: (i)~filtrado de calidad por sesión según los
 controles de la Sección~\ref{sec::qa}; (ii)~imputación por arrastre del último valor
 observado, sin interpolación, con cada valor arrastrado marcado como obsoleto para que los
 filtros puedan excluirlo; (iii)~exclusión de las columnas agregadas de ventana que
 incorporarían información futura; y (iv)~sin normalización para los modelos de árboles
-—invariantes a transformaciones monótonas— y con estandarización robusta por característica
+(invariantes a transformaciones monótonas) y con estandarización robusta por característica
 en los modelos profundos.
 
 \paragraph{Funciones de pérdida.} Cada familia entrena contra la pérdida estándar de su
@@ -576,8 +657,8 @@ contra el objetivo económico.
 \paragraph{Hardware y tiempos.} Todo el trabajo corre en una estación de consumo: los
 modelos de árboles y los análisis, en CPU; los modelos profundos, en una única GPU
 (Radeon~RX~6800~XT, 16~GB) mediante ROCm. Como referencia de coste, el \emph{linear probe}
-de MOMENT sobre 40.758 ventanas tarda unos 16~segundos por época en la GPU —la primera
-sube a 38 por el calentamiento— frente a unos 700 en CPU, es decir un factor cercano a
+de MOMENT sobre 40.758 ventanas tarda unos 16~segundos por época en la GPU (la primera
+sube a 38 por el calentamiento) frente a unos 700 en CPU, es decir un factor cercano a
 cuarenta; el ajuste completo de todas las capas ronda los 58~segundos por época. Ningún
 experimento del trabajo exige más de unas horas de cómputo, lo que acota también su coste
 de reproducción (Capítulo~\ref{ch::reproducibilidad}).
@@ -586,14 +667,19 @@ de reproducción (Capítulo~\ref{ch::reproducibilidad}).
 
 Para cada instante $t$ se define el retorno futuro del precio medio a un horizonte $H$,
 \begin{equation}
-\Delta_H(t) = \frac{m_{t+H} - m_t}{m_t},
+\Delta_H (t) = \frac{m_{t+H} - m_t}{m_t},
 \end{equation}
 donde $m_t$ es el precio medio del contrato. La etiqueta direccional se obtiene con un
-umbral $\theta$ que absorbe el \emph{spread}, las comisiones y el ruido:
+umbral $\theta \ll 1$ (en unidades de retorno relativo) que absorbe el \emph{spread}, las
+comisiones y el ruido. Su valor depende del experimento: en la etiqueta de referencia del
+corpus $\theta$ vale 5 puntos básicos ($0{,}0005$), unos $0{,}025$ ticks en la mediana de
+los precios, y su variante económica, que le suma la media horquilla y un margen de 2
+puntos básicos, ronda el medio tick; en los experimentos a horizonte H60 los umbrales
+equivalen a uno o dos ticks (Sección~\ref{sec::eda_corpus}):
 \begin{equation}
 y_t = \begin{cases}
-\textsc{up} & \text{si } \Delta_H(t) > \theta,\\[2pt]
-\textsc{down} & \text{si } \Delta_H(t) < -\theta,\\[2pt]
+\textsc{up} & \text{si } \Delta_H (t) > \theta,\\[2pt]
+\textsc{down} & \text{si } \Delta_H (t) < -\theta,\\[2pt]
 \textsc{flat} & \text{en otro caso.}
 \end{cases}
 \end{equation}
@@ -608,7 +694,7 @@ ello exigiría suponer un tamaño de posición y favorecería la sobreafirmació
 \paragraph{Los dos objetivos del especialista.} El modelo final no usa la etiqueta ternaria,
 sino dos objetivos complementarios, porque un modelo que debe decidir si entra necesita
 saber algo más fino que la dirección: cuánto vale la operación y si el entorno de ejecución
-es favorable (Figura~\ref{fig:doscabezas}).
+es favorable (véase la Figura~\ref{fig:doscabezas}).
 
 \begin{figure}[h]
 \centering
@@ -622,7 +708,7 @@ es favorable (Figura~\ref{fig:doscabezas}).
 \node[io] (x) {36 características\\causales (\emph{no\_clock})};
 \node[head, right=of x, yshift=9mm] (reg) {Regresor EV\\\texttt{exec\_net\_cost\_0p25}};
 \node[head, right=of x, yshift=-11mm] (clf) {Clasificador salud\\\texttt{healthy\_fill\_proxy}};
-\node[dec, right=14mm of $(reg)!0.5!(clf)$] (pol) {Operar si\\EV $>0{,}75$ \emph{y}\\P(salud)$\ge 0{,}50$};
+\node[dec, right=14mm of $(reg.east)!0.5!(clf.east)$, anchor=west] (pol) {Operar si\\EV $>0{,}75$ \emph{y}\\P(salud)$\ge 0{,}50$};
 \draw[-{Latex}] (x.east) -- (reg.west);
 \draw[-{Latex}] (x.east) -- (clf.west);
 \draw[-{Latex}] (reg.east) -- (pol.west);
@@ -644,6 +730,7 @@ deliberada: una operación puede tener alto valor esperado pero baja probabilida
 sano si el libro está degradado.
 
 \subsection{Ingeniería de características}
+\label{sec::features}
 
 El especialista recibe un vector de 36 características, todas calculadas exclusivamente con
 información disponible hasta el instante $t$. Se agrupan en cuatro bloques con una
@@ -665,11 +752,12 @@ calidad del libro (cobertura e indicadores de degradación), que informan de la 
 
 Una decisión deliberada es excluir las variables de reloj (hora, minuto, segundo): el
 conjunto se denomina por ello \emph{no\_clock}. El motivo es evitar que el modelo aprenda
-atajos temporales triviales —por ejemplo, asociar la señal a un instante concreto del día—
+atajos temporales triviales (por ejemplo, asociar la señal a un instante concreto del día)
 que no generalizarían y que, en la práctica, son una forma sutil de sobreajuste. El inventario
 completo se recoge en el Anexo~\ref{anexo:features}.
 
 \subsection{Validación temporal y prevención de fuga}
+\label{sec::validacion}
 
 Una partición aleatoria por filas, habitual en problemas sin estructura temporal, sería aquí
 un error grave: las observaciones contiguas están autocorrelacionadas y un mismo mercado
@@ -699,15 +787,15 @@ Polymarket, el tiempo entre observar la oportunidad y confirmar el emparejamient
 unos 0,43 segundos en el percentil 95 de la muestra válida. Aun así, por prudencia se
 trabaja con cifras peores: una latencia conceptual de un segundo y una latencia observable
 en los datos de dos segundos (la malla de captura). Conviene precisar \emph{dónde} reside esa
-latencia, porque determina qué mejoras son posibles. El cómputo local —desde observar el
-dato hasta emitir la decisión: cálculo de características e inferencia del modelo— se midió en
+latencia, porque determina qué mejoras son posibles. El cómputo local (desde observar el
+dato hasta emitir la decisión: cálculo de características e inferencia del modelo) se midió en
 torno a 25 milisegundos en el percentil 95, una fracción despreciable del ciclo. El grueso
 lo consumen etapas que no dependen del lenguaje de implementación: la construcción y la firma
 criptográfica de la orden, su envío por la red hasta el emparejador de Polymarket y la
 confirmación del emparejamiento. La latencia que anula la señal es, por tanto, un límite de
 red y de microestructura, no de software: reescribir el cálculo en un lenguaje más rápido
-reduciría esos 25 milisegundos a unos pocos, pero dejaría intacto el resto del ciclo —de
-cientos de milisegundos a segundos— sin rescatar la rentabilidad del lado \emph{taker}. Esta
+reduciría esos 25 milisegundos a unos pocos, pero dejaría intacto el resto del ciclo (de
+cientos de milisegundos a segundos) sin rescatar la rentabilidad del lado \emph{taker}. Esta
 observación es, además, una de las razones estructurales del giro al lado \emph{maker}
 (Capítulo~\ref{ch::despliegue}): el creador de mercado pasivo no compite en esta carrera de
 latencia. El coste de ejecución no se fija como un
@@ -717,45 +805,48 @@ coste completo como prueba de estrés. Modelar el coste relativo al libro de cad
 más fiel que asumir un coste fijo e igual para todas las operaciones. Formalmente, el neto
 ejecutado a horizonte $H$ con un factor de coste $c \in \{0,\ 0{,}25,\ 0{,}5,\ 1\}$ es
 \begin{equation}
-\text{net}_c(t) = \big(\Delta^{\text{ticks}}_H(t) - b\big) - c \cdot \kappa_t,
+\text{net}_c(t) = \big(\Delta^{\text{ticks}}_H (t) - b\big) - c \cdot \kappa_t,
 \label{eq:coste}
 \end{equation}
-donde $\Delta^{\text{ticks}}_H(t)$ es el \emph{markout} en ticks desde la entrada (a dos
+donde $\Delta^{\text{ticks}}_H (t)$ es el \emph{markout} en ticks desde la entrada (a dos
 segundos del instante de señal) hasta el horizonte, $b$ es un \emph{buffer} fijo y $\kappa_t$
 es el coste visible de entrada de esa operación. Nótese que, por construcción, un factor de
 coste mayor produce un neto menor sobre la misma operación; por eso el resultado al coste de
 referencia ($c=0{,}5$) es siempre inferior al optimista ($c=0{,}25$) y superior al de estrés
 ($c=1$).
 
-\subsection{Fe de erratas: el régimen de comisiones de 2026}
+\subsection{Corrección del modelo de costes: el régimen de comisiones de 2026}
 \label{sec::fe_erratas_fees}
 
 Durante la fase final del trabajo se detectó un error en el modelo de costes que
 merece documentarse como corrección metodológica explícita, porque su arreglo cambia
-las conclusiones económicas — en la dirección que las refuerza.
+positivamente las conclusiones económicas.
 
 Desde 2026 Polymarket aplica a los mercados de criptomonedas una comisión sobre el
 lado \emph{taker} de la operación, definida en su documentación
 oficial~\cite{polymarket_fees} como
 \begin{equation}
-\text{comisión}(C, p) = C \cdot r \cdot p\,(1-p),
+\text{comisión} (C, p) = C \cdot r \cdot p\,(1-p),
 \label{eq::fee_oficial}
 \end{equation}
 donde $C$ es el número de contratos, $p$ el precio de ejecución y $r=0{,}07$ la tasa
 vigente para cripto. La forma $p\,(1-p)$ hace que la comisión sea máxima en torno a
-$p=0{,}5$ —justo la zona de precios donde opera la mayor parte de este trabajo— y
-decrezca hacia los extremos. La versión implementada originalmente en el código
-calculaba $p\cdot r\cdot\big(p\,(1-p)\big)^{2}$ —elevaba al cuadrado el término
-$p\,(1-p)$ y arrastraba además un factor $p$ adicional—, lo que en torno al precio medio
-subestima el coste real en un factor de aproximadamente ocho: en $p=0{,}5$, la comisión oficial
-es de $1{,}75$ ticks por contrato frente a los $\sim$$0{,}22$ ticks del modelo erróneo
-(Figura~\ref{fig:fees_errata}).
+$p=0{,}5$ (justo la zona de precios donde opera la mayor parte de este trabajo) y
+decrezca hacia los extremos.
+
+La versión implementada originalmente en el código calculaba
+$p\cdot r\cdot\big(p\,(1-p)\big)^{2}$: elevaba al cuadrado el término $p\,(1-p)$ y
+arrastraba además un factor $p$ adicional, lo que en torno al precio medio subestima el
+coste real en un factor de aproximadamente ocho. Como se muestra en la
+Figura~\ref{fig:fees_errata}, en $p=0{,}5$ la comisión oficial es de $1{,}75$ ticks por
+contrato frente a los $\sim$$0{,}22$ ticks de la función de costes anterior.
 
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=0.95\textwidth]{figures/fig_fees_errata.png}
-\caption{Fe de erratas del modelo de costes. Izquierda: comisión oficial de 2026
-($r\,p(1-p)$, $r=0{,}07$) frente a la fórmula implementada originalmente, en ticks por
+\caption{Corrección de la función de costes para su adaptación al modelo oficial de
+costes de 2026. Izquierda: comisión oficial de 2026 ($r\,p (1-p)$, $r=0{,}07$) frente a la
+función de costes anterior, en ticks por
 contrato; en $p=0{,}5$ la diferencia es de un factor ocho ($1{,}75$ frente a
 $\sim$$0{,}22$). Derecha: distribución del precio de entrada del corpus operable de la
 ventana fuera de muestra (n=6.010 operaciones candidatas) superpuesta a la curva
@@ -765,25 +856,25 @@ coste de entrada medio de $1{,}75$ ticks por contrato.}
 \end{figure}
 
 Detectado el error, se corrigió la fórmula en todos los repositorios afectados y se
-re-evaluó la política congelada del especialista —sin reentrenar nada— sobre la misma
-ventana fuera de muestra, reproduciendo primero las cifras publicadas como control de
-integridad (n=754, $+0{,}349$ ticks netos; corte de baja volatilidad n=318,
-$+1{,}069$) y aplicando después la comisión oficial. El resultado se resume en la
-Tabla~\ref{tab::fees_antes_despues}: con el régimen de comisiones de 2026, ningún
-corte \emph{taker} es positivo — ni siquiera en la cota optimista que solo carga la
-comisión de entrada. Las comisiones medias medidas sobre el corpus (1,75 ticks la
+re-evaluó la política congelada del especialista (sin reentrenamiento de los modelos) sobre
+la misma ventana fuera de muestra. Primero se reprodujeron, como control de integridad, las
+cifras reportadas inicialmente en el repositorio con la función de costes anterior (n=754,
+$+0{,}349$ ticks netos; corte de baja volatilidad n=318, $+1{,}069$), y después se aplicó
+la comisión oficial. El resultado se resume en la Tabla~\ref{tab::fees_antes_despues}: con
+el régimen de comisiones de 2026, ningún corte \emph{taker} es positivo, ni siquiera en la
+cota optimista que solo carga la comisión de entrada. Las comisiones medias medidas sobre el corpus (1,75 ticks la
 entrada, 1,71 la salida) superan por sí solas el edge bruto de la señal.
 
 \begin{table}[htbp]
 \centering
 \caption{Re-evaluación de la política congelada con la comisión oficial de 2026.
-Ticks netos medios por operación; «solo entrada» es la cota optimista que omite la
+Ticks netos medios por operación; ``solo entrada'' es la cota optimista que omite la
 comisión de salida.}
 \label{tab::fees_antes_despues}
 \begin{tabular}{lccc}
 \hline
- & & \multicolumn{2}{c}{Fee oficial 2026} \\
-Corte & Publicado (fee errónea) & solo entrada & ida y vuelta \\
+ & Función de costes & \multicolumn{2}{c}{Función de costes oficial 2026} \\
+Corte & anterior & solo entrada & ida y vuelta \\
 \hline
 Todos (n=754) & $+0{,}349$ & $-1{,}059$ & $-3{,}304$ \\
 Baja volatilidad (n=318) & $+1{,}069$ & $-0{,}342$ & $-2{,}604$ \\
@@ -799,9 +890,8 @@ de comisiones de cada mercado entre quienes aportan liquidez, con el mismo peso
 $p\,(1-p)$. La consecuencia para el diseño del trabajo es el giro al lado maker que
 articula el Capítulo~\ref{ch::despliegue}: la señal predictiva conserva su valor,
 pero el vehículo económico viable es cobrar el \emph{spread} y el reembolso, no
-pagarlos. Esta corrección quedó registrada públicamente como fe de erratas antes de
-la evaluación prospectiva, con su propio sello de tiempo
-(Capítulo~\ref{ch::reproducibilidad}).
+pagarlos. Esta corrección quedó registrada en el repositorio público, con su propio sello
+de tiempo, antes de la evaluación prospectiva (Capítulo~\ref{ch::reproducibilidad}).
 
 \subsection{Métricas de evaluación}
 \label{sec::metricas}
@@ -823,10 +913,11 @@ operaciones y de días}, porque un neto sin soporte no es interpretable; (ii) un
 Esta batería evita confundir una señal estadística con una estrategia viable.
 
 \subsection{La escalera de modelos}
+\label{sec::escalera_modelos}
 
 Los modelos se evalúan en una progresión incremental, de menor a mayor complejidad,
 exigiendo en cada salto que la complejidad añadida se justifique con evidencia de mejora
-bajo el mismo protocolo de costes y validación (Figura~\ref{fig:escalera}).
+bajo el mismo protocolo de costes y validación (véase la Figura~\ref{fig:escalera}).
 
 \begin{figure}[h]
 \centering
@@ -835,7 +926,7 @@ bajo el mismo protocolo de costes y validación (Figura~\ref{fig:escalera}).
   node distance=4mm, font=\small, >=Latex,
   rung/.style={draw, rounded corners, align=center, minimum width=0.84\textwidth, minimum height=8mm, inner sep=3pt},
 ]
-\node[rung, fill=blue!6] (s1) {Línea base tabular H16 (acierto $\sim$90\,\%, pero deja de ser rentable con latencia)};
+\node[rung, fill=blue!6] (s1) {Modelos base tabulares H16 (acierto $\sim$90\,\%, pero dejan de ser rentables con latencia)};
 \node[rung, fill=blue!6, below=of s1] (s2) {Modelos sensibles a la latencia (AUC 0,79; política negativa)};
 \node[rung, fill=blue!8, below=of s2] (s3) {Secuencias y libro: GRU, Conv1D (\emph{BookEncoder}), fusión, TCN, auto-atención (representación sí, política no)};
 \node[rung, fill=orange!10, below=of s3] (s4) {Corrección del \emph{score} de selección adversa; selección de horizonte (H60)};
@@ -851,7 +942,7 @@ si no lo hace, se descarta.}
 \paragraph{Modelos sensibles a la latencia.} El primer salto sobre el baseline consiste en
 incorporar la latencia ya en el etiquetado y en la selección, de modo que el modelo aprenda a
 elegir operaciones que sigan siendo rentables \emph{tras} el retardo de entrada. Uno de estos
-modelos alcanza un AUC de test de 0,79 —una capacidad de clasificación notable— y, sin
+modelos alcanza un AUC de test de 0,79 (una capacidad de clasificación notable) y, sin
 embargo, su política económica sigue siendo negativa. La conclusión refuerza la lección
 central: más capacidad de clasificación no implica una política rentable.
 
@@ -862,7 +953,7 @@ representación se evalúan cinco arquitecturas:
 \begin{itemize}[noitemsep]
 \item una red recurrente \textbf{GRU}~\cite{cho2014gru} (capa oculta de dimensión 56) sobre
 la secuencia de características, que modela la dinámica temporal reciente. La GRU es la
-variante recurrente con dos puertas —actualización y reinicio— que deciden cuánto del estado
+variante recurrente con dos puertas (actualización y reinicio) que deciden cuánto del estado
 anterior se conserva en cada paso, lo que mitiga el desvanecimiento del gradiente de las
 recurrentes simples; se prefiere aquí a la LSTM porque logra una capacidad comparable con
 menos parámetros, algo relevante con los pocos miles de casos etiquetados disponibles;
@@ -881,23 +972,23 @@ en mercados poco líquidos;
 común, para aprovechar simultáneamente la dinámica temporal y la estructura del libro;
 \item una red convolucional temporal (\textbf{TCN})~\cite{bai2018tcn} orientada a clasificar
 el régimen de volatilidad de la sesión. Una TCN sustituye la recurrencia por convoluciones
-\emph{causales} —cada salida solo ve el pasado— con dilatación creciente: al duplicar el
+\emph{causales} (cada salida solo ve el pasado) con dilatación creciente: al duplicar el
 salto entre entradas consecutivas en cada capa, el campo receptivo crece de forma
 exponencial con la profundidad, lo que permite cubrir sesiones largas con pocos parámetros
 y entrenar en paralelo, sin la dependencia secuencial de una recurrente;
 \item un codificador con \textbf{auto-atención}~\cite{vaswani2017attention} sobre esa misma
-representación, en dos variantes —atención sobre la última fotografía del libro y sobre la
-secuencia completa—, incorporado para comprobar si el mecanismo que domina la literatura
+representación, en dos variantes (atención sobre la última fotografía del libro y sobre la
+secuencia completa), incorporado para comprobar si el mecanismo que domina la literatura
 reciente de modelos de secuencia cambia el diagnóstico. En la auto-atención cada posición
 de la entrada emite una consulta que se compara con las claves de todas las demás, y su
 representación de salida es la media de los valores ponderada por esa afinidad; el
 mecanismo aprende así qué partes del libro o de la secuencia son relevantes entre sí sin
-imponer una estructura de vecindad fija, a costa de muchos más parámetros —el motivo, como
-se verá, de su sobreajuste aquí.
+imponer una estructura de vecindad fija, a costa de muchos más parámetros (el motivo, como
+se verá, de su sobreajuste aquí).
 \end{itemize}
-Todas estas arquitecturas aprenden representación —obtienen métricas de clasificación y de
+Todas estas arquitecturas aprenden representación (obtienen métricas de clasificación y de
 ordenación razonables, y algunas políticas \emph{proxy} resultan positivas dentro de
-muestra—, pero ninguna produce una política rentable y estable cuando se exige selección
+muestra), pero ninguna produce una política rentable y estable cuando se exige selección
 causal día a día y estabilidad en todo el bloque de test. La
 Tabla~\ref{tab:triaje_profundo} recoge el triaje completo sobre el mismo tensor y el mismo
 protocolo, con las siete variantes entrenadas.
@@ -908,8 +999,8 @@ protocolo, con las siete variantes entrenadas.
 arquitecturas sobre el libro. Todas comparten tensor, protocolo y partición. $\rho$ es la
 correlación de Spearman sobre el bloque terminal. Las dos últimas columnas corresponden a
 la política seleccionada en validación de cada experimento, evaluada sobre los tres días
-del bloque terminal. \textbf{Es triaje exploratorio, no evidencia confirmatoria}: véase la
-advertencia del párrafo siguiente.}
+del bloque terminal. \textbf{Es triaje exploratorio, no evidencia confirmatoria}: véase el apartado
+``Límites del triaje original'' más abajo.}
 \label{tab:triaje_profundo}
 \footnotesize
 \setlength{\tabcolsep}{4.5pt}
@@ -933,10 +1024,10 @@ Fusión, dual               & 34.190 & $0{,}562$ & $0{,}552$ & $+0{,}127$ & --- 
 \end{table}
 
 La tabla dice dos cosas que una cifra suelta no diría. La primera es que \textbf{el AUC de
-validación no separa a estas arquitecturas} —las siete caen entre 0,560 y 0,569— mientras
+validación no separa a estas arquitecturas} (las siete caen entre 0,560 y 0,569) mientras
 que el bloque terminal sí las ordena. La ordenación \emph{fina} dentro de las variantes que
-solo ven el libro no debe leerse de esta tabla: la ampliación de la
-Sección~\ref{sec:ampliacion_triaje} la mide con cinco semillas y muestra que se invierte.
+solo ven el libro no debe leerse de esta tabla: la ampliación con cinco semillas que sigue
+muestra que se invierte.
 
 La segunda es la que decide la elección del candidato final. \textbf{El control tabular,
 con 18.186 parámetros, iguala o supera a todas las variantes que incorporan el libro},
@@ -944,59 +1035,51 @@ incluida la fusión de 42.874. La diferencia no está en el AUC, donde el margen
 sino en la correlación de rangos sobre el bloque terminal: $+0{,}134$ del control frente a
 $+0{,}020$ y $+0{,}065$ de las dos variantes de atención, entre dos y seis veces más. Añadir
 el libro de órdenes como representación profunda no aporta ordenación por encima de la que
-ya extraen las características tabulares. Ese es el motivo medido —y no una preferencia por
-la simplicidad— de que el candidato de la sección siguiente sea un modelo tabular.
+ya extraen las características tabulares. Ese es el motivo medido, y no una preferencia por
+la simplicidad, de que el candidato de la Sección~\ref{sec::especialista} sea un modelo
+tabular.
 
-\paragraph{Qué puede y qué no puede concluirse de este triaje.} La tabla anterior es
-\textbf{exploratoria y así debe leerse}, por cuatro razones que conviene declarar antes de
-que se conviertan en una objeción. Primera: el bloque terminal de este triaje tiene
-\textbf{tres días}, y las políticas evaluadas seleccionan entre 50 y 321 acciones, de modo
-que la diferencia entre «tres días negativos» y «dos» es de un solo día y no soporta ninguna
-lectura fina. Segunda: esa partición se ha reutilizado entre experimentos de esta fase, así
-que no es evidencia fresca en el sentido en que sí lo son los cortes pre-registrados del
-Capítulo~\ref{ch::resultados}. Tercera: cada variante se entrenó con \textbf{una sola semilla} y una única
-configuración de hiperparámetros, sin búsqueda. Ese reparo dejó de ser una conjetura: la
-Sección~\ref{sec:ampliacion_triaje} lo mide, y confirma que la ordenación fina entre las
-variantes del libro no sobrevive a la varianza de inicialización aunque la separación entre
-familias sí. Cuarta: el contexto es de ocho fotogramas, dieciséis segundos, que para un
-mecanismo de atención o una convolución dilatada es un régimen muy corto.
+\paragraph{Límites del triaje original.} La tabla anterior es \textbf{exploratoria y así
+debe leerse}, por cuatro razones que conviene declarar antes de que se conviertan en una
+objeción. Primera: el bloque terminal de este triaje tiene \textbf{tres días}, y las
+políticas evaluadas seleccionan entre 50 y 321 acciones, de modo que la diferencia entre
+``tres días negativos'' y ``dos'' es de un solo día y no soporta ninguna lectura fina.
+Segunda: esa partición se ha reutilizado entre experimentos de esta fase, así que no es
+evidencia fresca en el sentido en que sí lo son los cortes pre-registrados del
+Capítulo~\ref{ch::resultados}. Tercera: cada variante se entrenó con \textbf{una sola
+semilla} y una única configuración de hiperparámetros, sin búsqueda, y la LSTM, la
+arquitectura recurrente de referencia, no estaba en la comparación. Cuarta: el contexto es
+de ocho fotogramas, dieciséis segundos, que para un mecanismo de atención o una convolución
+dilatada es un régimen muy corto. Los dos primeros límites son del diseño y se aceptan; el
+tercero (semilla única y ausencia de la LSTM) se cerró con la ampliación que se describe a
+continuación; el cuarto (el contexto corto) queda abierto aquí y lo mide por su cuenta la
+Adenda~C del Capítulo~\ref{ch::resultados}.
 
-En consecuencia, la afirmación que este trabajo sostiene no es que el aprendizaje profundo
-no sirva en este problema, sino la más estrecha y la única que la evidencia respalda:
-\textbf{en este régimen de datos, con este contexto y este presupuesto de cómputo, ninguna
-de las cinco familias del triaje original se separó del ruido ni superó al control tabular}. La distinción
-importa porque la conclusión económica del trabajo no depende de ella: como se verá, la
-política muere por la estructura de costes y por la latencia, no por falta de capacidad
-predictiva, de modo que un modelo mejor elevaría el AUC pero no el resultado. Por eso el
-aprendizaje profundo se aparca a la espera de un volumen de datos sustancialmente mayor, y
-la Adenda~C del Capítulo~\ref{ch::resultados} mide por su cuenta cuánto haría falta.
-
-\subsubsection{Ampliación del triaje: semillas, LSTM y forecasting moderno}
+\paragraph{Control de reproducción: el triaje no reproduce entre plataformas.}
 \label{sec:ampliacion_triaje}
-
-El triaje anterior tiene dos huecos que su propio párrafo de acotación declara: descansa en
-una sola semilla y omite la LSTM. Ambos se cerraron con una ampliación cuyo protocolo
-—etapas, métricas de cabecera y, sobre todo, \emph{qué se escribiría en la memoria para cada
-resultado posible}— se selló con OpenTimestamps \textbf{antes} de ejecutar nada, con la
-cláusula expresa de que el candidato congelado no se cambiaría ganase lo que ganase cualquier
-modelo nuevo. Se añaden tres arquitecturas: la \textbf{LSTM}, que sustituye la celda
-recurrente del control tabular y cierra el hueco declarado; \textbf{DLinear}, que descompone
-la serie en tendencia y residuo y proyecta cada componente con una capa
-lineal~\cite{zeng2023dlinear}; y \textbf{PatchTST-lite}, parches temporales con atención e
-independencia de canal~\cite{nie2023patchtst}. Las dos últimas son adaptaciones pequeñas al
-tensor y al volumen disponibles, no reproducciones fieles de sus artículos.
-
-\paragraph{Un control previo que cambió el alcance de la comparación.} Antes de nada se
-re-ejecutó el experimento de auto-atención con su \emph{semilla original} en el entorno
-actual. No reproduce: con idénticos datos, código, semilla e hiperparámetros, y cambiando
-solo la plataforma de cómputo, la correlación de rangos de la variante principal pasa de
-$0{,}020$ a $0{,}058$ y su AUC de test de $0{,}514$ a $0{,}522$. \textbf{El ruido de
+El punto de partida de la ampliación, y su motivo principal, fue un control previo: antes de
+añadir nada se re-ejecutó el experimento de auto-atención con su \emph{semilla original} en
+el entorno actual. No reproduce: con idénticos datos, código, semilla e hiperparámetros, y
+cambiando solo la plataforma de cómputo, la correlación de rangos de la variante principal
+pasa de $0{,}020$ a $0{,}058$ y su AUC de test de $0{,}514$ a $0{,}522$. \textbf{El ruido de
 plataforma es, por tanto, del mismo orden que las diferencias que separan a estas
 arquitecturas entre sí}, lo que obliga a leer la Tabla~\ref{tab:triaje_profundo} como una
-foto de su entorno y no como una medición transportable. La ampliación que sigue se ejecutó
-íntegramente en un solo entorno y se interpreta solo dentro de él.
+foto de su entorno y no como una medición transportable. Ese resultado fija el diseño de la
+ampliación: cada variante se entrena con \textbf{cinco semillas}, íntegramente en un solo
+entorno, y se interpreta solo dentro de él, con la comparación pareada por semilla como
+instrumento. El protocolo (etapas, métricas de cabecera y, sobre todo, \emph{qué se
+escribiría en la memoria para cada resultado posible}) se selló con OpenTimestamps
+\textbf{antes} de ejecutar nada, con la cláusula expresa de que el candidato congelado no se
+cambiaría ganase lo que ganase cualquier modelo nuevo.
 
-La Tabla~\ref{tab:ampliacion_semillas} del Anexo~\ref{anexo:soporte} recoge las once
+\paragraph{Ampliación: semillas, LSTM y \emph{forecasting} moderno.} Se añaden tres
+arquitecturas: la \textbf{LSTM}, que sustituye la celda recurrente del control tabular y
+cierra el hueco declarado; \textbf{DLinear}, que descompone la serie en tendencia y residuo
+y proyecta cada componente con una capa lineal~\cite{zeng2023dlinear}; y
+\textbf{PatchTST-lite}, parches temporales con atención e independencia de
+canal~\cite{nie2023patchtst}. Las dos últimas son adaptaciones pequeñas al tensor y al
+volumen disponibles, no reproducciones fieles de sus artículos. La
+Tabla~\ref{tab:ampliacion_semillas} del Anexo~\ref{anexo:soporte} recoge las diez
 variantes con su dispersión entre semillas; aquí se resume lo que decide.
 
 \paragraph{Lo que confirma.} La separación entre las dos familias es \textbf{total}: la peor
@@ -1004,17 +1087,17 @@ de las treinta corridas que incorporan características tabulares ($\rho = 0{,}1
 encima de la mejor de las veinte que solo ven el libro ($\rho = 0{,}066$). En comparación
 pareada por semilla, las cuatro variantes del libro pierden contra el control tabular en las
 \textbf{cinco de cinco} semillas, con diferencias de $-0{,}082$ a $-0{,}106$ frente a errores
-estándar de $0{,}004$ a $0{,}007$. La conclusión que sostenía el triaje original —que añadir
+estándar de $0{,}004$ a $0{,}007$. La conclusión que sostenía el triaje original (que añadir
 el libro como representación profunda no aporta ordenación sobre las características
-tabulares— queda confirmada con un margen que la varianza de inicialización no explica.
+tabulares) queda confirmada con un margen que la varianza de inicialización no explica.
 
 \paragraph{Lo que corrige.} La ordenación \emph{dentro} de la familia del libro se invierte.
 El triaje original leía la auto-atención como el caso más nítido de sobreajuste por
 capacidad; con cinco semillas, la atención queda \textbf{por encima} de la convolución en las
 cinco ($+0{,}024$ de diferencia media). Esa lectura se retira. Lo que sí sobrevive, y en el
-eje correcto, es el patrón de fondo: la columna «Caída» ordena a las arquitecturas casi
-exactamente como la tesis predice —las dos de atención pierden $0{,}050$ de AUC al pasar de
-validación a test, \textbf{cinco veces más que el control tabular}, que pierde $0{,}010$—. La
+eje correcto, es el patrón de fondo: la columna ``Caída'' ordena a las arquitecturas casi
+exactamente como la tesis predice (las dos de atención pierden $0{,}050$ de AUC al pasar de
+validación a test, \textbf{cinco veces más que el control tabular}, que pierde $0{,}010$). La
 capacidad compra ordenación dentro de muestra y la paga fuera de ella; simplemente, la
 comparación que lo demuestra no era la que el triaje original eligió.
 
@@ -1035,12 +1118,23 @@ económica del trabajo: si
 la capacidad no limita, un modelo mejor no habría cambiado el resultado, porque lo que decide
 es el coste de ejecución y no la calidad de la predicción.
 
+\paragraph{Lo que este trabajo sostiene.} La afirmación que se defiende no es que el
+aprendizaje profundo no sirva en este problema, sino la más estrecha y la única que la
+evidencia respalda: \textbf{en este régimen de datos, con este contexto y este presupuesto
+de cómputo, ninguna de las familias evaluadas, ni en el triaje original ni en su ampliación,
+se separó del ruido ni superó al control tabular}. La distinción importa porque la
+conclusión económica del trabajo no depende de ella: como se verá, la política muere por la
+estructura de costes y por la latencia, no por falta de capacidad predictiva, de modo que un
+modelo mejor elevaría el AUC pero no el resultado. Por eso el aprendizaje profundo se aparca
+a la espera de un volumen de datos sustancialmente mayor, y la Adenda~C del
+Capítulo~\ref{ch::resultados} mide por su cuenta cuánto haría falta.
+
 Ninguna de estas corridas modifica el candidato congelado, que estaba sellado antes de que
 existieran, ni ninguna cifra del Capítulo~\ref{ch::resultados}. La cláusula estaba escrita en
 el protocolo antes de conocer los resultados.
 
 Durante la auditoría se detectó y corrigió un error de interpretación en el \emph{score} de
-selección adversa (su orientación correcta es $1 - P(\text{adverso})$), lo que ilustra que
+selección adversa (su orientación correcta es $1 - P (\text{adverso})$), lo que ilustra que
 una métrica positiva no basta sin auditar su significado económico. Por último, al comparar
 horizontes (Tabla~\ref{tab:horizonte}), solo H60 conserva señal; H120 y H240 colapsan, por
 lo que H60 queda como único candidato.
@@ -1060,193 +1154,14 @@ Top 35\,\% test, coste $1{,}0$ & $+0{,}058$ & $-1{,}491$ \\
 \end{tabular}
 \end{table}
 
-\subsection{Cobertura del temario de series temporales}
-
-La Tabla~\ref{tab:cobertura_temario} sitúa el trabajo frente al temario de la asignatura de
-series temporales, módulo a módulo, diciendo también qué no se aplicó y por qué. Un
-método que no encaja con la geometría del problema y se declara vale más que uno forzado.
-
-\begin{table}[htbp]
-\centering
-\caption[Cobertura del temario de series temporales]{Correspondencia entre los cinco módulos
-de la asignatura y su lugar en este trabajo. Las técnicas no ejecutadas se declaran con su
-motivo, no se omiten.}
-\label{tab:cobertura_temario}
-\footnotesize
-\setlength{\tabcolsep}{4pt}
-\begin{tabular}{>{\raggedright\arraybackslash}p{2.1cm}>{\raggedright\arraybackslash}p{4.3cm}>{\raggedright\arraybackslash}p{6.4cm}}
-\toprule
-\textbf{Módulo} & \textbf{Técnicas} & \textbf{Dónde aparece aquí} \\
-\midrule
-I. Introducción & Uni/multivariante, estacionariedad, espaciado, descomposición aditiva &
-Malla uniforme de 2\,s y contrato de latencia; ADF y KPSS; la descomposición
-tendencia--residuo reaparece como modelo (Sección~\ref{sec:ampliacion_triaje}) \\
-\addlinespace
-II. Preprocesado & ETL, datos faltantes, ventanas deslizantes y expandidas, estacionalidad y
-tendencia &
-Recolector y control de calidad por sesión; dato obsoleto e imputación por arrastre;
-validación \emph{walk-forward} \textbf{expansiva} con purga y embargo; Holt-Winters sobre la
-actividad \\
-\addlinespace
-III. Predicción & Persistencia, SMA, suavizado exponencial, ARIMA/SARIMA, Prophet, VAR,
-modelos de ML, LSTM, Transformer, fundacional &
-Escalera de la Sección~\ref{sec::escalera}: \emph{naive-drift}, Holt, ARIMA(1,1,1), kNN-DTW y
-MOMENT en tres regímenes; el ML es el \emph{gradient boosting} del candidato; LSTM y
-Transformer en la Sección~\ref{sec:ampliacion_triaje}. \textbf{No ejecutados:} SMA, Prophet,
-VAR \\
-\addlinespace
-IV. Supervisado & Similitud (DTW), características (TSFresh), diccionarios (SFA/BOSS),
-convolución &
-kNN-DTW con separación temporal estricta; la rama convolucional, en el BookEncoder y la TCN.
-\textbf{No ejecutados:} TSFresh y BOSS \\
-\addlinespace
-V. No supervisado & Clustering, detección de anomalías, segmentación, aprendizaje de
-representaciones &
-Agrupamiento congelado del \emph{gate} de regímenes; el BookEncoder como representación
-aprendida. \textbf{No ejecutados:} anomalías y segmentación \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-\paragraph{Por qué no se ejecutaron los cinco métodos restantes.} Las razones son de encaje,
-y las tres primeras comparten una: a esta escala la serie de precio está inmóvil en la
-inmensa mayoría de los pasos. La \textbf{media móvil simple} queda dominada por construcción
-por el persistente, que ya es el mejor de los baselines clásicos sobre una serie que no se
-mueve. \textbf{Prophet} está diseñado para series de negocio con estacionalidad de calendario
-y efectos de festivos; aquí el horizonte son segundos dentro de una sesión de una hora y no
-hay componente de calendario que modelar —el propio Holt-Winters, probado donde sí tiene
-sentido, solo aporta sobre la \emph{actividad} agregada y no sobre el precio—. La
-\textbf{autorregresión vectorial} respondería a la pregunta multivariante de si el contrato
-incorpora con retardo la información del subyacente; esa pregunta se ataca directamente y con
-más potencia mediante la correlación cruzada a quince desfases entre el perpetuo y el
-contrato, que es el tercero de los caminos del Capítulo~\ref{ch::conclusiones}, de modo que un
-VAR sería una segunda medición de lo ya medido.
-
-Las dos restantes chocan con la geometría de la tarea. \textbf{TSFresh} y los métodos de
-\textbf{diccionario} (SFA/BOSS) caracterizan series completas para clasificarlas, y aquí el
-punto de decisión es un instante concreto con quince segundos de contexto previo: no hay
-serie que caracterizar en el momento en que la política decide, que es la misma limitación
-—la tarea exige más fotogramas de los que el mercado mediano ofrece— que mide la Adenda~C.
-Por lo mismo, la \textbf{detección de anomalías} y la \textbf{segmentación} resuelven
-problemas que este trabajo no plantea: no se busca un suceso raro ni el punto de cambio de
-un régimen, sino el signo del movimiento en un horizonte fijo. La pieza del módulo que sí
-aplica —agrupar sesiones por régimen de volatilidad— está usada, y como \emph{gate}
-pre-registrado.
-
-\subsection{Peldaños de la asignatura: baselines clásicos, kNN-DTW y MOMENT}
-\label{sec::escalera}
-
-Para situar al especialista y responder de forma explícita a las técnicas de la
-asignatura de series temporales, se evalúa una escalera de modelos de referencia sobre
-un mismo problema controlado: predecir la dirección del precio medio a horizonte H60
-(60 pasos de 2\,s) en la foto de apertura$-45$\,s de cada mercado, con la misma capa
-económica (comisión taker oficial). El conjunto de evaluación son 906 casos congelados;
-cada modelo produce una señal de signo y se reporta su acierto direccional y su
-resultado bruto en ticks. Conviene subrayar que estos baselines usan un universo más
-amplio que el especialista final —no aplican su filtro estricto de tradabilidad—, de
-modo que la comparación con la cifra sellada del especialista es de contexto, no
-cabeza a cabeza.
-
-\paragraph{Qué declaran estos métodos en sus \emph{benchmarks} y qué se obtiene aquí.}
-La comparación con las cifras publicadas es parte de la pregunta. DeepLOB declara un F1
-del 83,4\,\% prediciendo la dirección a horizonte corto en FI-2010, un conjunto de
-acciones nórdicas de alta liquidez~\cite{zhang2019deeplob}; MOMENT declara resultados
-\emph{zero-shot} competitivos con modelos ajustados en sus colecciones de series de largo
-horizonte~\cite{goswami2024moment}. Nada de eso se reproduce en este corpus, y la
-diferencia no es un fallo de implementación sino de régimen: FI-2010 etiqueta movimientos
-sobre un subyacente que se mueve casi siempre, mientras que aquí el precio queda inmóvil
-en la mayoría de los pasos de dos segundos (Sección~\ref{sec::grano_temporal}), la señal
-útil vive a horizontes donde la comisión oficial de 2026 consume el margen, y la
-geometría contexto–horizonte excluye a la mayor parte de los mercados cortos. Este
-contraste —métodos que rinden donde fueron diseñados y no aquí— es precisamente lo que
-la comparación debe hacer visible, y anticipa la conclusión económica del
-Capítulo~\ref{ch::resultados}.
-
-Los baselines clásicos se ajustan por serie sobre el tramo pre-señal, sin información
-futura. El \textbf{naive-drift} (signo de la deriva reciente) y el \textbf{ARIMA(1,1,1)}
-son los más informativos; el \textbf{suavizado exponencial de Holt} queda por detrás, y
-el \textbf{kNN con distancia DTW} —biblioteca de mayo, consultas de junio, con
-separación temporal estricta— no supera a la deriva simple. Como demostración de
-forecasting estacional donde tiene sentido, un modelo de Holt-Winters sobre la actividad
-agregada mejora un 2,7\,\% el error del persistente; a horizonte de segundos sobre el
-precio, en cambio, el componente estacional no aporta.
-
-El peldaño fundacional es \textbf{MOMENT-1-small}, evaluado en tres regímenes de
-adaptación crecientes: \emph{zero-shot} (reconstrucción con la cola enmascarada, sin
-entrenar), \emph{linear-probing} (solo la cabeza de predicción, backbone congelado) y
-\emph{fine-tuning completo} (todo el modelo, entrenado en GPU). El entrenamiento usa
-ventanas del propio corpus muestreadas fuera de los casos de evaluación —con un margen
-de exclusión que garantiza que entrenamiento y evaluación no comparten ni un frame— y
-restringidas al mismo régimen de actividad que el corte de evaluación (Sección
-\ref{sec::eda_series}). La Tabla~\ref{tab::escalera} recoge el resultado.
-
-\begin{table}[htbp]
-\centering
-\caption[Escalera de modelos de referencia]{Escalera de modelos de referencia sobre el
-conjunto de 906 casos congelados (H60, comisión taker oficial). La columna $n$ es el
-soporte real de cada modelo: los baselines clásicos solo emiten señal donde su criterio
-interno lo permite, de modo que sus aciertos \emph{no} son comparables cabeza a cabeza
-entre sí ni con MOMENT —que responde en los 906—; el ejemplo extremo es ARIMA, cuyo
-56,5\,\% descansa en el 18\,\% de los casos. El neto taker es negativo en todos los
-casos por el régimen de comisiones de 2026.}
-\label{tab::escalera}
-\begin{tabular}{lrcc}
-\toprule
-Modelo & $n$ & Acierto direccional & Bruto (ticks) \\
-\midrule
-ARIMA(1,1,1) & 161 & 56,5\,\% & $+0{,}621$ \\
-naive-drift & 467 & 53,1\,\% & $+1{,}186$ \\
-Holt (suavizado exponencial) & 902 & 48,4\,\% & $+0{,}516$ \\
-\textbf{MOMENT fine-tuning completo} & 906 & \textbf{47,3\,\%} & $+0{,}082$ \\
-MOMENT linear-probing & 906 & 46,6\,\% & $-0{,}175$ \\
-MOMENT zero-shot & 906 & 45,5\,\% & $-0{,}585$ \\
-kNN-DTW & 232 & 45,3\,\% & $-0{,}209$ \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-De esta escalera se extraen dos lecturas. La primera es que la adaptación del
-fundacional \emph{ayuda de forma monótona}: cada régimen mejora al anterior, tanto en
-acierto como en resultado bruto (zero-shot $\to$ linear-probing $\to$ fine-tuning
-completo), lo que confirma que el modelo capta algo de la estructura local al
-especializarse; los tres regímenes responden sobre los mismos 906 casos, así que esta
-comparación sí es cabeza a cabeza. La segunda, más importante, es que \emph{ni siquiera
-el fine-tuning completo supera a los baselines clásicos}: Holt, que responde en 902 de
-los 906 casos —soporte casi idéntico—, lo supera ligeramente con una fracción del coste
-computacional, y naive-drift y ARIMA se sitúan por encima aunque sobre soportes menores
-(467 y 161 casos donde su criterio interno emite señal), de modo que su ventaja debe
-leerse con la cautela que la columna $n$ impone. El fundacional de series temporales, la
-herramienta más sofisticada de la escalera, no es en ningún caso la más precisa.
-
-Cabe preguntarse si el fundacional mejoraría con más datos. La
-Figura~\ref{fig::escalado} responde con una curva de escalado: se re-entrena el
-linear-probing sobre subconjuntos crecientes de ventanas (de 2.700 a 40.500) y se evalúa
-cada uno sobre los mismos casos congelados. La curva es esencialmente plana —el acierto
-oscila entre el 43,9 y el 46,8\,\% sin tendencia clara al alza— y se mantiene por debajo del
-baseline clásico en todo el rango. La conclusión es que el cuello de botella no es la
-cantidad de datos de entrenamiento ni la capacidad del modelo, sino el régimen de datos:
-a horizonte de 2 segundos, el precio medio de estos mercados apenas contiene estructura
-direccional explotable por encima de la deriva, con independencia de la sofisticación
-del modelo. Es la misma lección que atraviesa el trabajo —predecir es difícil, y donde
-se puede, no basta— reforzada ahora desde el lado del modelado.
-
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=0.78\textwidth]{figures/fig_moment_scaling.png}
-\caption{Curva de escalado del fine-tuning de MOMENT (linear-probing) frente al número
-de ventanas de entrenamiento, evaluada sobre los 906 casos congelados. Más datos no
-cierran la brecha con la deriva simple: el techo lo marca el régimen de datos, no el
-tamaño de la muestra.}
-\label{fig::escalado}
-\end{figure}
-
 \subsection{Especialista \emph{prestart} H60}
+\label{sec::especialista}
 
 El candidato final es un especialista para la ventana \emph{prestart}: un modelo de
 \emph{gradient boosting} sobre histogramas (HistGradientBoosting) con las dos cabezas
 descritas, entrenado sobre 36 características sin variables de reloj (para evitar atajos
 temporales triviales). La señal se restringe a la ventana de $-60$ a $-45$ segundos respecto
-a la apertura, con libro saludable y coste visible acotado (Figura~\ref{fig:prestart}).
+a la apertura, con libro saludable y coste visible acotado (véase la Figura~\ref{fig:prestart}).
 
 \begin{figure}[h]
 \centering
@@ -1271,7 +1186,7 @@ configuración de regularización agresiva (tasa de aprendizaje 0,045, hasta 220
 con parada anticipada, máximo de 15 hojas por árbol, mínimo de 120 muestras por hoja y
 regularización L2 de 0,10), necesaria porque, aunque el bloque de entrenamiento del especialista
 tiene 28.095 filas, estas pertenecen a solo unas 1.400 sesiones independientes, y es ese
-número —no el de filas— el que gobierna la varianza efectiva. La política congelada opera cuando el valor
+número (no el de filas) el que gobierna la varianza efectiva. La política congelada opera cuando el valor
 esperado predicho supera 0,75 y la probabilidad de salud no baja de 0,50; ambos umbrales se
 seleccionaron sobre el conjunto de validación, nunca sobre el test terminal.
 
@@ -1287,57 +1202,57 @@ nuevo bloque. Por esa razón, el resultado filtrado no se considera una segunda 
 fuera de muestra, sino un análisis \emph{post-hoc} que genera una hipótesis para validación
 prospectiva.
 
-\subsection{Brazos de \emph{gate} pre-registrados: estático, GARCH y clustering de regímenes}
-\label{sec::brazos_gate}
+\subsection{Variantes de filtro de régimen pre-registradas: estática, GARCH y clustering de regímenes}
+\label{sec::variantes_gate}
 
 El filtro de volatilidad anterior es una hipótesis \emph{post-hoc}, y como tal no puede
 validarse sobre los mismos días que la inspiraron. Para convertirla en una prueba honesta,
-el pre-registro compromete por adelantado \emph{tres} brazos de \emph{gate} de régimen,
-cada uno con sus parámetros fijados antes de mirar la ventana de evaluación, que se
-evalúan en paralelo sobre la misma selección de señales. Los tres atacan la misma pregunta
-—operar solo cuando el régimen se parece a aquel en el que el modelo fue entrenado— por
+el pre-registro compromete por adelantado \emph{tres} variantes de filtro de régimen,
+cada una con sus parámetros fijados antes de mirar la ventana de evaluación, que se
+evalúan en paralelo sobre la misma selección de señales. Las tres atacan la misma pregunta
+(operar solo cuando el régimen se parece a aquel en el que el modelo fue entrenado) por
 vías de sofisticación creciente.
 
-\paragraph{Brazo estático.} El filtro heredado: operar solo si la volatilidad realizada
+\paragraph{Variante estática.} El filtro heredado: operar solo si la volatilidad realizada
 del perpetuo a 5 segundos no supera $0{,}6657$, el percentil 80 de la volatilidad de
 entrenamiento. Es un umbral fijo sobre una única variable; su versión de junio se reporta
 como diagnóstico, nunca como confirmación.
 
-\paragraph{Brazo GARCH.} Un modelo GARCH(1,1) con media constante sobre los retornos
+\paragraph{Variante GARCH.} Un modelo GARCH(1,1) con media constante sobre los retornos
 logarítmicos a un minuto del precio del perpetuo (en puntos básicos), ajustado
-\emph{exclusivamente} con datos hasta el 31 de mayo (13.036 observaciones). El \emph{gate}
+\emph{exclusivamente} con datos hasta el 31 de mayo (13.036 observaciones). El filtro de régimen
 opera cuando la volatilidad condicional a un paso $\hat{\sigma}_t$ no supera $4{,}531$
 puntos básicos, el percentil 80 dentro de muestra. Los parámetros quedaron congelados
 ($\mu=0{,}0358$, $\omega=0{,}391$, $\alpha_1=0{,}0908$, $\beta_1=0{,}892$) con su resumen
-SHA-256 en el pre-registro. Frente al brazo estático, el GARCH sustituye un umbral fijo por
+SHA-256 en el pre-registro. Frente a la variante estática, el GARCH sustituye un umbral fijo por
 una estimación dinámica de la volatilidad que se actualiza sesión a sesión, pero sin
 reajustar nada tras el corte de mayo.
 
-\paragraph{Brazo de clustering de regímenes.} Un modelo no supervisado (KMeans con
+\paragraph{Variante de clustering de regímenes.} Un modelo no supervisado (KMeans con
 $k$ elegido por silueta, sobre características causales del tramo pre-apertura
-—volatilidad realizada, volumen, \emph{spread}, actividad y rango— normalizadas de forma
+(volatilidad realizada, volumen, \emph{spread}, actividad y rango) normalizadas de forma
 robusta) entrenado solo con datos anteriores a julio. La solución retenida es $k=2$
-(silueta $0{,}31$): un régimen «tranquilo» (volatilidad $\approx 5{,}8$ bps) y otro
-«agitado» ($\approx 13{,}0$ bps, con más \emph{spread} y volumen). A diferencia de los dos
+(silueta $0{,}31$): un régimen ``tranquilo'' (volatilidad $\approx 5{,}8$ bps) y otro
+``agitado'' ($\approx 13{,}0$ bps, con más \emph{spread} y volumen). A diferencia de los dos
 anteriores, no impone un umbral sobre una variable elegida a mano, sino que deja que los
 datos definan los regímenes; su artefacto se sella como adenda del pre-registro antes del
 primer corte prospectivo. Un hallazgo del cruce con la vía maker matiza su interpretación:
 el régimen agitado, que perjudica al lado taker, resulta \emph{más} rentable para el maker
-—el mismo flujo que estorbaba a uno alimenta al otro—, lo que lo señala como candidato a
-\emph{gate} de la política maker, no solo de la taker.
+(el mismo flujo que estorbaba a uno alimenta al otro), lo que lo señala como candidato a
+filtro de régimen de la política maker, no solo de la taker.
 
-\paragraph{Capas de reporte.} Sobre la selección de cada brazo se reportan, declaradas por
-adelantado, las capas de la Sección~\ref{sec::fe_erratas_fees}: la comparabilidad histórica
-(net@0,5), la capa \emph{taker} con la comisión oficial de 2026 —cuya expectativa negativa
-se compromete antes de mirar los datos— y la capa \emph{maker} simulada, cuando el
-simulador de colas y fills la produzca. La combinación de tres brazos pre-comprometidos y
-tres capas publicadas en su totalidad es lo que impide que la elección \emph{a posteriori}
+\paragraph{Niveles de coste.} Sobre la selección de cada variante se reportan, declarados
+por adelantado, los niveles de coste de la Sección~\ref{sec::fe_erratas_fees}: la
+comparabilidad histórica (net@0,5), el nivel \emph{taker} con la comisión oficial de 2026
+(cuya expectativa negativa se compromete antes de mirar los datos) y el nivel \emph{maker}
+simulado, cuando el simulador de colas y fills lo produzca. La combinación de tres variantes
+pre-comprometidas y tres niveles publicados en su totalidad es lo que impide que la elección \emph{a posteriori}
 del mejor resultado infle las conclusiones.
 
 \subsection{Protocolo de congelación}
 \label{sec:congelacion}
 
-El especialista base —modelo, conjunto de características y umbrales EV/salud— se congeló
+El especialista base (modelo, conjunto de características y umbrales EV/salud) se congeló
 antes de observar el conjunto fuera de muestra del 6 al 10 de junio. Su evaluación sin filtro
 constituye, por ello, la prueba fuera de muestra genuina y previene el sobreajuste por
 selección múltiple~\cite{bailey2014deflated}. El filtro de volatilidad queda fuera de esa
@@ -1349,7 +1264,7 @@ bloque y solo podrá validarse con observaciones posteriores al 10 de junio.
 
 Un censo de las funciones de pérdida empleadas a lo largo de este trabajo revela un patrón
 que ningún experimento aislado hacía visible: entropía cruzada binaria, error absoluto y
-QLIKE —todas pérdidas estadísticas—. En los veintiséis programas que entrenan un modelo
+QLIKE (todas pérdidas estadísticas). En los veintiséis programas que entrenan un modelo
 profundo, la decisión económica se tomó siempre \emph{después}, aplicando un umbral sobre
 una probabilidad. Nunca se entrenó nada directamente contra el dinero, pese a que el
 planteamiento inicial del trabajo contemplaba funciones de pérdida que penalizasen la
@@ -1362,7 +1277,7 @@ duplicar el tamaño de orden de 50 a 100 acciones solo multiplica el volumen cas
 100 y 200 acciones), de modo que el beneficio no es una función tratable del tamaño y una
 política de \emph{sizing} exigiría un simulador diferenciable. La decisión de
 \emph{retirada}, en cambio, sí lo es, y de forma exacta: el parámetro de aplanado
-—«dejar de cotizar en los últimos $k$ fotogramas»— se simuló para ocho valores de $k$, de
+(``dejar de cotizar en los últimos $k$ fotogramas'') se simuló para ocho valores de $k$, de
 modo que se conoce el \emph{contrafactual completo} de cada sesión: cuánto habría ganado
 con cada acción posible. El beneficio esperado de una política estocástica
 $\pi_\theta$ es entonces $\mathbb{E}[\text{P\&L}] = \sum_k \pi_k(\theta)\,e_k$, exacto y
@@ -1375,5 +1290,5 @@ de riesgo del pre-registro escrita como objetivo: maximizar la media diaria meno
 $\lambda$ veces la desviación a la baja (Sortino), agregada por día. Se comparan una
 variante tabular (resúmenes de la trayectoria) y una secuencial (codificador convolucional
 dilatado), con $\lambda$ elegido en validación. El carácter de esta línea es exploratorio
-—los treinta y cinco días del corte ya habían sido observados por los barridos previos— y
+(los treinta y cinco días del corte ya habían sido observados por los barridos previos) y
 sus resultados se reportan en el Capítulo~\ref{ch::resultados} con esa etiqueta.

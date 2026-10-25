@@ -1,5 +1,6 @@
 # Polymarket BTC — short-horizon microstructure and prediction
 
+[![tests](https://github.com/marcmaldonadolorca/polymarket-btc-microstructure/actions/workflows/tests.yml/badge.svg)](https://github.com/marcmaldonadolorca/polymarket-btc-microstructure/actions/workflows/tests.yml)
 
 > Master's thesis (MSc in Deep Learning, UPM, 2025/26), **graded 10/10**.
 > Author: **Marc Maldonado Lorca**.
@@ -193,7 +194,9 @@ It is also available as a notebook in
 The notebooks guide is in `notebooks/README.md`.
 
 Unit tests cover the frozen policy thresholds, the decision gates and the cost model
-(`src/edgerunner/`). They need only numpy, pandas and PyYAML:
+(`src/edgerunner/`). They need only numpy, pandas and PyYAML, and GitHub Actions runs them
+together with the ledger check on every push
+([`.github/workflows/tests.yml`](.github/workflows/tests.yml)):
 
 ```bash
 pip install numpy==2.4.1 pandas==3.0.2 pyyaml pytest -e .

@@ -1,0 +1,27 @@
+name: tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      # Only what the tests and the ledger audit import: neither needs torch, Jupyter or the
+      # private corpus, so the full requirements.txt is not installed here.
+      - name: Install test dependencies
+        run: pip install numpy==2.4.1 pandas==3.0.2 pyyaml==6.0.3 pytest==8.4.2 -e .
+
+      - name: Unit tests (frozen policy, gates, cost model)
+        run: pytest -q tests/
+
+      - name: Recompute the thesis' final numbers from the public ledger
+        run: python scripts/experiments/recompute_final_summary_from_public_ledger.py --check

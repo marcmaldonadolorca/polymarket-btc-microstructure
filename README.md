@@ -1,12 +1,39 @@
 # Polymarket BTC — short-horizon microstructure and prediction
 
-> Master's thesis (MSc in Deep Learning, UPM, 2025/26).
+
+> Master's thesis (MSc in Deep Learning, UPM, 2025/26), **graded 10/10**.
 > Author: **Marc Maldonado Lorca**.
 >
 > This repository accompanies the thesis. It documents a full methodology for
 > data capture, temporal validation and cost control for BTC markets on
 > Polymarket, and the **model ladder** that runs from a tabular baseline to a
 > frozen specialist and a subsequent regime-change diagnosis.
+
+## TL;DR
+
+- **Data engineering on my own infrastructure.** A collector I wrote has run 24/7 for months on a
+  Raspberry Pi: it polls Polymarket's public order-book and market-catalogue APIs, adds Bitcoin
+  spot, perpetual-futures and oracle references, aligns everything on a fixed 2-second grid and
+  applies per-session quality control before writing to SQLite. **372 GB in the thesis cut
+  (17 Aug 2026)**. See the [architecture diagram](#capture-and-data-architecture).
+- **An honest ML result.** A tabular baseline calls the price direction right ~90% of the time
+  (90.1% over 578 actions in 4 temporal folds) and still loses money: with a realistic 2 s entry
+  latency, net on the terminal test drops from +6.79 (zero latency) to **−1.48 ticks per action**. Sequence
+  models over the order book (GRU, Conv1D, TCN, fusion) learned representations, not a better
+  policy. Cost and latency decide, not accuracy.
+- **Evaluation discipline.** Strictly temporal splits; a specialist frozen before it saw 5
+  untouched days (+0.349 ticks per action, 754 actions, 3/5 positive days); post-hoc analysis
+  labelled as such; the evaluation protocol pre-registered with a timestamp on the Bitcoin
+  blockchain.
+- **Auditable in one command, without the private corpus** (also runs in CI):
+
+  ```bash
+  python scripts/experiments/recompute_final_summary_from_public_ledger.py --check
+  # Base OOS @0.5: n=754, mean=+0.349
+  # Low-vol post-hoc @0.5: n=318, mean=+1.069
+  # Market-cluster IC90: [+0.193, +2.004]
+  # Public ledger check: OK
+  ```
 
 ## What it is and what it isn't
 
@@ -71,6 +98,50 @@ these numbers. Only later dates can validate it (see
 [`config/frozen_policy_thresholds.yaml`](config/frozen_policy_thresholds.yaml)).
 
 
+## Capture and data architecture
+
+What the collector does, as described in the thesis (Chapter 3, *Sistema de captura
+multifuente*) and in the published schema ([`sql/core_training_base.sql`](sql/core_training_base.sql),
+[`docs/01_sistema_de_datos.md`](docs/01_sistema_de_datos.md)). The collector's own code is
+**not published**: it is coupled to the private host it runs on, and Chapter 7 (*El recolector,
+y por qué no se publica*) explains why. The schema, the processing pipeline and an anonymised
+ledger are.
+
+```mermaid
+flowchart TB
+    subgraph SRC["Public read-only sources, no authentication"]
+        GAMMA["Polymarket catalogue API (gamma-api)<br/>live BTC markets, token ids, window, tick size, fees"]
+        CLOB["Polymarket order-book API (clob)<br/>full L2 book + executed trades per token"]
+        EXT["Bitcoin references<br/>Binance spot, Binance perpetual, Chainlink oracle"]
+    end
+
+    subgraph PI["Raspberry Pi, 24/7: collector (private)"]
+        POLL["Periodic polling<br/>each response stamped with server and local receive time"]
+        GRID["Alignment on a fixed 2 s grid<br/>unit = session x token x t"]
+        QA["Per-session quality control<br/>coverage, continuity, gaps, startup latency,<br/>tradability; core / non-core tier"]
+    end
+
+    DB[("SQLite source of truth<br/>sessions, cross-venue features (94 cols), labels,<br/>market metadata, tradability<br/>372 GB in the thesis cut")]
+
+    subgraph REPO["This repository"]
+        SQL["sql/core_training_base.sql<br/>core tier, coverage >= 0.97, quality >= 70, no severe gaps"]
+        EXP["scripts/experiments/ + src/edgerunner/<br/>baselines, latency stress, GRU / Conv1D / TCN,<br/>frozen HGB specialist (deep models on a local GPU, ROCm)"]
+        LEDGER["results/final_candidate_actions_anonymized.csv<br/>754 out-of-sample actions, hashed ids"]
+        CHECK["recompute_final_summary_from_public_ledger.py --check<br/>(CI)"]
+    end
+
+    GAMMA --> POLL
+    CLOB --> POLL
+    POLL --> GRID
+    EXT --> GRID
+    GRID --> QA --> DB
+    DB --> SQL --> EXP --> LEDGER --> CHECK
+```
+
+The order-book API returns only the current book, not its history, so the corpus cannot be
+re-downloaded: it exists because it was observed live. That is why it is not reproducible from a
+script and why the public audit path goes through the anonymised ledger.
+
 ## Repository structure
 
 ```text
@@ -95,20 +166,21 @@ pip install -r requirements.txt
 
 The scripts in `scripts/experiments/` are the arc's entrypoints. By design they
 expect to run from the repository root (they resolve relative paths). The full
-dataset (~2.6M cross-venue rows and the SQLite source) is **not published** due
-to size. The repository includes the schema (`sql/`), the code and an anonymized
+dataset (~2.6M cross-venue feature rows for the modelling arc, and the collector's
+SQLite source, 372 GB by the 17 Aug 2026 cut) is **not published** due to size. The repository includes the schema (`sql/`), the code and an anonymized
 ledger of 754 units in `results/final_candidate_actions_anonymized.csv`, enough
 to recompute the final tables and the clustered uncertainty. Full training is not
 reproducible without the private corpus and is declared as a limitation.
 
-Key documents to understand the pipeline, in order:
+Key documents to understand the pipeline, in order (written in Spanish):
 `docs/01_sistema_de_datos.md` -> `docs/04_splits_validacion_temporal.md` ->
 `docs/07_stress_de_latencia.md` -> `docs/14_especialista_prestart_h60.md` ->
 `docs/16_validacion_fresh.md` -> `docs/18_paper_shadow.md`.
 
-The reading guide for `docs/` is in `docs/README.md`: it explains which documents
-are canonical, which internal artifacts are not published and how to audit the
-final numbers.
+The reading guide for `docs/` is [`docs/README.md`](docs/README.md), which opens with an
+**English summary** of what each canonical document covers, which internal artifacts are not
+published and how to audit the final numbers. The thesis itself
+([`reports/memoria.pdf`](reports/memoria.pdf)) is in Spanish with an English abstract.
 
 The final audit does not need the private corpus:
 
@@ -119,6 +191,14 @@ python scripts/experiments/recompute_final_summary_from_public_ledger.py --check
 It is also available as a notebook in
 `notebooks/08_auditoria_final_ledger.ipynb`.
 The notebooks guide is in `notebooks/README.md`.
+
+Unit tests cover the frozen policy thresholds, the decision gates and the cost model
+(`src/edgerunner/`). They need only numpy, pandas and PyYAML:
+
+```bash
+pip install numpy==2.4.1 pandas==3.0.2 pyyaml pytest -e .
+pytest -q tests/
+```
 
 ## Status and future work
 
